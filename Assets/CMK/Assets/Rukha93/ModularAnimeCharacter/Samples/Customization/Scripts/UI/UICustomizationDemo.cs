@@ -232,6 +232,10 @@ namespace Rukha93.ModularAnimeCharacter.Customization.UI
             OnChangeItem?.Invoke(CurrentCategory, m_ItemOptions[m_CurrentItemIndex]);
         }
 
+        private void _OnSaveData()
+        {
+
+        }
         #endregion
     }
 }

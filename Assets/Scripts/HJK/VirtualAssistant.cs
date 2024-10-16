@@ -1,8 +1,8 @@
 using System;
 using System.IO;
+using Newtonsoft.Json;
 using UnityEngine;
 using WebSocketSharp;
-using Newtonsoft.Json;
 
 public class VirtualAssistant : MonoBehaviour
 {
@@ -74,6 +74,7 @@ public class VirtualAssistant : MonoBehaviour
             byte[] audioData = Convert.FromBase64String(responseObj.item.content[0].audio);
             PlayAudio(audioData);
         }
+        
     }
 
     // 마이크로 음성 입력 시작
@@ -114,9 +115,10 @@ public class VirtualAssistant : MonoBehaviour
                 }
             }
         };
-
+        
         string jsonMessage = JsonConvert.SerializeObject(eventObj);
         ws.Send(jsonMessage);
+        
     }
 
     // AI 응답 음성 재생
