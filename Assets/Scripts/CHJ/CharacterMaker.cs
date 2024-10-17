@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class CharacterMaker : MonoBehaviour
 {
@@ -39,6 +40,8 @@ public class CharacterMaker : MonoBehaviour
             femaleCustomMgr.SetCustomizingIdx(0);
             currentCustomizeManager = femaleCustomMgr;
         }
+
+
     }
 
     public void SetCustomizingIdx(int idx)
@@ -63,7 +66,8 @@ public class CharacterMaker : MonoBehaviour
         data.customizingIdx = currentCustomizeManager.GetCustomizingIdx();
 
         DatabaseManager.Instance.SaveData(data);
-        //todo: dataManager¿Í ¿¬°á
+
+        SceneManager.LoadScene(2);
     }
 }
 
