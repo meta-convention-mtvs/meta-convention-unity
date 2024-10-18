@@ -18,6 +18,7 @@ public class CharacterMaker : MonoBehaviour
     private void Start()
     {
         currentCustomizeManager = maleCustomMgr;
+        currentCustomizeManager.SetCustomizingIdx(0);
         ui_cm.OnPrevClick += IncCustomizingIdx;
         ui_cm.OnNextClick += DecCustomizingIdx;
         ui_cm.OnSaveClick += SaveCharacterInfo;
@@ -66,8 +67,6 @@ public class CharacterMaker : MonoBehaviour
         data.customizingIdx = currentCustomizeManager.GetCustomizingIdx();
 
         DatabaseManager.Instance.SaveData(data);
-
-        SceneManager.LoadScene(2);
     }
 }
 
