@@ -5,8 +5,8 @@ using System;
 
 public class ChatManager : MonoBehaviour
 {
-    public TMP_InputField chatInputField;  // TextMeshPro 입력 필드
-    public TextMeshProUGUI chatDisplay;    // TextMeshPro 텍스트 컴포넌트
+    public InputField chatInputField;  // Legacy 입력 필드
+    public Text chatDisplay;    // Legacy 텍스트 컴포넌트
     public AIWebSocket aiWebSocket;         // WebSocket 연결 스크립트 참조
 
     void Start()
@@ -42,18 +42,29 @@ public class ChatManager : MonoBehaviour
 
     public void OnSendChat()
     {
+        // AIWebSocket이 설정되지 않았는지 확인
         if (aiWebSocket == null)
         {
             Debug.LogError("AIWebSocket이 설정되지 않았습니다.");
             return;
         }
 
+        // 사용자 메시지 가져오기
         string userMessage = chatInputField.text;
+        
+        // 메시지가 비어있지 않은 경우에만 처리
         if (!string.IsNullOrEmpty(userMessage))
         {
-            aiWebSocket.SendGenerateTextAudio(userMessage); // generate.text_audio 메시지 전송
+            // 서버로 텍스트 및 오디오 생성 요청 전송
+            aiWebSocket.SendGenerateTextAudio(userMessage);
+            
+            // 채팅 디스플레이에 사용자 메시지 추가
             chatDisplay.text += "\nuser: " + userMessage;
+            
+            // 입력 필드 초기화
             chatInputField.text = "";
+            
+            // 입력 필드에 포커스 설정
             chatInputField.ActivateInputField();
         }
     }
