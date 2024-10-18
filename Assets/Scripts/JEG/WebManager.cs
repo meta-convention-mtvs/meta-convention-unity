@@ -8,6 +8,8 @@ public class WebManager : MonoBehaviour
 {
     private string apiUrl = "http://localhost:3001/api/unity-data";
 
+    // 유니티의 버튼을 누르면, 웹에 신호가 간다...
+    // 아.. 이거 개인 서버 용 연결임! 
     public void SendDataToServer(string jsonData)
     {
         StartCoroutine(PostData(jsonData));
