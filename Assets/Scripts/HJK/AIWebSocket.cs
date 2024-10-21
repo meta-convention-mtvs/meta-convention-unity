@@ -276,4 +276,23 @@ public class AIWebSocket : MonoBehaviour
     {
         return ws != null && ws.IsAlive;
     }
+
+    // 매개변수가 없는 SendGenerateTextAudio 메소드
+    public void SendGenerateTextAudio()
+    {
+        if (ws != null && ws.IsAlive)
+        {
+            var request = new
+            {
+                type = "generate.text_audio"
+            };
+            string jsonMessage = JsonConvert.SerializeObject(request);
+            ws.Send(jsonMessage);
+            Debug.Log("generate.text_audio 메시지 전송 (빈 텍스트): " + jsonMessage);
+        }
+        else
+        {
+            Debug.LogError("WebSocket이 연결되지 않았거나 활성 상태가 아닙니다.");
+        }
+    }
 }
