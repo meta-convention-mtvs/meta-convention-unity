@@ -13,6 +13,7 @@ public class VoiceManager : MonoBehaviour
     private System.Collections.Generic.List<float> audioBuffer = new System.Collections.Generic.List<float>();
     private const int BUFFER_THRESHOLD = 24000; // 약 1초 분량의 오디오 (24kHz 샘플레이트 기준)
     private bool isPlaying = false;
+    private string lastRecordedAudioBase64;
 
     void Start()
     {
@@ -21,6 +22,7 @@ public class VoiceManager : MonoBehaviour
         {
             Debug.LogError("AIWebSocket 컴포넌트를 찾을 수 없습니다.");
         }
+        audioSource = gameObject.AddComponent<AudioSource>();
     }
 
     void Update()
@@ -56,13 +58,15 @@ public class VoiceManager : MonoBehaviour
             isRecording = false;
             Debug.Log("녹음 중지");
 
-            // 녹음된 데이터를 서버로 전송
             float[] samples = new float[recordedClip.samples];
             recordedClip.GetData(samples, 0);
             byte[] audioData = ConvertToByteArray(samples);
-            string base64AudioData = System.Convert.ToBase64String(audioData);
-            // aiWebSocket.SendBufferAddAudio(base64AudioData);  // buffer.add_audio 메시지 전송
-            aiWebSocket.SendGenerateTextAudio(base64AudioData);
+            lastRecordedAudioBase64 = Convert.ToBase64String(audioData);
+            
+            aiWebSocket.SendGenerateTextAudio(lastRecordedAudioBase64);
+            
+            // 재생 버튼 활성화
+            EnablePlaybackButton(true);
         }
     }
 
@@ -119,5 +123,36 @@ public class VoiceManager : MonoBehaviour
         }
 
         isPlaying = false;
+    }
+
+    public void PlayLastRecordedAudio()
+    {
+        if (!string.IsNullOrEmpty(lastRecordedAudioBase64))
+        {
+            byte[] audioData = Convert.FromBase64String(lastRecordedAudioBase64);
+            float[] samples = ConvertToFloatArray(audioData);
+            
+            AudioClip clip = AudioClip.Create("RecordedAudio", samples.Length, 1, 44100, false);
+            clip.SetData(samples, 0);
+            
+            audioSource.clip = clip;
+            audioSource.Play();
+        }
+        else
+        {
+            Debug.Log("재생할 녹음된 오디오가 없습니다.");
+        }
+    }
+
+    private float[] ConvertToFloatArray(byte[] byteArray)
+    {
+        float[] floatArray = new float[byteArray.Length / 4];
+        Buffer.BlockCopy(byteArray, 0, floatArray, 0, byteArray.Length);
+        return floatArray;
+    }
+
+    private void EnablePlaybackButton(bool enable)
+    {
+        // UI에서 재생 버튼을 활성화/비활성화하는 로직
     }
 }
