@@ -1,6 +1,8 @@
 using Firebase.Firestore;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
+using System.Net;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -9,6 +11,8 @@ public class UserInfo
 {
     [FirestoreProperty]
     public string uID { get; set; }
+    [FirestoreProperty]
+    public bool isCompany { get; set; }
     [FirestoreProperty]
     public string name { get; set; }
     [FirestoreProperty]
@@ -24,9 +28,38 @@ public class UserInfo
 [FirestoreData]
 public class CompanyInfo
 {
-    // 기업 , 부스 정보를 정리 하자 
-    // DB에 올릴 것 들
+    [FirestoreProperty]
+    public string uID { get; set; }
+    [FirestoreProperty]
+    public bool isCompany { get; set; }
+    [FirestoreProperty]
+    public string company_name { get; set; }
+    [FirestoreProperty]
+    public string company_mission { get; set; }
+    [FirestoreProperty]
+    public string company_website { get; set; }
+    [FirestoreProperty]
+    public List<Product> products { get; set; }
 }
+[FirestoreData]
+public class Product
+{
+    [FirestoreProperty]
+    public string name { get; set; }
+    [FirestoreProperty]
+    public string description { get; set; }
+    [FirestoreProperty]
+    public List<Resource> resources { get; set; }
+}
+[FirestoreData]
+public class Resource
+{
+    [FirestoreProperty]
+    public string type { get; set; }
+    [FirestoreProperty]
+    public string description { get; set; }
+}
+
 public class FireMgr : MonoBehaviour
 {
     public InputField inputEmail;
@@ -55,6 +88,7 @@ public class FireMgr : MonoBehaviour
     {
         UserInfo info = new UserInfo();
         info.uID = FireAuth.instance.auth.CurrentUser.UserId;
+        info.isCompany = false;
         info.name = userName.text;
         info.isMan = isMan;
         //info.interests = new List<string>();
@@ -64,6 +98,15 @@ public class FireMgr : MonoBehaviour
         FireStore.instance.SaveUserInfo(info);
     }
     // 가입 정보 구체화, poll 받아서  UID 기반으로 DB에 저장하기 
+
+    public void OoClickSaveCompanyInfo()
+    {
+        CompanyInfo info = new CompanyInfo();
+        info.uID = FireAuth.instance.auth.CurrentUser.UserId;
+        info.isCompany = true;
+        
+        
+    }
 
     public void OnClickLoadUserInfo()
     {
@@ -79,6 +122,29 @@ public class FireMgr : MonoBehaviour
         {
             print(info.interests[i]);
         }
+    }
+
+    public void OnClickUpload()
+    {
+        byte[] data = File.ReadAllBytes("D:\\UnityProjects\\meta-convention-unity\\Assets\\Materials\\");
+        string path = "ProfileImage/" + FireAuth.instance.auth.CurrentUser.UserId + ".png";
+
+        FireStorage.instance.Upload(data, path);
+    }
+    
+    public void OnClickDownload()
+    {
+        string path = "ProfileImage/" + FireAuth.instance.auth.CurrentUser.UserId + ".png";
+
+        FireStorage.instance.DownLoad(path, OnCompleteDownload);
+    }
+
+    public RawImage profileImage;
+    void OnCompleteDownload(byte[] data)
+    {
+        Texture2D texture = new Texture2D(2, 2);
+        texture.LoadImage(data);
+        profileImage.texture = texture;
     }
 
 }
