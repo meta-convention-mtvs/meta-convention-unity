@@ -14,10 +14,8 @@ public class UserInfo
     [FirestoreProperty]
     public bool isMan { get; set; }
     [FirestoreProperty]
-
     public List<string> interests { get; set; }
     [FirestoreProperty]
-
     public List<string> visitBooth { get; set; }
     [FirestoreProperty]
     public List<string> likeBooth { get; set; }
