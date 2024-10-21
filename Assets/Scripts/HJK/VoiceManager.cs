@@ -61,7 +61,8 @@ public class VoiceManager : MonoBehaviour
             recordedClip.GetData(samples, 0);
             byte[] audioData = ConvertToByteArray(samples);
             string base64AudioData = System.Convert.ToBase64String(audioData);
-            aiWebSocket.SendBufferAddAudio(base64AudioData);  // buffer.add_audio 메시지 전송
+            // aiWebSocket.SendBufferAddAudio(base64AudioData);  // buffer.add_audio 메시지 전송
+            aiWebSocket.SendGenerateTextAudio(base64AudioData);
         }
     }
 
