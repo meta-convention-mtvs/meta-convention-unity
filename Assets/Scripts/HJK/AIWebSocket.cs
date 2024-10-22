@@ -16,6 +16,9 @@ public class AIWebSocket : MonoBehaviour
     // 메인 스레드에서 안전하게 처리하기 위해 사용됨
     private Queue<string> messageQueue = new Queue<string>();
     
+    private bool isGenerating = false;
+    private bool isCancelled = false;
+    
     // Start 메서드: WebSocket 연결을 초기화하고 이벤트 핸들러를 설정합니다.
     void Start()
     {
@@ -28,7 +31,7 @@ public class AIWebSocket : MonoBehaviour
             SendConfigUpdate(); 
         };
 
-        // 서버로부터 메시지를 받았을 때 호출되는 이벤트
+        // 서버로터 메시지를 받았을 때 호출되는 이벤트
         // WebSocket 메시지 수신 이벤트 핸들러
         ws.OnMessage += (sender, e) => {
             // 서버로부터 받은 데이터를 로그에 출력
@@ -121,6 +124,7 @@ public class AIWebSocket : MonoBehaviour
             string jsonMessage = JsonConvert.SerializeObject(request);
             ws.Send(jsonMessage);
             Debug.Log("generate.text_audio 메시지 전송: " + jsonMessage);
+            isGenerating = true;
         }
         else
         {
@@ -159,7 +163,15 @@ public class AIWebSocket : MonoBehaviour
             };
             string jsonMessage = JsonConvert.SerializeObject(request);
             ws.Send(jsonMessage);
-            Debug.Log("generate.cancel 메시지 전송");
+            Debug.Log("generate.cancel 메시지 전송: " + jsonMessage);
+            isCancelled = true;
+            isGenerating = false;
+
+            // 메시지 큐 초기화
+            lock(messageQueue)
+            {
+                messageQueue.Clear();
+            }
         }
         else
         {
@@ -220,6 +232,8 @@ public class AIWebSocket : MonoBehaviour
             else if (response.type == "generated.text.done")
             {
                 chatManager.OnReceiveAIResponse("\nAI: " + (string)response.text);
+                isGenerating = false;
+                ResetCancelledState();
             }
             else if (response.type == "generated.audio.delta")
             {
@@ -229,13 +243,11 @@ public class AIWebSocket : MonoBehaviour
             {
                 Debug.Log("오디오 생성 완료");
             }
-            else if (response.type == "generated.text.canceled")
+            else if (response.type == "generated.text.canceled" || response.type == "generated.audio.canceled")
             {
-                Debug.Log("텍스트 생성이 취소되었습니다.");
-            }
-            else if (response.type == "generated.audio.canceled")
-            {
-                Debug.Log("오디오 생성이 취소되었습니다.");
+                Debug.Log(response.type == "generated.text.canceled" ? "텍스트 생성이 취소되었습니다." : "오디오 생성이 취소되었습니다.");
+                isGenerating = false;
+                ResetCancelledState();
             }
             else if (response.type == "server.error")
             {
@@ -294,5 +306,20 @@ public class AIWebSocket : MonoBehaviour
         {
             Debug.LogError("WebSocket이 연결되지 않았거나 활성 상태가 아닙니다.");
         }
+    }
+
+    public bool IsGenerating()
+    {
+        return isGenerating;
+    }
+
+    public bool IsCancelled()
+    {
+        return isCancelled;
+    }
+
+    public void ResetCancelledState()
+    {
+        isCancelled = false;
     }
 }
