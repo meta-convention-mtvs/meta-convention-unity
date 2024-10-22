@@ -10,7 +10,7 @@ namespace StarterAssets
 {
     [RequireComponent(typeof(CharacterController))]
 #if ENABLE_INPUT_SYSTEM 
-    [RequireComponent(typeof(PlayerInput))]
+    [RequireComponent(typeof(PlayerInteract))]
 #endif
     public class ThirdPersonController : MonoBehaviour
     {

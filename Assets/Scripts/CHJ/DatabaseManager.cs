@@ -28,5 +28,4 @@ public class DatabaseManager : Singleton<DatabaseManager>
         return default(T);
     }
 
-
 }

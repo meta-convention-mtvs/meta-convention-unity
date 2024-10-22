@@ -10,7 +10,7 @@ public class CharacterMaker : MonoBehaviour
     public UICharacterMaker ui_cm;
 
     [SerializeField]
-    CharacterCustomzieData data;
+    CharacterCustomizeData data;
 
     bool isMan = true;
     CustomizeManager currentCustomizeManager;
@@ -62,7 +62,7 @@ public class CharacterMaker : MonoBehaviour
 
     public void SaveCharacterInfo()
     {
-        data = new CharacterCustomzieData();
+        data = new CharacterCustomizeData();
         data.isMan = isMan;
         data.customizingIdx = currentCustomizeManager.GetCustomizingIdx();
 
@@ -71,7 +71,7 @@ public class CharacterMaker : MonoBehaviour
 }
 
 [System.Serializable]
-public class CharacterCustomzieData
+public class CharacterCustomizeData
 {
     public bool isMan;
     public int customizingIdx;

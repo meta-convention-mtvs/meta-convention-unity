@@ -2,14 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public interface IKeyInteractableObject 
+public interface IKeyInteractableObject
 {
-    public virtual void ShowInfo()
-    {
-
-    }
-    public virtual void Interact()
-    {
-
-    }
+    public void ShowText();
+    public void HideText();
+    public void Interact();
 }

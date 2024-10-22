@@ -15,7 +15,7 @@ public class NextSceneButton : MonoBehaviour
     }
     public void LoadScene()
     {
-        if(DatabaseManager.Instance.GetData<CharacterCustomzieData>(typeof(CharacterCustomzieData).ToString())!=null)
+        if(DatabaseManager.Instance.GetData<CharacterCustomizeData>(typeof(CharacterCustomizeData).ToString())!=null)
             connectMgr.JoinOrCreateRoom();  
     }
 }
