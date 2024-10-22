@@ -4,6 +4,7 @@ using UnityEngine;
 using WebSocketSharp;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Collections;
 
 // AIWebSocket 클래스: WebSocket을 통해 AI 서버와 통신하는 기능을 제공합니다.
 public class AIWebSocket : MonoBehaviour
@@ -31,17 +32,12 @@ public class AIWebSocket : MonoBehaviour
             SendConfigUpdate(); 
         };
 
-        // 서버로터 메시지를 받았을 때 호출되는 이벤트
-        // WebSocket 메시지 수신 이벤트 핸들러
+        // 서버로부터 메시지를 받았을 때 호출되는 이벤트
         ws.OnMessage += (sender, e) => {
-            // 서버로부터 받은 데이터를 로그에 출력
-            Debug.Log("서버로부터 수신한 데이터: " + e.Data);
-            
             // 스레드 안전성을 위해 messageQueue에 락을 걸고 데이터를 큐에 추가
             lock(messageQueue)
             {
                 // 받은 메시지를 큐에 추가
-                // 이렇게 하면 메인 스레드에서 안전하게 메시지를 처리할 수 있음
                 messageQueue.Enqueue(e.Data);
             }
         };
@@ -163,20 +159,21 @@ public class AIWebSocket : MonoBehaviour
             };
             string jsonMessage = JsonConvert.SerializeObject(request);
             ws.Send(jsonMessage);
-            Debug.Log("generate.cancel 메시지 전송: " + jsonMessage);
-            isCancelled = true;
-            isGenerating = false;
+            Debug.Log("generate.cancel 메시지 전송 시간: " + DateTime.Now.ToString("HH:mm:ss.fff"));
+            StartCoroutine(WaitForCancelResponse());
+        }
+    }
 
-            // 메시지 큐 초기화
-            lock(messageQueue)
-            {
-                messageQueue.Clear();
-            }
-        }
-        else
+    private IEnumerator WaitForCancelResponse()
+    {
+        float waitTime = 0f;
+        while (waitTime < 10f) // 10초 동안 대기
         {
-            Debug.LogError("WebSocket이 연결되지 않았거나 활성 상태가 아닙니다.");
+            yield return new WaitForSeconds(0.5f);
+            waitTime += 0.5f;
+            Debug.Log($"취소 응답 대기 중... ({waitTime}초 경과)");
         }
+        Debug.Log("서버로부터 취소 응답 없음 (10초 초과)");
     }
 
     // SendBufferAddAudio 메서드: 오디오 버퍼에 데이터를 추가하는 요청을 서버에 전송합니다.
@@ -221,6 +218,7 @@ public class AIWebSocket : MonoBehaviour
     // ProcessReceivedMessage 메서드: 서버로부터 받은 메시지를 처리합니다.
     private void ProcessReceivedMessage(string message)
     {
+        Debug.Log("받은 메시지: " + message);
         try
         {
             var response = JsonConvert.DeserializeObject<dynamic>(message);
@@ -244,7 +242,8 @@ public class AIWebSocket : MonoBehaviour
                 Debug.Log("오디오 생성 완료");
             }
             else if (response.type == "generated.text.canceled" || response.type == "generated.audio.canceled")
-            {
+            {                
+                Debug.Log("P 버튼을 눌러서 생성이 취소되었습니다.(아마도?)");
                 Debug.Log(response.type == "generated.text.canceled" ? "텍스트 생성이 취소되었습니다." : "오디오 생성이 취소되었습니다.");
                 isGenerating = false;
                 ResetCancelledState();
