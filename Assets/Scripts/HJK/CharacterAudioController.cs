@@ -2,20 +2,27 @@
 
 public class CharacterAudioController : MonoBehaviour
 {
+    private AudioSource audioSource;
     public Animator animator;
-    public AudioSource audioSource;
+    public VoiceManager voiceManager;
+
+    void Start()
+    {
+        // AudioSource 컴포넌트가 없으면 자동으로 추가
+        audioSource = GetComponent<AudioSource>();
+        if (audioSource == null)
+        {
+            audioSource = gameObject.AddComponent<AudioSource>();
+        }
+    }
 
     void Update()
     {
-        if (audioSource.isPlaying)
+        // VoiceManager의 AudioSource 상태를 현재 AudioSource에 동기화
+        if (voiceManager != null && voiceManager.audioSource != null)
         {
-            // 음성이 재생 중일 때 말하는 애니메이션 활성화
-            animator.SetBool("isTalking", true);
-        }
-        else
-        {
-            // 음성이 끝났을 때 대기 애니메이션 활성화
-            animator.SetBool("isTalking", false);
+            audioSource.clip = voiceManager.audioSource.clip;
+            animator.SetBool("isTalking", voiceManager.IsPlaying());
         }
     }
 }

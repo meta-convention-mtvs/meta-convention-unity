@@ -194,4 +194,10 @@ public class VoiceManager : MonoBehaviour
             playingStatusText.text = "isPlaying: " + (isPlaying ? "true" : "false");
         }
     }
+
+    // isPlaying 상태를 외부에서 확인할 수 있는 메서드 추가
+    public bool IsPlaying()
+    {
+        return isPlaying;
+    }
 }
