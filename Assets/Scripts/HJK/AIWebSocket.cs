@@ -22,6 +22,34 @@ public class AIWebSocket : MonoBehaviour
     
     public Text generatingStatusText; // Inspector에서 할당할 Text 컴포넌트
 
+    private string aiId;              // AI 식별자 추가
+    private string currentSessionId;  // 현재 세션 ID 추가
+    
+    // 새로운 프로퍼티 추가
+    public string AiId => aiId;
+    public string CurrentSessionId => currentSessionId;
+
+    // 세션 할당 메서드 추가
+    public void AssignSession(string userId)
+    {
+        currentSessionId = userId;
+        Debug.Log($"AI {aiId}가 사용자 {userId}에게 할당됨");
+    }
+
+    // 세션 해제 메서드 추가
+    public void UnassignSession()
+    {
+        currentSessionId = null;
+        Debug.Log($"AI {aiId} 세션 해제됨");
+    }
+
+    // AI ID 초기화 메서드 추가
+    public void Initialize(string newAiId)
+    {
+        aiId = newAiId;
+        Debug.Log($"AI {aiId} 초기화됨");
+    }
+
     // Start 메서드: WebSocket 연결을 초기화하고 이벤트 핸들러를 설정합니다.
     void Start()
     {
@@ -193,8 +221,8 @@ public class AIWebSocket : MonoBehaviour
     private void ProcessReceivedMessage(string message)
     {
         Debug.Log("받은 메시지: " + message);
-        try
-        {
+        //try
+        //{
             var response = JsonConvert.DeserializeObject<dynamic>(message);
             
             if (response.type == "generated.text.delta")
@@ -247,11 +275,11 @@ public class AIWebSocket : MonoBehaviour
             {
                 Debug.LogWarning($"알 수 없는 메시지 유형: {response.type}");
             }
-        }
-        catch (Exception ex)
-        {
-            Debug.LogError($"메시지 처리 중 예외 발생: {ex.Message}");
-        }
+        //}
+        //catch (Exception ex)
+        //{
+        //    Debug.LogError($"메시지 처리 중 예외 발생: {ex.Message}");
+        //}
     }
 
     // IsConnected 메서드: WebSocket 연결 상태를 반환합니다.
@@ -285,14 +313,19 @@ public class AIWebSocket : MonoBehaviour
     // }
 
     // SendBufferAddAudio 메서드: 오디오 버퍼에 데이터를 추가하는 요청을 서버에 전송합니다.
-    public void SendBufferAddAudio(string base64AudioData)
+    public void SendBufferAddAudio(string base64Audio)
     {
+        if (string.IsNullOrEmpty(currentSessionId))
+        {
+            Debug.LogWarning("할당된 세션이 없습니다");
+            return;
+        }
         if (ws != null && ws.IsAlive)
         {
             var request = new
             {
                 type = "buffer.add_audio",
-                audio = base64AudioData
+                audio = base64Audio
             };
             string jsonMessage = JsonConvert.SerializeObject(request);
             ws.Send(jsonMessage);

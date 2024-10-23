@@ -17,7 +17,7 @@ public class PlayerInteract : MonoBehaviourPun
 
     private void Update()
     {
-        if (!photonView.IsMine)
+        if (photonView != null && !photonView.IsMine)
             return;
 
         Collider[] colliders = Physics.OverlapSphere(transform.position, interactionDistance, interactionMask);

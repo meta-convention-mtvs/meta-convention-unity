@@ -25,7 +25,10 @@ public class VoiceManager : MonoBehaviour
 
     public Text playingStatusText; // UI Text 컴포넌트를 위한 변수 추가
     public Button replayButton; // 재생 버튼을 위한 변수 추가
-    
+
+    private string userId;           // 사용자 식별자 추가
+    private AIWebSocket currentAI;   // 현재 연결된 AI 참조 추가
+
     // 시작 시 실행되는 메서드
     void Start()
     {
@@ -104,9 +107,13 @@ public class VoiceManager : MonoBehaviour
             recordedClip.GetData(samples, 0); // 녹음된 데이터 가져오기
             byte[] audioData = ConvertToByteArray(samples); // float 배열을 byte 배열로 변환
             lastRecordedAudioBase64 = Convert.ToBase64String(audioData); // byte 배열을 Base64 문자열로 변환
-            
-            aiWebSocket.SendBufferAddAudio(lastRecordedAudioBase64); // 녹음된 오디오 데이터를 서버로 전송
-            aiWebSocket.SendGenerateTextAudio(); // 텍스트 및 오디오 생성 요청
+            if(lastRecordedAudioBase64 == null)
+            {
+                Debug.Log("녹음된 오디오 데이터가 없습니다.");
+                return;
+            }
+            currentAI.SendBufferAddAudio(lastRecordedAudioBase64); // 녹음된 오디오 데이터를 서버로 전송
+            currentAI.SendGenerateTextAudio(); // 텍스트 및 오디오 생성 요청
         }
     }
 
@@ -134,7 +141,7 @@ public class VoiceManager : MonoBehaviour
             isAudioCancelled = true;
             
             // 서버에 취소 요청
-            aiWebSocket.SendGenerateCancel();
+            currentAI.SendGenerateCancel();
             
             UpdatePlayingStatusUI();
         }
@@ -260,6 +267,30 @@ public class VoiceManager : MonoBehaviour
         else
         {
             Debug.Log("재생할 녹음된 오디오가 없거나 현재 다른 오디오가 재생 중입니다.");
+        }
+    }
+
+    // AI 연결 설정 메서드 추가
+    public void SetCurrentAI(AIWebSocket aiWebSocket)
+    {
+        currentAI = aiWebSocket;
+        Debug.Log($"사용자 {userId}가 AI {aiWebSocket.AiId}와 연결됨");
+    }
+
+    // 사용자 ID 초기화 메서드 추가
+    public void Initialize(string newUserId)
+    {
+        userId = newUserId;
+        Debug.Log($"VoiceManager가 사용자 {userId}로 초기화됨");
+    }
+
+    // 연결 해제 메서드 추가
+    public void DisconnectFromAI()
+    {
+        if (currentAI != null)
+        {
+            Debug.Log($"사용자 {userId}가 AI {currentAI.AiId}와 연결 해제됨");
+            currentAI = null;
         }
     }
 }
