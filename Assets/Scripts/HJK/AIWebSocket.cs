@@ -4,6 +4,7 @@ using UnityEngine;
 using WebSocketSharp;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Collections;
 
 // AIWebSocket 클래스: WebSocket을 통해 AI 서버와 통신하는 기능을 제공합니다.
 public class AIWebSocket : MonoBehaviour
@@ -15,6 +16,10 @@ public class AIWebSocket : MonoBehaviour
     // 서버로부터 받은 메시지를 저장하는 큐
     // 메인 스레드에서 안전하게 처리하기 위해 사용됨
     private Queue<string> messageQueue = new Queue<string>();
+    
+    private bool isGenerating = false;
+    private bool isCancelled = false;
+    private bool cancelResponseReceived = false;
     
     // Start 메서드: WebSocket 연결을 초기화하고 이벤트 핸들러를 설정합니다.
     void Start()
@@ -29,16 +34,11 @@ public class AIWebSocket : MonoBehaviour
         };
 
         // 서버로부터 메시지를 받았을 때 호출되는 이벤트
-        // WebSocket 메시지 수신 이벤트 핸들러
         ws.OnMessage += (sender, e) => {
-            // 서버로부터 받은 데이터를 로그에 출력
-            Debug.Log("서버로부터 수신한 데이터: " + e.Data);
-            
             // 스레드 안전성을 위해 messageQueue에 락을 걸고 데이터를 큐에 추가
             lock(messageQueue)
             {
                 // 받은 메시지를 큐에 추가
-                // 이렇게 하면 메인 스레드에서 안전하게 메시지를 처리할 수 있음
                 messageQueue.Enqueue(e.Data);
             }
         };
@@ -121,6 +121,7 @@ public class AIWebSocket : MonoBehaviour
             string jsonMessage = JsonConvert.SerializeObject(request);
             ws.Send(jsonMessage);
             Debug.Log("generate.text_audio 메시지 전송: " + jsonMessage);
+            isGenerating = true;
         }
         else
         {
@@ -159,11 +160,29 @@ public class AIWebSocket : MonoBehaviour
             };
             string jsonMessage = JsonConvert.SerializeObject(request);
             ws.Send(jsonMessage);
-            Debug.Log("generate.cancel 메시지 전송");
+            Debug.Log("generate.cancel 메시지 전송 시간: " + DateTime.Now.ToString("HH:mm:ss.fff"));
+            cancelResponseReceived = false;
+            StartCoroutine(WaitForCancelResponse());
+        }
+    }
+
+    private IEnumerator WaitForCancelResponse()
+    {
+        float waitTime = 0f;
+        while (waitTime < 10f && !cancelResponseReceived) // 10초 동안 대기 또는 응답 수신 시까지
+        {
+            yield return new WaitForSeconds(0.5f);
+            waitTime += 0.5f;
+            Debug.Log($"취소 응답 대기 중... ({waitTime}초 경과)");
+        }
+        
+        if (cancelResponseReceived)
+        {
+            Debug.Log("서버로부터 취소 응답을 받았습니다.");
         }
         else
         {
-            Debug.LogError("WebSocket이 연결되지 않았거나 활성 상태가 아닙니다.");
+            Debug.Log("서버로부터 취소 응답 없음 (10초 초과)");
         }
     }
 
@@ -209,6 +228,7 @@ public class AIWebSocket : MonoBehaviour
     // ProcessReceivedMessage 메서드: 서버로부터 받은 메시지를 처리합니다.
     private void ProcessReceivedMessage(string message)
     {
+        Debug.Log("받은 메시지: " + message);
         try
         {
             var response = JsonConvert.DeserializeObject<dynamic>(message);
@@ -220,6 +240,8 @@ public class AIWebSocket : MonoBehaviour
             else if (response.type == "generated.text.done")
             {
                 chatManager.OnReceiveAIResponse("\nAI: " + (string)response.text);
+                isGenerating = false;
+                ResetCancelledState();
             }
             else if (response.type == "generated.audio.delta")
             {
@@ -229,13 +251,13 @@ public class AIWebSocket : MonoBehaviour
             {
                 Debug.Log("오디오 생성 완료");
             }
-            else if (response.type == "generated.text.canceled")
-            {
-                Debug.Log("텍스트 생성이 취소되었습니다.");
-            }
-            else if (response.type == "generated.audio.canceled")
-            {
-                Debug.Log("오디오 생성이 취소되었습니다.");
+            else if (response.type == "generated.text.canceled" || response.type == "generated.audio.canceled")
+            {                
+                Debug.Log("P 버튼을 눌러서 생성이 취소되었습니다.");
+                Debug.Log(response.type == "generated.text.canceled" ? "텍스트 생성이 취소되었습니다." : "오디오 생성이 취소되었습니다.");
+                isGenerating = false;
+                cancelResponseReceived = true; // 취소 응답 수신 표시
+                ResetCancelledState();
             }
             else if (response.type == "server.error")
             {
@@ -275,5 +297,39 @@ public class AIWebSocket : MonoBehaviour
     public bool IsConnected()
     {
         return ws != null && ws.IsAlive;
+    }
+
+    // 매개변수가 없는 SendGenerateTextAudio 메소드
+    public void SendGenerateTextAudio()
+    {
+        if (ws != null && ws.IsAlive)
+        {
+            var request = new
+            {
+                type = "generate.text_audio"
+            };
+            string jsonMessage = JsonConvert.SerializeObject(request);
+            ws.Send(jsonMessage);
+            Debug.Log("generate.text_audio 메시지 전송 (빈 텍스트): " + jsonMessage);
+        }
+        else
+        {
+            Debug.LogError("WebSocket이 연결되지 않았거나 활성 상태가 아닙니다.");
+        }
+    }
+
+    public bool IsGenerating()
+    {
+        return isGenerating;
+    }
+
+    public bool IsCancelled()
+    {
+        return isCancelled;
+    }
+
+    public void ResetCancelledState()
+    {
+        isCancelled = false;
     }
 }
