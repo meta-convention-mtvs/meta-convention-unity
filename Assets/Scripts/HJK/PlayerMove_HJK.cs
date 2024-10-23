@@ -2,17 +2,15 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(PlayerInput), typeof(CharacterController))]
+[RequireComponent(typeof(CharacterController))]
 public class PlayerMove_HJK : MonoBehaviour
 {
     CharacterController cc;
-    PlayerInput playerInput;
 
     public float moveSpeed = 3.0f;
     void Start()
     {
         cc = GetComponent<CharacterController>();
-        playerInput = GetComponent<PlayerInput>();
     }
 
     private void Update()
@@ -21,9 +19,11 @@ public class PlayerMove_HJK : MonoBehaviour
     }
     void Move()
     {
+        float h = Input.GetAxis("Horizontal");
+        float v = Input.GetAxis("Vertical");
         // input값을 받는다.
-        Vector3 dirH = transform.right * playerInput._userInput.horizontal;
-        Vector3 dirV = transform.forward * playerInput._userInput.vertical;
+        Vector3 dirH = transform.right * h;
+        Vector3 dirV = transform.forward * v;
         Vector3 dir = dirH + dirV;
 
         // 이동한다
