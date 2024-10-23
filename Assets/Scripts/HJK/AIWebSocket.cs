@@ -5,6 +5,7 @@ using WebSocketSharp;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Collections;
+using UnityEngine.UI;
 
 // AIWebSocket 클래스: WebSocket을 통해 AI 서버와 통신하는 기능을 제공합니다.
 public class AIWebSocket : MonoBehaviour
@@ -18,9 +19,37 @@ public class AIWebSocket : MonoBehaviour
     private Queue<string> messageQueue = new Queue<string>();
     
     private bool isGenerating = false;
-    private bool isCancelled = false;
-    private bool cancelResponseReceived = false;
     
+    public Text generatingStatusText; // Inspector에서 할당할 Text 컴포넌트
+
+    private string aiId;              // AI 식별자 추가
+    private string currentSessionId;  // 현재 세션 ID 추가
+    
+    // 새로운 프로퍼티 추가
+    public string AiId => aiId;
+    public string CurrentSessionId => currentSessionId;
+
+    // 세션 할당 메서드 추가
+    public void AssignSession(string userId)
+    {
+        currentSessionId = userId;
+        Debug.Log($"AI {aiId}가 사용자 {userId}에게 할당됨");
+    }
+
+    // 세션 해제 메서드 추가
+    public void UnassignSession()
+    {
+        currentSessionId = null;
+        Debug.Log($"AI {aiId} 세션 해제됨");
+    }
+
+    // AI ID 초기화 메서드 추가
+    public void Initialize(string newAiId)
+    {
+        aiId = newAiId;
+        Debug.Log($"AI {aiId} 초기화됨");
+    }
+
     // Start 메서드: WebSocket 연결을 초기화하고 이벤트 핸들러를 설정합니다.
     void Start()
     {
@@ -152,76 +181,39 @@ public class AIWebSocket : MonoBehaviour
     // SendGenerateCancel 메서드: 생성 취소 요청을 서버에 전송합니다.
     public void SendGenerateCancel()
     {
+        Debug.Log("SendGenerateCancel 호출은 성공함..");
         if (ws != null && ws.IsAlive)
         {
+            // 취소 요청 전에 현재 상태 확인
+            if (!isGenerating)
+            {
+                Debug.Log("현재 생성 중인 작업이 없습니다.");
+                return;
+            }
+
             var request = new
             {
                 type = "generate.cancel"
             };
             string jsonMessage = JsonConvert.SerializeObject(request);
             ws.Send(jsonMessage);
-            Debug.Log("generate.cancel 메시지 전송 시간: " + DateTime.Now.ToString("HH:mm:ss.fff"));
-            cancelResponseReceived = false;
-            StartCoroutine(WaitForCancelResponse());
-        }
-    }
-
-    private IEnumerator WaitForCancelResponse()
-    {
-        float waitTime = 0f;
-        while (waitTime < 10f && !cancelResponseReceived) // 10초 동안 대기 또는 응답 수신 시까지
-        {
-            yield return new WaitForSeconds(0.5f);
-            waitTime += 0.5f;
-            Debug.Log($"취소 응답 대기 중... ({waitTime}초 경과)");
-        }
-        
-        if (cancelResponseReceived)
-        {
-            Debug.Log("서버로부터 취소 응답을 받았습니다.");
-        }
-        else
-        {
-            Debug.Log("서버로부터 취소 응답 없음 (10초 초과)");
-        }
-    }
-
-    // SendBufferAddAudio 메서드: 오디오 버퍼에 데이터를 추가하는 요청을 서버에 전송합니다.
-    public void SendBufferAddAudio(string base64AudioData)
-    {
-        if (ws != null && ws.IsAlive)
-        {
-            var request = new
-            {
-                type = "buffer.add_audio",
-                audio = base64AudioData
-            };
-            string jsonMessage = JsonConvert.SerializeObject(request);
             ws.Send(jsonMessage);
-            Debug.Log("buffer.add_audio 메시지 전송");
-        }
-        else
-        {
-            Debug.LogError("WebSocket이 연결되지 않았거나 활성 상태가 아닙니다.");
+            ws.Send(jsonMessage);
+            Debug.Log("generate.cancel 메시지 전송");
+            
+            // 일정 시간 후에도 취소 응답이 오지 않으면 강제로 상태 리셋
+            // StartCoroutine(ResetGeneratingStateAfterDelay(3f));
         }
     }
 
-    // SendBufferClearAudio 메서드: 오디오 버퍼를 초기화하는 요청을 서버에 전송합니다.
-    public void SendBufferClearAudio()
+    private IEnumerator ResetGeneratingStateAfterDelay(float delay)
     {
-        if (ws != null && ws.IsAlive)
+        yield return new WaitForSeconds(delay);
+        if (isGenerating)
         {
-            var request = new
-            {
-                type = "buffer.clear_audio"
-            };
-            string jsonMessage = JsonConvert.SerializeObject(request);
-            ws.Send(jsonMessage);
-            Debug.Log("buffer.clear_audio 메시지 전송");
-        }
-        else
-        {
-            Debug.LogError("WebSocket이 연결되지 않았거나 활성 상태가 아닙니다.");
+            Debug.LogWarning("서버로부터 취소 응답을 받지 못했습니다. 상태를 강제로 리셋합니다.");
+            isGenerating = false;
+            chatManager.OnReceiveAIResponse("\n[생성이 강제 중단되었습니다.]");
         }
     }
 
@@ -229,19 +221,24 @@ public class AIWebSocket : MonoBehaviour
     private void ProcessReceivedMessage(string message)
     {
         Debug.Log("받은 메시지: " + message);
-        try
-        {
+        //try
+        //{
             var response = JsonConvert.DeserializeObject<dynamic>(message);
             
             if (response.type == "generated.text.delta")
             {
-                chatManager.OnReceiveAIResponse((string)response.delta);
+                IsGenerating = true;
             }
             else if (response.type == "generated.text.done")
             {
                 chatManager.OnReceiveAIResponse("\nAI: " + (string)response.text);
-                isGenerating = false;
-                ResetCancelledState();
+                IsGenerating = false;
+            }
+            else if (response.type == "generated.text.canceled" || response.type == "generated.audio.canceled")
+            {                
+                Debug.Log(response.type == "generated.text.canceled" ? "텍스트 생성이 취소되었습니다." : "오디오 생성이 취소되었습니다.");
+                IsGenerating = false;
+                StopAllCoroutines();
             }
             else if (response.type == "generated.audio.delta")
             {
@@ -250,14 +247,6 @@ public class AIWebSocket : MonoBehaviour
             else if (response.type == "generated.audio.done")
             {
                 Debug.Log("오디오 생성 완료");
-            }
-            else if (response.type == "generated.text.canceled" || response.type == "generated.audio.canceled")
-            {                
-                Debug.Log("P 버튼을 눌러서 생성이 취소되었습니다.");
-                Debug.Log(response.type == "generated.text.canceled" ? "텍스트 생성이 취소되었습니다." : "오디오 생성이 취소되었습니다.");
-                isGenerating = false;
-                cancelResponseReceived = true; // 취소 응답 수신 표시
-                ResetCancelledState();
             }
             else if (response.type == "server.error")
             {
@@ -286,11 +275,11 @@ public class AIWebSocket : MonoBehaviour
             {
                 Debug.LogWarning($"알 수 없는 메시지 유형: {response.type}");
             }
-        }
-        catch (Exception ex)
-        {
-            Debug.LogError($"메시지 처리 중 예외 발생: {ex.Message}");
-        }
+        //}
+        //catch (Exception ex)
+        //{
+        //    Debug.LogError($"메시지 처리 중 예외 발생: {ex.Message}");
+        //}
     }
 
     // IsConnected 메서드: WebSocket 연결 상태를 반환합니다.
@@ -318,18 +307,76 @@ public class AIWebSocket : MonoBehaviour
         }
     }
 
-    public bool IsGenerating()
+    // public bool IsGenerating()
+    // {
+    //     return isGenerating;
+    // }
+
+    // SendBufferAddAudio 메서드: 오디오 버퍼에 데이터를 추가하는 요청을 서버에 전송합니다.
+    public void SendBufferAddAudio(string base64Audio)
     {
-        return isGenerating;
+        if (string.IsNullOrEmpty(currentSessionId))
+        {
+            Debug.LogWarning("할당된 세션이 없습니다");
+            return;
+        }
+        if (ws != null && ws.IsAlive)
+        {
+            var request = new
+            {
+                type = "buffer.add_audio",
+                audio = base64Audio
+            };
+            string jsonMessage = JsonConvert.SerializeObject(request);
+            ws.Send(jsonMessage);
+            Debug.Log("buffer.add_audio 메시지 전송");
+        }
+        else
+        {
+            Debug.LogError("WebSocket이 연결되지 않았거나 활성 상태가 아닙니다.");
+        }
     }
 
-    public bool IsCancelled()
+    // SendBufferClearAudio 메서드도 유지
+    public void SendBufferClearAudio()
     {
-        return isCancelled;
+        if (ws != null && ws.IsAlive)
+        {
+            var request = new
+            {
+                type = "buffer.clear_audio"
+            };
+            string jsonMessage = JsonConvert.SerializeObject(request);
+            ws.Send(jsonMessage);
+            Debug.Log("buffer.clear_audio 메시지 전송");
+        }
+        else
+        {
+            Debug.LogError("WebSocket이 연결되지 않았거나 활성 상태가 아닙니다.");
+        }
     }
 
-    public void ResetCancelledState()
+    // IsGenerating 상태를 외부에서 확인할 수 있는 프로퍼티 추가
+    public bool IsGenerating
     {
-        isCancelled = false;
+        get { return isGenerating; }
+        private set 
+        { 
+            isGenerating = value;
+            UpdateGeneratingStatusUI();
+        }
+    }
+
+    // UI 업데이트 메서드
+    private void UpdateGeneratingStatusUI()
+    {
+        if (generatingStatusText != null)
+        {
+            generatingStatusText.text = "isGenerating: " + (isGenerating ? "true" : "false");
+        }
+        else
+        {
+            Debug.LogError("generatingStatusText가 설정되지 않았습니다.");
+        }
     }
 }

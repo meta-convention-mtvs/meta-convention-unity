@@ -24,12 +24,22 @@ public class VoiceManager : MonoBehaviour
     private Coroutine playCoroutine; // 오디오 재생을 위한 코루틴
 
     public Text playingStatusText; // UI Text 컴포넌트를 위한 변수 추가
+    public Button replayButton; // 재생 버튼을 위한 변수 추가
+
+    private string userId;           // 사용자 식별자 추가
+    private AIWebSocket currentAI;   // 현재 연결된 AI 참조 추가
 
     // 시작 시 실행되는 메서드
     void Start()
     {
         audioSource = gameObject.AddComponent<AudioSource>(); // AudioSource 컴포넌트 추가
-        UpdatePlayingStatusUI(); // 초기 상태 업데이트
+        UpdatePlayingStatusUI();
+        
+        // 버튼에 클릭 이벤트 리스너 추가
+        if (replayButton != null)
+        {
+            replayButton.onClick.AddListener(PlayLastRecordedAudio);
+        }
     }
 
     // 매 프레임마다 실행되는 메서드
@@ -38,7 +48,7 @@ public class VoiceManager : MonoBehaviour
         // 'M' 키를 눌러 녹음 시작
         if (Input.GetKeyDown(KeyCode.M))
         {
-            if (!isRecording && !aiWebSocket.IsGenerating())
+            if (!isRecording)
             {
                 StartRecording();
             }
@@ -65,6 +75,16 @@ public class VoiceManager : MonoBehaviour
     {
         if (!isRecording)
         {
+            // 마이크가 제대로 초기화되었는지 확인
+            string[] devices = Microphone.devices;
+            Debug.Log($"사용 가능한 마이크: {string.Join(", ", devices)}"); // 디버그 로그 추가
+            
+            if (devices.Length == 0)
+            {
+                Debug.LogError("사용 가능한 마이크가 없습니다!");
+                return;
+            }
+            
             isAudioCancelled = false; // 새로운 녹음 시작 시 취소 상태 초기화
             recordedClip = Microphone.Start(null, true, 10, 24000); // 마이크로 10초 동안 24kHz로 녹음 시작
             isRecording = true;
@@ -87,9 +107,13 @@ public class VoiceManager : MonoBehaviour
             recordedClip.GetData(samples, 0); // 녹음된 데이터 가져오기
             byte[] audioData = ConvertToByteArray(samples); // float 배열을 byte 배열로 변환
             lastRecordedAudioBase64 = Convert.ToBase64String(audioData); // byte 배열을 Base64 문자열로 변환
-            
-            aiWebSocket.SendBufferAddAudio(lastRecordedAudioBase64); // 녹음된 오디오 데이터를 서버로 전송
-            aiWebSocket.SendGenerateTextAudio(); // 텍스트 및 오디오 생성 요청
+            if(lastRecordedAudioBase64 == null)
+            {
+                Debug.Log("녹음된 오디오 데이터가 없습니다.");
+                return;
+            }
+            currentAI.SendBufferAddAudio(lastRecordedAudioBase64); // 녹음된 오디오 데이터를 서버로 전송
+            currentAI.SendGenerateTextAudio(); // 텍스트 및 오디오 생성 요청
         }
     }
 
@@ -98,19 +122,29 @@ public class VoiceManager : MonoBehaviour
     {
         Debug.Log("오디오 재생 중지 요청");
         
-        audioSource.Stop(); // 오디오 재생 중지
-        audioBuffer.Clear(); // 오디오 버퍼 초기화
-        isPlaying = false;
-        isAudioCancelled = true; // 오디오 취소 상태를 true로 설정
-        
-        if (playCoroutine != null)
+        if (isPlaying)
         {
-            StopCoroutine(playCoroutine); // 재생 코루틴 중지
-            playCoroutine = null;
-        }
+            // 코루틴 중지
+            if (playCoroutine != null)
+            {
+                StopCoroutine(playCoroutine);
+                playCoroutine = null;
+            }
 
-        aiWebSocket.SendGenerateCancel(); // 서버에 생성 취소 요청 전송
-        UpdatePlayingStatusUI(); // 상태 변경 시 UI 업데이트
+            // 현재 재생 중인 오디오 중지
+            audioSource.Stop();
+            audioSource.clip = null;  // 현재 클립도 제거
+
+            // 버퍼와 상태 초기화
+            audioBuffer.Clear();
+            isPlaying = false;
+            isAudioCancelled = true;
+            
+            // 서버에 취소 요청
+            currentAI.SendGenerateCancel();
+            
+            UpdatePlayingStatusUI();
+        }
     }
 
     // 서버로부터 받은 오디오 데이터를 처리하는 메서드
@@ -148,10 +182,15 @@ public class VoiceManager : MonoBehaviour
     private IEnumerator PlayBufferedAudio()
     {
         isPlaying = true;
-        UpdatePlayingStatusUI(); // 상태 변경 시 UI 업데이트
+        UpdatePlayingStatusUI();
 
-        while (audioBuffer.Count > 0)
+        while (audioBuffer.Count > 0 && !isAudioCancelled)  // 취소 상태 확인 추가
         {
+            if (isAudioCancelled)  // 추가 체크
+            {
+                break;
+            }
+
             int sampleCount = Mathf.Min(audioBuffer.Count, BUFFER_THRESHOLD);
             float[] playbackSamples = audioBuffer.GetRange(0, sampleCount).ToArray();
             audioBuffer.RemoveRange(0, sampleCount);
@@ -162,11 +201,11 @@ public class VoiceManager : MonoBehaviour
             audioSource.clip = clip;
             audioSource.Play();
 
-            yield return new WaitForSeconds(clip.length); // 클립 재생이 끝날 때까지 대기
+            yield return new WaitForSeconds(clip.length);
         }
 
         isPlaying = false;
-        UpdatePlayingStatusUI(); // 상태 변경 시 UI 업데이트
+        UpdatePlayingStatusUI();
         playCoroutine = null;
     }
 
@@ -199,5 +238,59 @@ public class VoiceManager : MonoBehaviour
     public bool IsPlaying()
     {
         return isPlaying;
+    }
+
+    // 마지막으로 녹음된 오디오를 재생하는 메서드
+    public void PlayLastRecordedAudio()
+    {
+        Debug.Log("마지막 녹음된 오디오 재생 요청 버튼 클릭");
+        if (lastRecordedAudioBase64 != null && !isPlaying)
+        {
+            byte[] audioData = Convert.FromBase64String(lastRecordedAudioBase64);
+            short[] shortArray = new short[audioData.Length / 2];
+            Buffer.BlockCopy(audioData, 0, shortArray, 0, audioData.Length);
+            
+            float[] samples = new float[shortArray.Length];
+            for (int i = 0; i < shortArray.Length; i++)
+            {
+                samples[i] = shortArray[i] / 32768f;
+            }
+
+            AudioClip clip = AudioClip.Create("LastRecording", samples.Length, 1, 24000, false);
+            clip.SetData(samples, 0);
+
+            audioSource.clip = clip;
+            audioSource.Play();
+            
+            Debug.Log("마지막 녹음된 오디오 재생 중");
+        }
+        else
+        {
+            Debug.Log("재생할 녹음된 오디오가 없거나 현재 다른 오디오가 재생 중입니다.");
+        }
+    }
+
+    // AI 연결 설정 메서드 추가
+    public void SetCurrentAI(AIWebSocket aiWebSocket)
+    {
+        currentAI = aiWebSocket;
+        Debug.Log($"사용자 {userId}가 AI {aiWebSocket.AiId}와 연결됨");
+    }
+
+    // 사용자 ID 초기화 메서드 추가
+    public void Initialize(string newUserId)
+    {
+        userId = newUserId;
+        Debug.Log($"VoiceManager가 사용자 {userId}로 초기화됨");
+    }
+
+    // 연결 해제 메서드 추가
+    public void DisconnectFromAI()
+    {
+        if (currentAI != null)
+        {
+            Debug.Log($"사용자 {userId}가 AI {currentAI.AiId}와 연결 해제됨");
+            currentAI = null;
+        }
     }
 }
