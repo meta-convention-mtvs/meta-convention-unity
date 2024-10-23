@@ -1,3 +1,4 @@
+ï»¿using Firebase.Firestore;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -25,7 +26,7 @@ public class CharacterMaker : MonoBehaviour
         ui_cm.OnGenderClick += ChangeGender;
     }
 
-    // ¼ºº°ÀÌ ¹Ù²î¾úÀ» ¶§
+    // ì„±ë³„ì´ ë°”ë€Œì—ˆì„ ë•Œ
     public void ChangeGender()
     {
         isMan = !isMan;
@@ -70,9 +71,11 @@ public class CharacterMaker : MonoBehaviour
     }
 }
 
-[System.Serializable]
+[FirestoreData]
 public class CharacterCustomizeData
 {
-    public bool isMan;
-    public int customizingIdx;
+    [FirestoreProperty]
+    public bool isMan { get; set; }
+    [FirestoreProperty]
+    public int customizingIdx { get; set; }
 }

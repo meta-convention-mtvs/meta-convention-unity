@@ -1,4 +1,4 @@
-using Photon.Pun;
+ï»¿using Photon.Pun;
 using Photon.Realtime;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
 using System.Collections;
@@ -20,9 +20,9 @@ public class ModelingRuntimeCreate : MonoBehaviourPun
         anim = gameObject.GetComponent<Animator>();
         if (photonView.IsMine)
         {
-            // data¸¦ ÀĞ¾î¿Â´Ù.
-            CharacterCustomizeData myData = DatabaseManager.Instance.GetData<CharacterCustomizeData>(typeof(CharacterCustomizeData).ToString());
-            CreateAvatar(myData);
+            // dataë¥¼ ì½ì–´ì˜¨ë‹¤.
+            DatabaseManager.Instance.GetData<CharacterCustomizeData>(CreateAvatar);
+            
         }
     }
 
@@ -30,8 +30,8 @@ public class ModelingRuntimeCreate : MonoBehaviourPun
     void CreateAvatar(CharacterCustomizeData customzieData)
     {
 
-        // data¿¡ ÀûÇôÀÖ´Â gender, idx ¿¡ µû¶ó prefabÀ» »ı¼ºÈÄ ÇÃ·¹ÀÌ¾îÀÇ prefabÀÇ ÀÚ½ÄÀ¸·Î ¸¸µç´Ù.
-        // ÇÃ·¹ÀÌ¾îÀÇ ¿¡´Ï¸ŞÀÌÅÍÀÇ Avatar¸¦ ¹Ù²ãÁØ´Ù.
+        // dataì— ì í˜€ìˆëŠ” gender, idx ì— ë”°ë¼ prefabì„ ìƒì„±í›„ í”Œë ˆì´ì–´ì˜ prefabì˜ ìì‹ìœ¼ë¡œ ë§Œë“ ë‹¤.
+        // í”Œë ˆì´ì–´ì˜ ì—ë‹ˆë©”ì´í„°ì˜ Avatarë¥¼ ë°”ê¿”ì¤€ë‹¤.
 
         if (customzieData != null)
         {

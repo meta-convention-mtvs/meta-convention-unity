@@ -1,4 +1,4 @@
-using Photon.Pun;
+﻿using Photon.Pun;
 using Photon.Realtime;
 using System;
 using System.Collections;
@@ -13,6 +13,7 @@ public class PlayerInteract : MonoBehaviourPun
     public LayerMask interactionMask;
 
     GameObject previousClosestObject;
+
 
     private void Update()
     {

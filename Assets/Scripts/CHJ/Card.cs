@@ -1,16 +1,22 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using Firebase.Firestore;
 
-[Serializable]
+[FirestoreData]
 public class Card
-{ 
-    public string id;
-    public string nickname;
-    public string institute;
-    public string major;
-    public string email;
+{
+    [FirestoreProperty]
+    public string id { get; set;}
+    [FirestoreProperty]
+    public string nickname { get; set; }
+    [FirestoreProperty]
+    public string institute { get; set; }
+    [FirestoreProperty]
+    public string major { get; set; }
+    [FirestoreProperty]
+    public string email { get; set; }
 
     public Card(string id, string nickname, string institute, string major, string email)
     {
@@ -19,6 +25,11 @@ public class Card
         this.institute = institute;
         this.major = major;
         this.email = email;
+    }
+
+    public Card()
+    {
+
     }
     
 }

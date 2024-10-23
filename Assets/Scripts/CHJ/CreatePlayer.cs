@@ -1,4 +1,4 @@
-using Cinemachine;
+ï»¿using Cinemachine;
 using Photon.Pun;
 using Photon.Realtime;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
@@ -9,18 +9,23 @@ public class CreatePlayer : MonoBehaviour
 {
     public CinemachineVirtualCamera cinemachine;
     public bool isPlayerExchangeCard;
-
+    GameObject player;
 
     private void Start()
     {
-        GameObject player = Create();
-        Card myCard = DatabaseManager.Instance.GetData<Card>(typeof(Card).ToString());
-        SaveCardInProperties(player.GetPhotonView().Owner, myCard);
+        player = Create();
+        DatabaseManager.Instance.GetData<Card>(onCardLoad);
+
         CameraFollow(player, cinemachine);
+    }
+
+    private void onCardLoad(Card myCard)
+    {
+        SaveCardInProperties(player.GetPhotonView().Owner, myCard);
     }
     public GameObject Create()
     {
-        // ÇÃ·¹ÀÌ¾î prefab »ı¼º
+        // í”Œë ˆì´ì–´ prefab ìƒì„±
         return PhotonNetwork.Instantiate("Player", new Vector3(0, 3, 0), Quaternion.identity);
     }
 
@@ -40,7 +45,7 @@ public class CreatePlayer : MonoBehaviour
 
     public void CameraFollow(GameObject player, CinemachineVirtualCamera cinemachine)
     {
-        // Cinemachine Ä«¸Ş¶ó°¡ Ä³¸¯ÅÍ¸¦ ¹Ù¶óº¼ ¼ö ÀÖ°Ô ÇÑ´Ù.
+        // Cinemachine ì¹´ë©”ë¼ê°€ ìºë¦­í„°ë¥¼ ë°”ë¼ë³¼ ìˆ˜ ìˆê²Œ í•œë‹¤.
         cinemachine.Follow = player.transform.Find("PlayerCameraRoot");
     }
 }
