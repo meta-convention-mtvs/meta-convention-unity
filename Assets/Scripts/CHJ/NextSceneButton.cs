@@ -1,4 +1,4 @@
-using Photon.Pun;
+﻿using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -15,7 +15,13 @@ public class NextSceneButton : MonoBehaviour
     }
     public void LoadScene()
     {
-        if(DatabaseManager.Instance.GetData<CharacterCustomzieData>(typeof(CharacterCustomzieData).ToString())!=null)
-            connectMgr.JoinOrCreateRoom();  
+        DatabaseManager.Instance.GetData<CharacterCustomizeData>(JoinRoom);
+        
+    }
+
+    void JoinRoom(CharacterCustomizeData data)
+    {
+        if(data!= null)
+            connectMgr.JoinOrCreateRoom();
     }
 }

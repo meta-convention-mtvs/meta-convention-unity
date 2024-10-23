@@ -1,24 +1,51 @@
-using Cinemachine;
+ï»¿using Cinemachine;
 using Photon.Pun;
-using System.Collections;
+using Photon.Realtime;
+using Hashtable = ExitGames.Client.Photon.Hashtable;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class CreatePlayer : MonoBehaviour
 {
     public CinemachineVirtualCamera cinemachine;
+    public bool isPlayerExchangeCard;
+    GameObject player;
 
     private void Start()
     {
-        Create();
+        player = Create();
+        DatabaseManager.Instance.GetData<Card>(onCardLoad);
+
+        CameraFollow(player, cinemachine);
     }
-    public void Create()
+
+    private void onCardLoad(Card myCard)
     {
-        // ÇÃ·¹ÀÌ¾î prefab »ı¼º
-        GameObject player = PhotonNetwork.Instantiate("Player", new Vector3(0, 3, 0), Quaternion.identity);
+        SaveCardInProperties(player.GetPhotonView().Owner, myCard);
+    }
+    public GameObject Create()
+    {
+        // í”Œë ˆì´ì–´ prefab ìƒì„±
+        return PhotonNetwork.Instantiate("Player", new Vector3(0, 3, 0), Quaternion.identity);
+    }
 
+    void SaveCardInProperties(Player player, Card myCard)
+    {
+        Hashtable myInformation = new Hashtable
+        {
+            {"id", myCard.id },
+            {"nickname",myCard.nickname },
+            {"institute", myCard.institute },
+            {"major", myCard.major },
+            {"email", myCard.email }
+        };
 
-        // Cinemachine Ä«¸Ş¶ó°¡ Ä³¸¯ÅÍ¸¦ ¹Ù¶óº¼ ¼ö ÀÖ°Ô ÇÑ´Ù.
-        cinemachine.Follow = player.transform.Find("PlayerCameraRoot") ;
+        player.SetCustomProperties(myInformation);
+    }
+
+    public void CameraFollow(GameObject player, CinemachineVirtualCamera cinemachine)
+    {
+        // Cinemachine ì¹´ë©”ë¼ê°€ ìºë¦­í„°ë¥¼ ë°”ë¼ë³¼ ìˆ˜ ìˆê²Œ í•œë‹¤.
+        cinemachine.Follow = player.transform.Find("PlayerCameraRoot");
     }
 }

@@ -10,7 +10,7 @@ namespace StarterAssets
 {
     [RequireComponent(typeof(CharacterController))]
 #if ENABLE_INPUT_SYSTEM 
-    [RequireComponent(typeof(PlayerInput))]
+    [RequireComponent(typeof(PlayerInteract))]
 #endif
     public class ThirdPersonController : MonoBehaviour
     {
@@ -335,6 +335,9 @@ namespace StarterAssets
                     {
                         _animator.SetBool(_animIDFreeFall, true);
                     }
+
+
+
                 }
 
                 // if we are not grounded, do not jump
