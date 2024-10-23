@@ -36,7 +36,6 @@ public class PlayerInteract : MonoBehaviourPun
             if (Input.GetKeyDown(KeyCode.F))
             {
                 go.Interact();
-
             }
         }
         previousClosestObject = closestObject;

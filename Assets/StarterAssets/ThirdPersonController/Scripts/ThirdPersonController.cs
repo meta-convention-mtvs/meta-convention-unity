@@ -335,6 +335,9 @@ namespace StarterAssets
                     {
                         _animator.SetBool(_animIDFreeFall, true);
                     }
+
+
+
                 }
 
                 // if we are not grounded, do not jump

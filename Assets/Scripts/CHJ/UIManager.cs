@@ -1,13 +1,34 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using DG.Tweening;
+
+public class UI
+{
+    public GameObject UIObject;
+    public UIType uiType;
+
+    public UI(GameObject obj, UIType type)
+    {
+        UIObject = obj;
+        uiType = type;
+    }
+}
+
+public enum UIType
+{
+    OptionPopUp,
+    Option,
+    Normal,
+    Memo,
+    HUD
+}
 
 public class UIManager : MonoBehaviour
 {
     public static UIManager Instance;
 
-    public GameObject cardInfoUI;
-    public GameObject infoTextUI;
+    public float UIAnimationTime = 1.0f;
 
     private void Awake()
     {
@@ -21,31 +42,96 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    Stack<GameObject> uiStack;
+    Stack<UI> uiStack;
 
     private void Start()
     {
-        uiStack = new Stack<GameObject>();
+        uiStack = new Stack<UI>();
     }
 
     private void Update()
     {
-        // 만약에 눌린 키가 esc라면
+        GetEscapeInput();
+    }
+    
+    void GetEscapeInput()
+    {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            HideUI();
+            if(uiStack.Count > 0)
+            {
+                HideUI();
+            }
         }
     }
-    public void ShowUI(GameObject UI)
+    public void ShowUI(GameObject uiObject, UIType uiType)
     {
-        UI.SetActive(true);
-        uiStack.Push(UI);
+        UI ui = new UI(uiObject, uiType);
+        if(uiStack.Count > 0)
+        {
+            UI previousUI = uiStack.Peek();
+            if (HasHigherOrder(previousUI, ui))
+            {
+                switch (uiType) {
+                    case UIType.Normal:
+                        PlayNoramlUIAnimation(ui, UIAnimationTime, true);
+                        break;
+                }
+                uiStack.Push(ui);
+            }
+        }
+        else
+        {
+            switch (uiType)
+            {
+                case UIType.Normal:
+                    PlayNoramlUIAnimation(ui, UIAnimationTime, true);
+                    break;
+            }
+            uiStack.Push(ui);
+        }
+
+        
+    }
+    void HideUI()
+    {
+        UI ui = uiStack.Pop();
+        if (ui != null)
+        {
+            switch (ui.uiType)
+            {
+                case UIType.Normal:
+                    PlayNoramlUIAnimation(ui, UIAnimationTime, false);
+                    break;
+            }
+        }
     }
 
-    public void HideUI()
+    void PlayNoramlUIAnimation(UI ui, float time, bool isSetActive)
     {
-        GameObject uiToHide = uiStack.Pop();
-        if (uiToHide != null)
-            uiToHide.SetActive(false);
+        CanvasGroup canvas = ui.UIObject.GetComponent<CanvasGroup>();
+        float startAlpha, endAlpha;
+        if (isSetActive)
+        {
+            startAlpha = 0;
+            endAlpha = 1;
+        }
+        else
+        {
+            startAlpha = 1;
+            endAlpha = 0;
+        }
+        if (canvas != null)
+        {
+            canvas.alpha = startAlpha;
+            canvas.DOFade(endAlpha, time).OnComplete(()=> canvas.blocksRaycasts = isSetActive);
+        }
+    }
+
+    bool HasHigherOrder(UI prevUI, UI currUI)
+    {
+        if ((int)prevUI.uiType > (int)currUI.uiType)
+            return true;
+        return false;
     }
 }

@@ -6,15 +6,16 @@ using UnityEngine.UI;
 
 public class CardReader : MonoBehaviour
 {
-    public GameObject uiCardPopup;
+    public GameObject uiCardObject;
     public Button saveButton;
 
     public CardBook cardBook;
 
     public void ShowCardUI(Player player)
     {
-        uiCardPopup.SetActive(true);
-        UICard uiCard = uiCardPopup.GetComponentInChildren<UICard>();
+        //uiCardPopup.SetActive(true);
+        UIManager.Instance.ShowUI(uiCardObject, UIType.Normal);
+        UICard uiCard = uiCardObject.GetComponentInChildren<UICard>();
         // 남의 카드를 읽어온다.
         Card opponentCard = ReadCard(player);
         // 그 카드를 UI에 띄운다.

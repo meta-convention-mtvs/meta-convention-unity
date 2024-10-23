@@ -54,8 +54,9 @@ public class CardBook : MonoBehaviour
 
     public void ShowCardBookUI()
     {
-        cardBookUI.SetActive(true);
-        
+        //cardBookUI.SetActive(true);
+        UIManager.Instance.ShowUI(cardBookUI, UIType.Normal);
+
         myCard.ShowCardUI(CardReader.ReadCard(PhotonNetwork.LocalPlayer));
         for(int i = 0; i<myCardBook.Count; i++)
         {
