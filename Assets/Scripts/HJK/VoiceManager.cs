@@ -5,6 +5,7 @@ using System.Collections;
 using System.IO;
 using System.Text;
 using System.Collections.Generic;
+using UnityEngine.UI; // UI 네임스페이스 추가
 
 // VoiceManager 클래스: 음성 녹음, 재생 및 AI와의 통신을 관리합니다.
 public class VoiceManager : MonoBehaviour
@@ -22,10 +23,13 @@ public class VoiceManager : MonoBehaviour
 
     private Coroutine playCoroutine; // 오디오 재생을 위한 코루틴
 
+    public Text playingStatusText; // UI Text 컴포넌트를 위한 변수 추가
+
     // 시작 시 실행되는 메서드
     void Start()
     {
         audioSource = gameObject.AddComponent<AudioSource>(); // AudioSource 컴포넌트 추가
+        UpdatePlayingStatusUI(); // 초기 상태 업데이트
     }
 
     // 매 프레임마다 실행되는 메서드
@@ -106,6 +110,7 @@ public class VoiceManager : MonoBehaviour
         }
 
         aiWebSocket.SendGenerateCancel(); // 서버에 생성 취소 요청 전송
+        UpdatePlayingStatusUI(); // 상태 변경 시 UI 업데이트
     }
 
     // 서버로부터 받은 오디오 데이터를 처리하는 메서드
@@ -143,6 +148,7 @@ public class VoiceManager : MonoBehaviour
     private IEnumerator PlayBufferedAudio()
     {
         isPlaying = true;
+        UpdatePlayingStatusUI(); // 상태 변경 시 UI 업데이트
 
         while (audioBuffer.Count > 0)
         {
@@ -160,6 +166,7 @@ public class VoiceManager : MonoBehaviour
         }
 
         isPlaying = false;
+        UpdatePlayingStatusUI(); // 상태 변경 시 UI 업데이트
         playCoroutine = null;
     }
 
@@ -177,5 +184,14 @@ public class VoiceManager : MonoBehaviour
 
         Buffer.BlockCopy(intData, 0, bytesData, 0, bytesData.Length);
         return bytesData;
+    }
+
+    // UI 업데이트를 위한 새로운 메서드
+    private void UpdatePlayingStatusUI()
+    {
+        if (playingStatusText != null)
+        {
+            playingStatusText.text = "isPlaying: " + (isPlaying ? "true" : "false");
+        }
     }
 }

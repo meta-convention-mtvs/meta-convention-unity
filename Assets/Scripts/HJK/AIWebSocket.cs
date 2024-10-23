@@ -19,6 +19,7 @@ public class AIWebSocket : MonoBehaviour
     
     private bool isGenerating = false;
     private bool isCancelled = false;
+    private bool cancelResponseReceived = false;
     
     // Start 메서드: WebSocket 연결을 초기화하고 이벤트 핸들러를 설정합니다.
     void Start()
@@ -160,6 +161,7 @@ public class AIWebSocket : MonoBehaviour
             string jsonMessage = JsonConvert.SerializeObject(request);
             ws.Send(jsonMessage);
             Debug.Log("generate.cancel 메시지 전송 시간: " + DateTime.Now.ToString("HH:mm:ss.fff"));
+            cancelResponseReceived = false;
             StartCoroutine(WaitForCancelResponse());
         }
     }
@@ -167,13 +169,21 @@ public class AIWebSocket : MonoBehaviour
     private IEnumerator WaitForCancelResponse()
     {
         float waitTime = 0f;
-        while (waitTime < 10f) // 10초 동안 대기
+        while (waitTime < 10f && !cancelResponseReceived) // 10초 동안 대기 또는 응답 수신 시까지
         {
             yield return new WaitForSeconds(0.5f);
             waitTime += 0.5f;
             Debug.Log($"취소 응답 대기 중... ({waitTime}초 경과)");
         }
-        Debug.Log("서버로부터 취소 응답 없음 (10초 초과)");
+        
+        if (cancelResponseReceived)
+        {
+            Debug.Log("서버로부터 취소 응답을 받았습니다.");
+        }
+        else
+        {
+            Debug.Log("서버로부터 취소 응답 없음 (10초 초과)");
+        }
     }
 
     // SendBufferAddAudio 메서드: 오디오 버퍼에 데이터를 추가하는 요청을 서버에 전송합니다.
@@ -243,9 +253,10 @@ public class AIWebSocket : MonoBehaviour
             }
             else if (response.type == "generated.text.canceled" || response.type == "generated.audio.canceled")
             {                
-                Debug.Log("P 버튼을 눌러서 생성이 취소되었습니다.(아마도?)");
+                Debug.Log("P 버튼을 눌러서 생성이 취소되었습니다.");
                 Debug.Log(response.type == "generated.text.canceled" ? "텍스트 생성이 취소되었습니다." : "오디오 생성이 취소되었습니다.");
                 isGenerating = false;
+                cancelResponseReceived = true; // 취소 응답 수신 표시
                 ResetCancelledState();
             }
             else if (response.type == "server.error")
