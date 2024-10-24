@@ -5,7 +5,8 @@ using System.Collections;
 using System.IO;
 using System.Text;
 using System.Collections.Generic;
-using UnityEngine.UI; // UI 네임스페이스 추가
+using UnityEngine.UI;
+using System.Threading.Tasks; // UI 네임스페이스 추가
 
 // VoiceManager 클래스: 음성 녹음, 재생 및 AI와의 통신을 관리합니다.
 public class VoiceManager : MonoBehaviour
@@ -54,9 +55,9 @@ public class VoiceManager : MonoBehaviour
     {
         if (!isRecording)
         {
-            // 마이크가 제대로 초기화되었는지 확인
+            Debug.Log("[시간] StartRecording 시작");
             string[] devices = Microphone.devices;
-            Debug.Log($"사용 가능한 마이크: {string.Join(", ", devices)}"); // 디버그 로그 추가
+            Debug.Log($"[시간] 사용 가능한 마이크: {string.Join(", ", devices)}");
             
             if (devices.Length == 0)
             {
@@ -64,11 +65,13 @@ public class VoiceManager : MonoBehaviour
                 return;
             }
             
-            isAudioCancelled = false; // 새로운 녹음 시작 시 취소 상태 초기화
-            recordedClip = Microphone.Start(null, true, 10, 24000); // 마이크로 10초 동안 24kHz로 녹음 시작
+            Debug.Log("[시간] Microphone.Start 호출 직전");
+            recordedClip = Microphone.Start(null, true, 10, 24000);
+            Debug.Log("[시간] Microphone.Start 호출 완료");
+            
             isRecording = true;
-            audioBuffer.Clear(); // 오디오 버퍼 초기화
-            Debug.Log("녹음 시작");
+            audioBuffer.Clear();
+            Debug.Log("[시간] StartRecording 완료");
         }
     }
 
@@ -96,62 +99,64 @@ public class VoiceManager : MonoBehaviour
     //    }
     //}
 
-    public void StopRecordingAndSend()
+    public async Task StopRecordingAndSend()
     {
         if (isRecording)
         {
+            Debug.Log("[시간] StopRecordingAndSend 시작");
             int position = Microphone.GetPosition(null);
-            Debug.Log($"녹음 종료. 녹음된 위치: {position}");
-            print(recordedClip.samples);
+            Debug.Log($"[시간] 녹음 종료. 녹음된 위치: {position}, 전체 샘플 수: {recordedClip.samples}");
+            
+            Debug.Log("[시간] Microphone.End 호출 직전");
             Microphone.End(null);
+            Debug.Log("[시간] Microphone.End 호출 완료");
+            
             isRecording = false;
 
             if (recordedClip != null)
             {
+                Debug.Log("[시간] ConvertAudioDataToBytes 시작");
                 lastRecordedAudioBase64 = ConvertAudioDataToBytes(recordedClip);
-                Debug.Log($"변환된 오디오 데이터 길이: {(lastRecordedAudioBase64?.Length ?? 0)}");
+                Debug.Log($"[시간] 변환된 오디오 데이터 길이: {(lastRecordedAudioBase64?.Length ?? 0)}");
 
                 if (string.IsNullOrEmpty(lastRecordedAudioBase64))
                 {
                     Debug.LogError("오디오 데이터 변환 실패");
                     return;
                 }
-                print("Hello");
-                aiWebSocket.SendBufferAddAudio(lastRecordedAudioBase64);
-                //aiWebSocket.SendGenerateTextAudio();
-                print("Bye");
+                
+                Debug.Log("[시간] SendBufferAddAudio 호출 직전");
+                await aiWebSocket.SendBufferAddAudio(lastRecordedAudioBase64);
+                Debug.Log("[시간] SendGenerateTextAudio 호출 직전");
+                await aiWebSocket.SendGenerateTextAudio();
+                Debug.Log("[시간] StopRecordingAndSend 완료");
             }
             else
             {
                 Debug.LogError("recordedClip이 null입니다");
             }
         }
+        
+        // Task.CompletedTask를 반환하는 대신 메소드를 여기서 종료합니다.
     }
 
     string ConvertAudioDataToBytes(AudioClip recordedClip)
     {
-        // 전체 클립 길이로 배열 생성
-        float[] samples = new float[recordedClip.samples * recordedClip.channels];
-
         // 녹음된 실제 위치 확인
         int position = Microphone.GetPosition(null);
         if (position <= 0) position = recordedClip.samples;
 
-        // 실제 녹음된 데이터만큼만 새 배열 생성
-        float[] actualSamples = new float[position];
+        float[] samples = new float[position * recordedClip.channels];
 
-        // 전체 데이터 가져오기
+        // 원본 데이터 가져오기
         if (!recordedClip.GetData(samples, 0))
         {
             Debug.LogError("오디오 데이터를 가져오는데 실패했습니다.");
             return null;
         }
 
-        // 실제 녹음된 부분만 복사
-        Array.Copy(samples, actualSamples, position);
-
         // 변환 및 반환
-        byte[] audioData = ConvertToByteArray(actualSamples);
+        byte[] audioData = ConvertToByteArray(samples);
         return Convert.ToBase64String(audioData);
     }
 
@@ -258,11 +263,16 @@ public class VoiceManager : MonoBehaviour
     {
         short[] intData = new short[samples.Length];
         byte[] bytesData = new byte[samples.Length * 2];
-        float rescaleFactor = 32767f; // float를 short로 변환할 때 사용할 스케일 팩터
+        float rescaleFactor = 32767f;
 
         for (int i = 0; i < samples.Length; i++)
         {
-            intData[i] = (short)(Mathf.Clamp(samples[i], -1f, 1f) * rescaleFactor);
+            // 노이즈 게이트 적용 (작은 소리는 제거)
+            float sample = samples[i];
+            if (Mathf.Abs(sample) < 0.01f)
+                sample = 0f;
+                
+            intData[i] = (short)(Mathf.Clamp(sample, -1f, 1f) * rescaleFactor);
         }
 
         Buffer.BlockCopy(intData, 0, bytesData, 0, bytesData.Length);

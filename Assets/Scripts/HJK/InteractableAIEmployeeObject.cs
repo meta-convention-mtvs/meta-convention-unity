@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using System.Threading.Tasks;
 
 public class InteractableAIEmployeeObject : MonoBehaviour, IKeyInteractableObject
 {
@@ -32,7 +33,7 @@ public class InteractableAIEmployeeObject : MonoBehaviour, IKeyInteractableObjec
     }
 
     // Update is called once per frame
-    void Update()
+    async void Update()
     {
         if (isInteracting)
         {
@@ -45,7 +46,7 @@ public class InteractableAIEmployeeObject : MonoBehaviour, IKeyInteractableObjec
             // 'M' 키를 떼면 녹음 중지 및 전송
             if (Input.GetKeyUp(KeyCode.M))
             {
-                voiceManager.StopRecordingAndSend();
+                await voiceManager.StopRecordingAndSend();
             }
 
             // 'P' 키를 눌러 현재 재생 중인 오디오 중지
