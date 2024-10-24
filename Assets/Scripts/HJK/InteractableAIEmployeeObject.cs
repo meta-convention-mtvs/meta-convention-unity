@@ -6,28 +6,53 @@ using UnityEngine.UI;
 public class InteractableAIEmployeeObject : MonoBehaviour, IKeyInteractableObject
 {
     public Text text_1;
+
+    VoiceManager voiceManager;
+
+    bool isInteracting = false;
     public void ShowText()
     {
-        throw new System.NotImplementedException();
+        text_1.gameObject.SetActive(true);
     }
     public void HideText()
     {
-        throw new System.NotImplementedException();
+        text_1.gameObject.SetActive(false);
     }
     public void Interact()
     {
-        throw new System.NotImplementedException();
+        isInteracting = true;
     }
 
     // Start is called before the first frame update
     void Start()
     {
-        
+        voiceManager = GameObject.FindWithTag("VoiceManager").GetComponent<VoiceManager>();
+        if (voiceManager == null)
+            Debug.LogError("Can't find voiceManager, set tag");
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+        if (isInteracting)
+        {
+            // 'M' 키를 눌러 녹음 시작
+            if (Input.GetKeyDown(KeyCode.M))
+            {
+                voiceManager.StartRecording();
+            }
+
+            // 'M' 키를 떼면 녹음 중지 및 전송
+            if (Input.GetKeyUp(KeyCode.M))
+            {
+                voiceManager.StopRecordingAndSend();
+            }
+
+            // 'P' 키를 눌러 현재 재생 중인 오디오 중지
+            if (Input.GetKeyDown(KeyCode.P))
+            {
+                voiceManager.StopCurrentAudioPlayback();
+            }
+        }
     }
 }

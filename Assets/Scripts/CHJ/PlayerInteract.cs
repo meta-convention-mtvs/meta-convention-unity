@@ -5,7 +5,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using WebSocketSharp;
 
 public class PlayerInteract : MonoBehaviourPun
 {
@@ -23,6 +22,7 @@ public class PlayerInteract : MonoBehaviourPun
         Collider[] colliders = Physics.OverlapSphere(transform.position, interactionDistance, interactionMask);
 
         GameObject closestObject = FindClosestGameObject(colliders, interactionDistance);
+
 
         if(previousClosestObject != null && closestObject != previousClosestObject)
         {

@@ -19,10 +19,12 @@ public class AIWebSocket : MonoBehaviour
     private Queue<string> messageQueue = new Queue<string>();
     
     private bool isGenerating = false;
-    
+
     public Text generatingStatusText; // Inspector에서 할당할 Text 컴포넌트
 
+    [SerializeField]
     private string aiId;              // AI 식별자 추가
+    [SerializeField]
     private string currentSessionId;  // 현재 세션 ID 추가
     
     // 새로운 프로퍼티 추가
@@ -53,19 +55,26 @@ public class AIWebSocket : MonoBehaviour
     // Start 메서드: WebSocket 연결을 초기화하고 이벤트 핸들러를 설정합니다.
     void Start()
     {
-        ws = new WebSocket("ws://metaai2.iptime.org:44444");
+        ConnectToWebsocket("ws://metaai2.iptime.org:44444", messageQueue);
+//        NetworkManager.Instance.RegisterAI(this, aiId);
+
+    }
+
+    public void ConnectToWebsocket(string websocketAddress, Queue<string> messageQueue)
+    {
+        ws = new WebSocket(websocketAddress);
 
         // WebSocket 연결 성공 시 호출되는 이벤트
         ws.OnOpen += (sender, e) => {
             Debug.Log("WebSocket 연결 성공");
             // 연결 성공 후 초기 설정을 서버로 전송
-            SendConfigUpdate(); 
+            SendConfigUpdate();
         };
 
         // 서버로부터 메시지를 받았을 때 호출되는 이벤트
         ws.OnMessage += (sender, e) => {
             // 스레드 안전성을 위해 messageQueue에 락을 걸고 데이터를 큐에 추가
-            lock(messageQueue)
+            lock (messageQueue)
             {
                 // 받은 메시지를 큐에 추가
                 messageQueue.Enqueue(e.Data);
@@ -116,72 +125,58 @@ public class AIWebSocket : MonoBehaviour
         }
     }
 
-    // SendConfigUpdate 메서드: 서버에 초기 설정을 전송합니다.
-    public void SendConfigUpdate()
+    public void SendRequest(dynamic request)
     {
-        if (ws != null && ws.IsAlive)
+        if (IsWebSocketConnected())
         {
-            var configUpdate = new
-            {
-                type = "config.update",
-                org = "cf79ea17-a487-4b27-a20d-bbd11ff885da", // 실제 기업 ID로 교체
-                llm = "realtime" // 현재 지원되는 LLM
-            };
-            string jsonMessage = JsonConvert.SerializeObject(configUpdate);
+            string jsonMessage = JsonConvert.SerializeObject(request);
             ws.Send(jsonMessage);
-            Debug.Log("config.update 메시지 전송");
+            Debug.Log(request.type +" 메시지 전송: " + jsonMessage);
         }
         else
         {
             Debug.LogError("WebSocket이 연결되지 않았거나 활성 상태가 아닙니다.");
         }
+    }
+    // SendConfigUpdate 메서드: 서버에 초기 설정을 전송합니다.
+    public void SendConfigUpdate()
+    {
+        var configUpdate = new
+        {
+            type = "config.update",
+            org = "cf79ea17-a487-4b27-a20d-bbd11ff885da", // 실제 기업 ID로 교체
+            llm = "realtime" // 현재 지원되는 LLM
+        };
+        SendRequest(configUpdate);
+
     }
 
     // SendGenerateTextAudio 메서드: 텍스트와 오디오 생성 요청을 서버에 전송합니다.
     public void SendGenerateTextAudio(string text)
     {
-        if (ws != null && ws.IsAlive)
+        isGenerating = true;
+        var request = new
         {
-            var request = new
-            {
-                type = "generate.text_audio",
-                text = text
-            };
-            string jsonMessage = JsonConvert.SerializeObject(request);
-            ws.Send(jsonMessage);
-            Debug.Log("generate.text_audio 메시지 전송: " + jsonMessage);
-            isGenerating = true;
-        }
-        else
-        {
-            Debug.LogError("WebSocket이 연결되지 않았거나 활성 상태가 아닙니다.");
-        }
+            type = "generate.text_audio",
+            text = text
+        };
+        SendRequest(request);
     }
-
     // SendGenerateOnlyText 메서드: 텍스트만 생성 요청을 서버에 전송합니다.
     public void SendGenerateOnlyText(string text)
     {
-        if (ws != null && ws.IsAlive)
+        var request = new
         {
-            var request = new
-            {
-                type = "generate.only_text",
-                text = text
-            };
-            string jsonMessage = JsonConvert.SerializeObject(request);
-            ws.Send(jsonMessage);
-            Debug.Log("generate.only_text 메시지 전송: " + jsonMessage);
-        }
-        else
-        {
-            Debug.LogError("WebSocket이 연결되지 않았거나 활성 상태가 아닙니다.");
-        }
+            type = "generate.only_text",
+            text = text
+        };
+        SendRequest(request);
     }
 
     // SendGenerateCancel 메서드: 생성 취소 요청을 서버에 전송합니다.
     public void SendGenerateCancel()
     {
-        Debug.Log("SendGenerateCancel 호출은 성공함..");
+        //Debug.Log("SendGenerateCancel 호출은 성공함..");
         if (ws != null && ws.IsAlive)
         {
             // 취소 요청 전에 현재 상태 확인
@@ -197,13 +192,47 @@ public class AIWebSocket : MonoBehaviour
             };
             string jsonMessage = JsonConvert.SerializeObject(request);
             ws.Send(jsonMessage);
-            ws.Send(jsonMessage);
-            ws.Send(jsonMessage);
             Debug.Log("generate.cancel 메시지 전송");
             
             // 일정 시간 후에도 취소 응답이 오지 않으면 강제로 상태 리셋
             // StartCoroutine(ResetGeneratingStateAfterDelay(3f));
         }
+    }
+    // 매개변수가 없는 SendGenerateTextAudio 메소드
+    public void SendGenerateTextAudio()
+    {
+        var request = new
+        {
+            type = "generate.text_audio"
+        };
+        SendRequest(request);
+        Debug.Log("audio with null text");
+    }
+
+    // SendBufferAddAudio 메서드: 오디오 버퍼에 데이터를 추가하는 요청을 서버에 전송합니다.
+    public void SendBufferAddAudio(string base64Audio)
+    {
+        if (string.IsNullOrEmpty(currentSessionId))
+        {
+            Debug.LogWarning("할당된 세션이 없습니다");
+            return;
+        }
+        var request = new
+        {
+            type = "buffer.add_audio",
+            audio = base64Audio
+        };
+        SendRequest(request);
+    }
+
+    // SendBufferClearAudio 메서드도 유지
+    public void SendBufferClearAudio()
+    {
+        var request = new
+        {
+            type = "buffer.clear_audio"
+        };
+        SendRequest(request);
     }
 
     private IEnumerator ResetGeneratingStateAfterDelay(float delay)
@@ -283,77 +312,9 @@ public class AIWebSocket : MonoBehaviour
     }
 
     // IsConnected 메서드: WebSocket 연결 상태를 반환합니다.
-    public bool IsConnected()
+    public bool IsWebSocketConnected()
     {
         return ws != null && ws.IsAlive;
-    }
-
-    // 매개변수가 없는 SendGenerateTextAudio 메소드
-    public void SendGenerateTextAudio()
-    {
-        if (ws != null && ws.IsAlive)
-        {
-            var request = new
-            {
-                type = "generate.text_audio"
-            };
-            string jsonMessage = JsonConvert.SerializeObject(request);
-            ws.Send(jsonMessage);
-            Debug.Log("generate.text_audio 메시지 전송 (빈 텍스트): " + jsonMessage);
-        }
-        else
-        {
-            Debug.LogError("WebSocket이 연결되지 않았거나 활성 상태가 아닙니다.");
-        }
-    }
-
-    // public bool IsGenerating()
-    // {
-    //     return isGenerating;
-    // }
-
-    // SendBufferAddAudio 메서드: 오디오 버퍼에 데이터를 추가하는 요청을 서버에 전송합니다.
-    public void SendBufferAddAudio(string base64Audio)
-    {
-        if (string.IsNullOrEmpty(currentSessionId))
-        {
-            Debug.LogWarning("할당된 세션이 없습니다");
-            return;
-        }
-        if (ws != null && ws.IsAlive)
-        {
-            var request = new
-            {
-                type = "buffer.add_audio",
-                audio = base64Audio
-            };
-            string jsonMessage = JsonConvert.SerializeObject(request);
-            ws.Send(jsonMessage);
-            Debug.Log("buffer.add_audio 메시지 전송");
-        }
-        else
-        {
-            Debug.LogError("WebSocket이 연결되지 않았거나 활성 상태가 아닙니다.");
-        }
-    }
-
-    // SendBufferClearAudio 메서드도 유지
-    public void SendBufferClearAudio()
-    {
-        if (ws != null && ws.IsAlive)
-        {
-            var request = new
-            {
-                type = "buffer.clear_audio"
-            };
-            string jsonMessage = JsonConvert.SerializeObject(request);
-            ws.Send(jsonMessage);
-            Debug.Log("buffer.clear_audio 메시지 전송");
-        }
-        else
-        {
-            Debug.LogError("WebSocket이 연결되지 않았거나 활성 상태가 아닙니다.");
-        }
     }
 
     // IsGenerating 상태를 외부에서 확인할 수 있는 프로퍼티 추가
@@ -370,13 +331,13 @@ public class AIWebSocket : MonoBehaviour
     // UI 업데이트 메서드
     private void UpdateGeneratingStatusUI()
     {
-        if (generatingStatusText != null)
-        {
-            generatingStatusText.text = "isGenerating: " + (isGenerating ? "true" : "false");
-        }
-        else
-        {
-            Debug.LogError("generatingStatusText가 설정되지 않았습니다.");
-        }
+       if (generatingStatusText != null)
+       {
+           generatingStatusText.text = "isGenerating: " + (isGenerating ? "true" : "false");
+       }
+       else
+       {
+           //Debug.LogError("generatingStatusText가 설정되지 않았습니다.");
+       }
     }
 }

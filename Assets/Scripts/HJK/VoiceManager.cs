@@ -32,6 +32,7 @@ public class VoiceManager : MonoBehaviour
     // 시작 시 실행되는 메서드
     void Start()
     {
+        NetworkManager.Instance.RegisterUser(this, userId);
         audioSource = gameObject.AddComponent<AudioSource>(); // AudioSource 컴포넌트 추가
         UpdatePlayingStatusUI();
         
@@ -45,29 +46,7 @@ public class VoiceManager : MonoBehaviour
     // 매 프레임마다 실행되는 메서드
     void Update()
     {
-        // 'M' 키를 눌러 녹음 시작
-        if (Input.GetKeyDown(KeyCode.M))
-        {
-            if (!isRecording)
-            {
-                StartRecording();
-            }
-        }
-        
-        // 'M' 키를 떼면 녹음 중지 및 전송
-        if (Input.GetKeyUp(KeyCode.M))
-        {
-            if (isRecording)
-            {
-                StopRecordingAndSend();
-            }
-        }
 
-        // 'P' 키를 눌러 현재 재생 중인 오디오 중지
-        if (Input.GetKeyDown(KeyCode.P))
-        {
-            StopCurrentAudioPlayback();
-        }
     }
 
     // 녹음을 시작하는 메서드
@@ -94,31 +73,91 @@ public class VoiceManager : MonoBehaviour
     }
 
     // 녹음을 중지하고 서버로 전송하는 메서드
+    //public void StopRecordingAndSend()
+    //{
+    //    if (isRecording)
+    //    {
+    //        Microphone.End(null); // 녹음 중지
+    //        isRecording = false;
+    //        Debug.Log("녹음 중지");
+
+    //        //int position = Microphone.GetPosition(null); // 현재 녹음 위치 가져오기
+    //        //float[] samples = new float[position];
+    //        //recordedClip.GetData(samples, 0); // 녹음된 데이터 가져오기
+    //        //byte[] audioData = ConvertToByteArray(samples); // float 배열을 byte 배열로 변환
+    //        lastRecordedAudioBase64 = ConvertAudioDataToBytes(recordedClip); // byte 배열을 Base64 문자열로 변환
+    //        if(lastRecordedAudioBase64 == null)
+    //        {
+    //            Debug.Log("녹음된 오디오 데이터가 없습니다.");
+    //            return;
+    //        }
+    //        aiWebSocket.SendBufferAddAudio(lastRecordedAudioBase64); // 녹음된 오디오 데이터를 서버로 전송
+    //        aiWebSocket.SendGenerateTextAudio(); // 텍스트 및 오디오 생성 요청
+    //    }
+    //}
+
     public void StopRecordingAndSend()
     {
         if (isRecording)
         {
-            int position = Microphone.GetPosition(null); // 현재 녹음 위치 가져오기
-            Microphone.End(null); // 녹음 중지
+            int position = Microphone.GetPosition(null);
+            Debug.Log($"녹음 종료. 녹음된 위치: {position}");
+            print(recordedClip.samples);
+            Microphone.End(null);
             isRecording = false;
-            Debug.Log("녹음 중지");
 
-            float[] samples = new float[position];
-            recordedClip.GetData(samples, 0); // 녹음된 데이터 가져오기
-            byte[] audioData = ConvertToByteArray(samples); // float 배열을 byte 배열로 변환
-            lastRecordedAudioBase64 = Convert.ToBase64String(audioData); // byte 배열을 Base64 문자열로 변환
-            if(lastRecordedAudioBase64 == null)
+            if (recordedClip != null)
             {
-                Debug.Log("녹음된 오디오 데이터가 없습니다.");
-                return;
+                lastRecordedAudioBase64 = ConvertAudioDataToBytes(recordedClip);
+                Debug.Log($"변환된 오디오 데이터 길이: {(lastRecordedAudioBase64?.Length ?? 0)}");
+
+                if (string.IsNullOrEmpty(lastRecordedAudioBase64))
+                {
+                    Debug.LogError("오디오 데이터 변환 실패");
+                    return;
+                }
+                print("Hello");
+                aiWebSocket.SendBufferAddAudio(lastRecordedAudioBase64);
+                //aiWebSocket.SendGenerateTextAudio();
+                print("Bye");
             }
-            currentAI.SendBufferAddAudio(lastRecordedAudioBase64); // 녹음된 오디오 데이터를 서버로 전송
-            currentAI.SendGenerateTextAudio(); // 텍스트 및 오디오 생성 요청
+            else
+            {
+                Debug.LogError("recordedClip이 null입니다");
+            }
         }
     }
 
+    string ConvertAudioDataToBytes(AudioClip recordedClip)
+    {
+        // 전체 클립 길이로 배열 생성
+        float[] samples = new float[recordedClip.samples * recordedClip.channels];
+
+        // 녹음된 실제 위치 확인
+        int position = Microphone.GetPosition(null);
+        if (position <= 0) position = recordedClip.samples;
+
+        // 실제 녹음된 데이터만큼만 새 배열 생성
+        float[] actualSamples = new float[position];
+
+        // 전체 데이터 가져오기
+        if (!recordedClip.GetData(samples, 0))
+        {
+            Debug.LogError("오디오 데이터를 가져오는데 실패했습니다.");
+            return null;
+        }
+
+        // 실제 녹음된 부분만 복사
+        Array.Copy(samples, actualSamples, position);
+
+        // 변환 및 반환
+        byte[] audioData = ConvertToByteArray(actualSamples);
+        return Convert.ToBase64String(audioData);
+    }
+
+
     // 현재 재생 중인 오디오를 중지하는 메서드
-    private void StopCurrentAudioPlayback()
+    public void StopCurrentAudioPlayback()
     {
         Debug.Log("오디오 재생 중지 요청");
         
@@ -141,7 +180,7 @@ public class VoiceManager : MonoBehaviour
             isAudioCancelled = true;
             
             // 서버에 취소 요청
-            currentAI.SendGenerateCancel();
+            aiWebSocket.SendGenerateCancel();
             
             UpdatePlayingStatusUI();
         }
@@ -166,7 +205,11 @@ public class VoiceManager : MonoBehaviour
         }
 
         audioBuffer.AddRange(samples); // 변환된 샘플을 오디오 버퍼에 추가
+        StartAudioBuffer(audioBuffer);
+    }
 
+    void StartAudioBuffer(List<float> audioBuffer)
+    {
         // 버퍼가 임계값에 도달하고 현재 재생 중이 아니면 재생 시작
         if (audioBuffer.Count >= BUFFER_THRESHOLD && !isPlaying)
         {
@@ -176,6 +219,7 @@ public class VoiceManager : MonoBehaviour
             }
             playCoroutine = StartCoroutine(PlayBufferedAudio());
         }
+
     }
 
     // 버퍼링된 오디오를 재생하는 코루틴
