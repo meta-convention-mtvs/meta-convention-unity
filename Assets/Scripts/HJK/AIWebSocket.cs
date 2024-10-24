@@ -19,7 +19,7 @@ public class AIWebSocket : MonoBehaviour
     private Queue<string> messageQueue = new Queue<string>();
     
     private bool isGenerating = false;
-    
+
     public Text generatingStatusText; // Inspector에서 할당할 Text 컴포넌트
 
     [SerializeField]
@@ -154,7 +154,7 @@ public class AIWebSocket : MonoBehaviour
     // SendGenerateTextAudio 메서드: 텍스트와 오디오 생성 요청을 서버에 전송합니다.
     public void SendGenerateTextAudio(string text)
     {
-        //isGenerating = true;
+        isGenerating = true;
         var request = new
         {
             type = "generate.text_audio",
@@ -317,12 +317,6 @@ public class AIWebSocket : MonoBehaviour
         return ws != null && ws.IsAlive;
     }
 
-
-    // public bool IsGenerating()
-    // {
-    //     return isGenerating;
-    // }
-
     // IsGenerating 상태를 외부에서 확인할 수 있는 프로퍼티 추가
     public bool IsGenerating
     {
@@ -337,13 +331,13 @@ public class AIWebSocket : MonoBehaviour
     // UI 업데이트 메서드
     private void UpdateGeneratingStatusUI()
     {
-        if (generatingStatusText != null)
-        {
-            generatingStatusText.text = "isGenerating: " + (isGenerating ? "true" : "false");
-        }
-        else
-        {
-            Debug.LogError("generatingStatusText가 설정되지 않았습니다.");
-        }
+       if (generatingStatusText != null)
+       {
+           generatingStatusText.text = "isGenerating: " + (isGenerating ? "true" : "false");
+       }
+       else
+       {
+           //Debug.LogError("generatingStatusText가 설정되지 않았습니다.");
+       }
     }
 }

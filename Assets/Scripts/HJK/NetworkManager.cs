@@ -5,15 +5,13 @@ using UnityEngine;
 // NetworkManager가 AIWebSocket 인스턴스 관리
 public class NetworkManager : Singleton<NetworkManager>
 {
-    private Dictionary<string, AIWebSocket> aiConnections;
-    private Dictionary<string, VoiceManager> userVoiceManagers;
-
+    // Dictionary를 선언과 동시에 초기화
+    private Dictionary<string, AIWebSocket> aiConnections = new Dictionary<string, AIWebSocket>();
+    private Dictionary<string, VoiceManager> userVoiceManagers = new Dictionary<string, VoiceManager>();
 
     private void Start()
     {
-        // Dictionary 초기화
-        aiConnections = new Dictionary<string, AIWebSocket>();
-        userVoiceManagers = new Dictionary<string, VoiceManager>();       
+        // Start에서의 초기화는 제거해도 됨
     }
 
     // 4. 기존 기능 유지
@@ -52,6 +50,12 @@ public class NetworkManager : Singleton<NetworkManager>
         if (voiceManager == null)
         {
             Debug.LogError($"VoiceManager가 null입니다. User ID: {userId}");
+            return;
+        }
+
+        if (string.IsNullOrEmpty(userId))  // userId null 체크 추가
+        {
+            Debug.LogError("User ID가 null이거나 비어있습니다.");
             return;
         }
 

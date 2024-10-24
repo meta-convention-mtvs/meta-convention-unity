@@ -1272,7 +1272,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   chatManager: {fileID: 791432659}
   voiceManager: {fileID: 907778767}
-  generatingStatusText: {fileID: 0}
   aiId: dfd
   currentSessionId: dfdf
 --- !u!114 &907778767
@@ -1291,6 +1290,7 @@ MonoBehaviour:
   aiWebSocket: {fileID: 907778766}
   playingStatusText: {fileID: 218232162}
   replayButton: {fileID: 0}
+  userId: 777
 --- !u!82 &907778768
 AudioSource:
   m_ObjectHideFlags: 0
