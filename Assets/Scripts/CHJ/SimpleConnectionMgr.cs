@@ -1,4 +1,4 @@
-using Photon.Pun;
+Ôªøusing Photon.Pun;
 using Photon.Realtime;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
 using System.Collections;
@@ -7,7 +7,8 @@ using UnityEngine;
 
 public class SimpleConnectionMgr : MonoBehaviourPunCallbacks
 {
-    #region ∏ﬁ¿Œº≠πˆø° ø¨∞·
+
+    #region Î©îÏù∏ÏÑúÎ≤ÑÏóê Ïó∞Í≤∞
     private void Start()
     {
         PhotonNetwork.SendRate = 120;
@@ -21,14 +22,14 @@ public class SimpleConnectionMgr : MonoBehaviourPunCallbacks
     }
     #endregion
 
-    #region ∑Îø° ¿‘¿Â
-    public void JoinOrCreateRoom()
+    #region Î£∏Ïóê ÏûÖÏû•, ÎÇòÍ∞ÄÍ∏∞
+    public void JoinOrCreateRoom(string roomName)
     {
         if (PhotonNetwork.IsConnected)
         {
             RoomOptions roomOptions = new RoomOptions();
             roomOptions.MaxPlayers = 20;
-            PhotonNetwork.JoinOrCreateRoom("MainHall", roomOptions, TypedLobby.Default);
+            PhotonNetwork.JoinOrCreateRoom(roomName, roomOptions, TypedLobby.Default);
         }
         else
         {
@@ -37,17 +38,13 @@ public class SimpleConnectionMgr : MonoBehaviourPunCallbacks
     }
     #endregion
 
-    #region ∑Î ƒ›πÈ«‘ºˆ
+    #region Î£∏ ÏΩúÎ∞±Ìï®Ïàò
     public override void OnJoinedRoom()
     {
         print("Entered the Room");
         PhotonNetwork.LoadLevel("MainScene_CHJ");
     }
 
-    public override void OnJoinRoomFailed(short returnCode, string message)
-    {
-        print("Enter room failed...");
-        print(returnCode + message);
-    }
+
     #endregion
 }

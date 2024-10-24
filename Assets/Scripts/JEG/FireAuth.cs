@@ -5,6 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class FireAuth : MonoBehaviour
 {
@@ -12,6 +13,9 @@ public class FireAuth : MonoBehaviour
     public FirebaseAuth auth;
 
     public GameObject loginUI;
+    public InputField inputEmail;
+    public InputField inputPassword;
+
     private void Awake()
     {
         instance = this;
@@ -95,5 +99,21 @@ public class FireAuth : MonoBehaviour
     {
         auth.SignOut();
         print("·Î±× ¾Æ¿ô!");
+    }
+
+
+    public void OnClickSignUp()
+    {
+        instance.SignUp(inputEmail.text, inputPassword.text);
+    }
+
+    public void OnClickLogIn()
+    {
+        instance.LogIn(inputEmail.text, inputPassword.text);
+    }
+
+    public void OnClickLogOut()
+    {
+        instance.Logout();
     }
 }
