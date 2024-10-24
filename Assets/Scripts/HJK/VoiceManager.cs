@@ -26,9 +26,7 @@ public class VoiceManager : MonoBehaviour
     public Text playingStatusText; // UI Text 컴포넌트를 위한 변수 추가
     public Button replayButton; // 재생 버튼을 위한 변수 추가
 
-    [SerializeField] // Inspector에서 설정할 수 있도록 SerializeField 추가
-    private string userId;  // userId를 Inspector에서 설정
-    
+    private string userId;           // 사용자 식별자 추가
     private AIWebSocket currentAI;   // 현재 연결된 AI 참조 추가
 
     // 시작 시 실행되는 메서드
@@ -48,29 +46,7 @@ public class VoiceManager : MonoBehaviour
     // 매 프레임마다 실행되는 메서드
     void Update()
     {
-        // 'M' 키를 눌러 녹음 시작
-        if (Input.GetKeyDown(KeyCode.M))
-        {
-            if (!isRecording)
-            {
-                StartRecording();
-            }
-        }
-        
-        // 'M' 키를 떼면 녹음 중지 및 전송
-        if (Input.GetKeyUp(KeyCode.M))
-        {
-            if (isRecording)
-            {
-                StopRecordingAndSend();
-            }
-        }
 
-        // 'P' 키를 눌러 현재 재생 중인 오디오 중지
-        if (Input.GetKeyDown(KeyCode.P))
-        {
-            StopCurrentAudioPlayback();
-        }
     }
 
     // 녹음을 시작하는 메서드
@@ -78,9 +54,9 @@ public class VoiceManager : MonoBehaviour
     {
         if (!isRecording)
         {
-            isAudioCancelled = false;
+            // 마이크가 제대로 초기화되었는지 확인
             string[] devices = Microphone.devices;
-            Debug.Log($"사용 가능한 마이크: {string.Join(", ", devices)}");
+            Debug.Log($"사용 가능한 마이크: {string.Join(", ", devices)}"); // 디버그 로그 추가
             
             if (devices.Length == 0)
             {
@@ -88,35 +64,45 @@ public class VoiceManager : MonoBehaviour
                 return;
             }
             
-            try
-            {
-                recordedClip = Microphone.Start(null, true, 10, 24000);
-                if (recordedClip != null)
-                {
-                    isRecording = true;
-                    audioBuffer.Clear();
-                    Debug.Log("녹음 시작됨: AudioClip 생성 성공");
-                }
-                else
-                {
-                    Debug.LogError("녹음 시작 실패: AudioClip이 null입니다");
-                }
-            }
-            catch (System.Exception e)
-            {
-                Debug.LogError($"녹음 시작 중 오류: {e.Message}");
-            }
+            isAudioCancelled = false; // 새로운 녹음 시작 시 취소 상태 초기화
+            recordedClip = Microphone.Start(null, true, 10, 24000); // 마이크로 10초 동안 24kHz로 녹음 시작
+            isRecording = true;
+            audioBuffer.Clear(); // 오디오 버퍼 초기화
+            Debug.Log("녹음 시작");
         }
     }
 
     // 녹음을 중지하고 서버로 전송하는 메서드
+    //public void StopRecordingAndSend()
+    //{
+    //    if (isRecording)
+    //    {
+    //        Microphone.End(null); // 녹음 중지
+    //        isRecording = false;
+    //        Debug.Log("녹음 중지");
+
+    //        //int position = Microphone.GetPosition(null); // 현재 녹음 위치 가져오기
+    //        //float[] samples = new float[position];
+    //        //recordedClip.GetData(samples, 0); // 녹음된 데이터 가져오기
+    //        //byte[] audioData = ConvertToByteArray(samples); // float 배열을 byte 배열로 변환
+    //        lastRecordedAudioBase64 = ConvertAudioDataToBytes(recordedClip); // byte 배열을 Base64 문자열로 변환
+    //        if(lastRecordedAudioBase64 == null)
+    //        {
+    //            Debug.Log("녹음된 오디오 데이터가 없습니다.");
+    //            return;
+    //        }
+    //        aiWebSocket.SendBufferAddAudio(lastRecordedAudioBase64); // 녹음된 오디오 데이터를 서버로 전송
+    //        aiWebSocket.SendGenerateTextAudio(); // 텍스트 및 오디오 생성 요청
+    //    }
+    //}
+
     public void StopRecordingAndSend()
     {
         if (isRecording)
         {
             int position = Microphone.GetPosition(null);
             Debug.Log($"녹음 종료. 녹음된 위치: {position}");
-            
+            print(recordedClip.samples);
             Microphone.End(null);
             isRecording = false;
 
@@ -124,15 +110,16 @@ public class VoiceManager : MonoBehaviour
             {
                 lastRecordedAudioBase64 = ConvertAudioDataToBytes(recordedClip);
                 Debug.Log($"변환된 오디오 데이터 길이: {(lastRecordedAudioBase64?.Length ?? 0)}");
-                
+
                 if (string.IsNullOrEmpty(lastRecordedAudioBase64))
                 {
                     Debug.LogError("오디오 데이터 변환 실패");
                     return;
                 }
-                
+                print("Hello");
                 aiWebSocket.SendBufferAddAudio(lastRecordedAudioBase64);
-                aiWebSocket.SendGenerateTextAudio();
+                //aiWebSocket.SendGenerateTextAudio();
+                print("Bye");
             }
             else
             {
@@ -145,14 +132,14 @@ public class VoiceManager : MonoBehaviour
     {
         // 전체 클립 길이로 배열 생성
         float[] samples = new float[recordedClip.samples * recordedClip.channels];
-        
+
         // 녹음된 실제 위치 확인
         int position = Microphone.GetPosition(null);
         if (position <= 0) position = recordedClip.samples;
 
         // 실제 녹음된 데이터만큼만 새 배열 생성
         float[] actualSamples = new float[position];
-        
+
         // 전체 데이터 가져오기
         if (!recordedClip.GetData(samples, 0))
         {
@@ -162,7 +149,7 @@ public class VoiceManager : MonoBehaviour
 
         // 실제 녹음된 부분만 복사
         Array.Copy(samples, actualSamples, position);
-        
+
         // 변환 및 반환
         byte[] audioData = ConvertToByteArray(actualSamples);
         return Convert.ToBase64String(audioData);
@@ -170,7 +157,7 @@ public class VoiceManager : MonoBehaviour
 
 
     // 현재 재생 중인 오디오를 중지하는 메서드
-    private void StopCurrentAudioPlayback()
+    public void StopCurrentAudioPlayback()
     {
         Debug.Log("오디오 재생 중지 요청");
         
@@ -303,48 +290,27 @@ public class VoiceManager : MonoBehaviour
         Debug.Log("마지막 녹음된 오디오 재생 요청 버튼 클릭");
         if (lastRecordedAudioBase64 != null && !isPlaying)
         {
-            try
+            byte[] audioData = Convert.FromBase64String(lastRecordedAudioBase64);
+            short[] shortArray = new short[audioData.Length / 2];
+            Buffer.BlockCopy(audioData, 0, shortArray, 0, audioData.Length);
+            
+            float[] samples = new float[shortArray.Length];
+            for (int i = 0; i < shortArray.Length; i++)
             {
-                byte[] audioData = Convert.FromBase64String(lastRecordedAudioBase64);
-                Debug.Log($"오디오 데이터 길이: {audioData.Length}");
-                
-                if (audioData.Length == 0)
-                {
-                    Debug.LogError("오디오 데이터가 비어있습니다.");
-                    return;
-                }
-
-                short[] shortArray = new short[audioData.Length / 2];
-                Buffer.BlockCopy(audioData, 0, shortArray, 0, audioData.Length);
-                
-                float[] samples = new float[shortArray.Length];
-                for (int i = 0; i < shortArray.Length; i++)
-                {
-                    samples[i] = shortArray[i] / 32768f;
-                }
-
-                if (samples.Length == 0)
-                {
-                    Debug.LogError("변환 샘플 데이터가 비어있습니다.");
-                    return;
-                }
-
-                AudioClip clip = AudioClip.Create("LastRecording", samples.Length, 1, 24000, false);
-                clip.SetData(samples, 0);
-
-                audioSource.clip = clip;
-                audioSource.Play();
-                
-                Debug.Log($"오디오 재생 시작: 샘플 길이 = {samples.Length}");
+                samples[i] = shortArray[i] / 32768f;
             }
-            catch (System.Exception e)
-            {
-                Debug.LogError($"오디오 재생 중 오류 발생: {e.Message}");
-            }
+
+            AudioClip clip = AudioClip.Create("LastRecording", samples.Length, 1, 24000, false);
+            clip.SetData(samples, 0);
+
+            audioSource.clip = clip;
+            audioSource.Play();
+            
+            Debug.Log("마지막 녹음된 오디오 재생 중");
         }
         else
         {
-            Debug.Log($"재생 불가: lastRecordedAudioBase64 null? {lastRecordedAudioBase64 == null}, isPlaying? {isPlaying}");
+            Debug.Log("재생할 녹음된 오디오가 없거나 현재 다른 오디오가 재생 중입니다.");
         }
     }
 

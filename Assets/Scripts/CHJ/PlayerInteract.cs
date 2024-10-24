@@ -23,6 +23,7 @@ public class PlayerInteract : MonoBehaviourPun
 
         GameObject closestObject = FindClosestGameObject(colliders, interactionDistance);
 
+
         if(previousClosestObject != null && closestObject != previousClosestObject)
         {
             IKeyInteractableObject go = previousClosestObject.GetComponent<IKeyInteractableObject>();

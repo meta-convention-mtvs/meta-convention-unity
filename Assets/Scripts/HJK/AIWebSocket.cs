@@ -56,11 +56,11 @@ public class AIWebSocket : MonoBehaviour
     void Start()
     {
         ConnectToWebsocket("ws://metaai2.iptime.org:44444", messageQueue);
-        NetworkManager.Instance.RegisterAI(this, aiId);
+//        NetworkManager.Instance.RegisterAI(this, aiId);
 
     }
 
-    private void ConnectToWebsocket(string websocketAddress, Queue<string> messageQueue)
+    public void ConnectToWebsocket(string websocketAddress, Queue<string> messageQueue)
     {
         ws = new WebSocket(websocketAddress);
 
