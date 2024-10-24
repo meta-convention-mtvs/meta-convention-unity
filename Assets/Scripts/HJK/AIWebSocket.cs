@@ -22,7 +22,9 @@ public class AIWebSocket : MonoBehaviour
     
     public Text generatingStatusText; // Inspector에서 할당할 Text 컴포넌트
 
+    [SerializeField]
     private string aiId;              // AI 식별자 추가
+    [SerializeField]
     private string currentSessionId;  // 현재 세션 ID 추가
     
     // 새로운 프로퍼티 추가
@@ -54,6 +56,8 @@ public class AIWebSocket : MonoBehaviour
     void Start()
     {
         ConnectToWebsocket("ws://metaai2.iptime.org:44444", messageQueue);
+        NetworkManager.Instance.RegisterAI(this, aiId);
+
     }
 
     private void ConnectToWebsocket(string websocketAddress, Queue<string> messageQueue)

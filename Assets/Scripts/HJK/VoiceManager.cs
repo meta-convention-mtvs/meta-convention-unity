@@ -32,6 +32,7 @@ public class VoiceManager : MonoBehaviour
     // 시작 시 실행되는 메서드
     void Start()
     {
+        NetworkManager.Instance.RegisterUser(this, userId);
         audioSource = gameObject.AddComponent<AudioSource>(); // AudioSource 컴포넌트 추가
         UpdatePlayingStatusUI();
         
@@ -98,15 +99,15 @@ public class VoiceManager : MonoBehaviour
     {
         if (isRecording)
         {
-            int position = Microphone.GetPosition(null); // 현재 녹음 위치 가져오기
             Microphone.End(null); // 녹음 중지
             isRecording = false;
             Debug.Log("녹음 중지");
 
-            float[] samples = new float[position];
-            recordedClip.GetData(samples, 0); // 녹음된 데이터 가져오기
-            byte[] audioData = ConvertToByteArray(samples); // float 배열을 byte 배열로 변환
-            lastRecordedAudioBase64 = Convert.ToBase64String(audioData); // byte 배열을 Base64 문자열로 변환
+            //int position = Microphone.GetPosition(null); // 현재 녹음 위치 가져오기
+            //float[] samples = new float[position];
+            //recordedClip.GetData(samples, 0); // 녹음된 데이터 가져오기
+            //byte[] audioData = ConvertToByteArray(samples); // float 배열을 byte 배열로 변환
+            lastRecordedAudioBase64 = ConvertAudioDataToBytes(recordedClip); // byte 배열을 Base64 문자열로 변환
             if(lastRecordedAudioBase64 == null)
             {
                 Debug.Log("녹음된 오디오 데이터가 없습니다.");
@@ -116,6 +117,16 @@ public class VoiceManager : MonoBehaviour
             currentAI.SendGenerateTextAudio(); // 텍스트 및 오디오 생성 요청
         }
     }
+
+    string ConvertAudioDataToBytes(AudioClip recordedClip)
+    {
+        int position = Microphone.GetPosition(null); // 현재 녹음 위치 가져오기
+        float[] samples = new float[position];
+        recordedClip.GetData(samples, 0); // 녹음된 데이터 가져오기
+        byte[] audioData = ConvertToByteArray(samples); // float 배열을 byte 배열로 변환
+        return Convert.ToBase64String(audioData); // byte 배열을 Base64 문자열로 변환
+    }
+
 
     // 현재 재생 중인 오디오를 중지하는 메서드
     private void StopCurrentAudioPlayback()
@@ -166,7 +177,11 @@ public class VoiceManager : MonoBehaviour
         }
 
         audioBuffer.AddRange(samples); // 변환된 샘플을 오디오 버퍼에 추가
+        StartAudioBuffer(audioBuffer);
+    }
 
+    void StartAudioBuffer(List<float> audioBuffer)
+    {
         // 버퍼가 임계값에 도달하고 현재 재생 중이 아니면 재생 시작
         if (audioBuffer.Count >= BUFFER_THRESHOLD && !isPlaying)
         {
@@ -176,6 +191,7 @@ public class VoiceManager : MonoBehaviour
             }
             playCoroutine = StartCoroutine(PlayBufferedAudio());
         }
+
     }
 
     // 버퍼링된 오디오를 재생하는 코루틴
