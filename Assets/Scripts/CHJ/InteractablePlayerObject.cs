@@ -1,4 +1,4 @@
-using Photon.Pun;
+﻿using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -13,8 +13,8 @@ public class InteractablePlayerObject : MonoBehaviourPun, IKeyInteractableObject
 
     private void Start()
     {
-        cardBook = GameObject.FindWithTag("CardBook").GetComponent<CardBook>();
-        cardReader = GameObject.FindWithTag("CardReader").GetComponent<CardReader>();
+        cardBook = GameObject.FindWithTag("CardBook")?.GetComponent<CardBook>();
+        cardReader = GameObject.FindWithTag("CardReader")?.GetComponent<CardReader>();
     }
     public void HideText()
     {
