@@ -7,7 +7,7 @@ using UnityEngine.UI;
 public class NextSceneButton : MonoBehaviour
 {
     public Button btn_nextScene;
-    public SimpleConnectionMgr connectMgr;
+    public SimpleConnectionMgr simpleMgr;
 
     private void Start()
     {
@@ -22,6 +22,6 @@ public class NextSceneButton : MonoBehaviour
     void JoinRoom(CharacterCustomizeData data)
     {
         if(data!= null)
-            connectMgr.JoinOrCreateRoom();
+            simpleMgr.JoinOrCreateRoom("MainHall");
     }
 }
