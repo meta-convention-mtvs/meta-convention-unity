@@ -10,7 +10,7 @@ namespace Ricimi
 {
 	// This UI component is a specialized selection slider that allows you to
 	// scroll between different text-based options.
-	public class TextSelectionSlider : MonoBehaviour
+	public class Customization_GenderSelection : MonoBehaviour
 	{
 		public List<string> Options;
 		public Text OptionText;
