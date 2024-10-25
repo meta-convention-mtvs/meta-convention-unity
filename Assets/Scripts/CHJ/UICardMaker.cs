@@ -1,16 +1,15 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using TMPro;
 using UnityEngine.UI;
 using System;
 
 public class UICardMaker : MonoBehaviour
 {
-    public TMP_InputField nameInput;
-    public TMP_InputField instituteInput;
-    public TMP_InputField majorInput;
-    public TMP_InputField email_Input;
+    public Text nameInput;
+    public Text instituteInput;
+    public Text majorInput;
+    public Text email_Input;
     public Button saveButton;
 
     public Action<string, string, string, string> OnSaveClick;
