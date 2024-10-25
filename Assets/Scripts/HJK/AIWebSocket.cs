@@ -11,9 +11,8 @@ using System.Threading.Tasks;
 // AIWebSocket 클래스: WebSocket을 통해 AI 서버와 통신하는 기능을 제공합니다.
 public class AIWebSocket : MonoBehaviour
 {
-    public ChatManager chatManager;
     public VoiceManager voiceManager;
-
+    public TextItem uiText;
     private WebSocket ws;
     // 서버로부터 받은 메시지를 저장하는 큐
     // 메인 스레드에서 안전하게 처리하기 위해 사용됨
@@ -256,7 +255,7 @@ public class AIWebSocket : MonoBehaviour
         {
             Debug.LogWarning("서버로부터 취소 응답을 받지 못했습니다. 상태를 강제로 리셋합니다.");
             isGenerating = false;
-            chatManager.OnReceiveAIResponse("\n[생성이 강제 중단되었습니다.]");
+            uiText.AddText("\n[생성이 강제 중단되었습니다.]");
         }
     }
 
@@ -270,11 +269,12 @@ public class AIWebSocket : MonoBehaviour
             
             if (response.type == "generated.text.delta")
             {
+                uiText.AddText((string)response.delta);
                 IsGenerating = true;
             }
             else if (response.type == "generated.text.done")
             {
-                chatManager.OnReceiveAIResponse("\nAI: " + (string)response.text);
+                uiText.AddText("\n");
                 IsGenerating = false;
             }
             else if (response.type == "generated.text.canceled" || response.type == "generated.audio.canceled")

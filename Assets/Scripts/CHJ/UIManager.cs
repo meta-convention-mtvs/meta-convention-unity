@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
@@ -20,6 +20,7 @@ public enum UIType
     OptionPopUp,
     Option,
     Normal,
+    Conversation,
     Memo,
     HUD
 }
@@ -60,46 +61,47 @@ public class UIManager : MonoBehaviour
         {
             if(uiStack.Count > 0)
             {
-                HideUI();
+                HideUIInStack();
             }
         }
     }
     public void ShowUI(GameObject uiObject, UIType uiType)
     {
         UI ui = new UI(uiObject, uiType);
-        if(uiStack.Count > 0)
-        {
-            UI previousUI = uiStack.Peek();
-            if (HasHigherOrder(previousUI, ui))
-            {
-                switch (uiType) {
-                    case UIType.Normal:
-                        PlayNoramlUIAnimation(ui, UIAnimationTime, true);
-                        break;
-                }
-                uiStack.Push(ui);
-            }
-        }
-        else
+
+        if (IsShowUI(uiStack, ui))
         {
             switch (uiType)
             {
+                case UIType.Conversation:
                 case UIType.Normal:
                     PlayNoramlUIAnimation(ui, UIAnimationTime, true);
                     break;
             }
             uiStack.Push(ui);
         }
-
-        
     }
-    void HideUI()
+
+    bool IsShowUI(Stack<UI> uiStack, UI currentUI)
+    {
+        if (uiStack.Count == 0)
+            return true;
+
+        UI uI = uiStack.Peek();
+        if (HasHigherOrder(uI, currentUI))
+            return true;
+        else 
+            return false;
+    }
+
+    void HideUIInStack()
     {
         UI ui = uiStack.Pop();
         if (ui != null)
         {
             switch (ui.uiType)
             {
+                case UIType.Conversation:
                 case UIType.Normal:
                     PlayNoramlUIAnimation(ui, UIAnimationTime, false);
                     break;
@@ -110,6 +112,12 @@ public class UIManager : MonoBehaviour
     void PlayNoramlUIAnimation(UI ui, float time, bool isSetActive)
     {
         CanvasGroup canvas = ui.UIObject.GetComponent<CanvasGroup>();
+        if (canvas == null)
+        {
+            Debug.LogError("Canvas Group 이 붙여져 있지 않습니다 : " + ui.UIObject.name);
+            return;
+        }
+
         float startAlpha, endAlpha;
         if (isSetActive)
         {
@@ -121,11 +129,11 @@ public class UIManager : MonoBehaviour
             startAlpha = 1;
             endAlpha = 0;
         }
-        if (canvas != null)
-        {
-            canvas.alpha = startAlpha;
-            canvas.DOFade(endAlpha, time).OnComplete(()=> canvas.blocksRaycasts = isSetActive);
-        }
+
+        canvas.alpha = startAlpha;
+        canvas.blocksRaycasts = isSetActive;
+        canvas.DOFade(endAlpha, time).OnComplete(()=> canvas.blocksRaycasts = isSetActive);
+
     }
 
     bool HasHigherOrder(UI prevUI, UI currUI)

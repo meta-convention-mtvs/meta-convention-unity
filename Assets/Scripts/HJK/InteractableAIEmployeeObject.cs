@@ -8,6 +8,7 @@ public class InteractableAIEmployeeObject : MonoBehaviour, IKeyInteractableObjec
 {
     public Text text_1;
 
+    GameObject AISpeackUI;
     VoiceManager voiceManager;
 
     bool isInteracting = false;
@@ -22,14 +23,19 @@ public class InteractableAIEmployeeObject : MonoBehaviour, IKeyInteractableObjec
     public void Interact()
     {
         isInteracting = true;
+        //UI를 띄운다
+        UIManager.Instance.ShowUI(AISpeackUI, UIType.Conversation);
     }
 
     // Start is called before the first frame update
     void Start()
     {
         voiceManager = GameObject.FindWithTag("VoiceManager").GetComponent<VoiceManager>();
+        AISpeackUI = GameObject.FindWithTag("AISpeackUI");
         if (voiceManager == null)
             Debug.LogError("Can't find voiceManager, set tag");
+        if (AISpeackUI == null)
+            Debug.LogError("Can't find AISpeackUI, set tag");
     }
 
     // Update is called once per frame

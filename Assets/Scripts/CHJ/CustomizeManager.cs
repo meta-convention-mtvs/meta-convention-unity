@@ -1,11 +1,11 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class CustomizeManager : MonoBehaviour
 {
-    [Header("½ºÅ©¸³Æ®°¡ ´ã´çÇÏ´Â °´Ã¼")]
-    public string scriptInfo = "³²ÀÚÄ³¸¯ÅÍ";
+    [Header("ìŠ¤í¬ë¦½íŠ¸ê°€ ë‹´ë‹¹í•˜ëŠ” ê°ì²´")]
+    public string scriptInfo = "ë‚¨ììºë¦­í„°";
     [Space]
     public CustomizeTemplet myTemplet;
 
@@ -69,7 +69,7 @@ public class CustomizeManager : MonoBehaviour
     {
         if (curObj != null)
         {
-            // ±× Àü¿¡ È°¼ºÈ­µÇ¾ú´ø ¿ÀºêÁ§Æ® ºñÈ°¼ºÈ­
+            // ê·¸ ì „ì— í™œì„±í™”ë˜ì—ˆë˜ ì˜¤ë¸Œì íŠ¸ ë¹„í™œì„±í™”
             curObj.SetActive(false);
         }
         curObj = instanceObjects[customizingIdx];

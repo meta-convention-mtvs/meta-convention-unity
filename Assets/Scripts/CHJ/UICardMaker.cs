@@ -3,14 +3,16 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using System;
+using Ricimi;
 
 public class UICardMaker : MonoBehaviour
 {
-    public Text nameInput;
-    public Text instituteInput;
-    public Text majorInput;
-    public Text email_Input;
+    public InputField nameInput;
+    public InputField instituteInput;
+    public InputField majorInput;
+    public InputField email_Input;
     public Button saveButton;
+    public Text cardErrorText;
 
     public Action<string, string, string, string> OnSaveClick;
 
@@ -21,7 +23,13 @@ public class UICardMaker : MonoBehaviour
 
     private void _OnSaveClick()
     {
+        if (nameInput.text == "" || instituteInput.text == "" || majorInput.text == "" || email_Input.text == "")
+        {
+            cardErrorText.text = "모든 필드를 채워주세요";
+            return;
+        }
         OnSaveClick?.Invoke(nameInput.text, instituteInput.text, majorInput.text, email_Input.text);
+        saveButton.gameObject.GetComponent<SceneTransition>().PerformTransition();
     }
 
 

@@ -67,7 +67,7 @@ public class CharacterMaker : MonoBehaviour
         data.isMan = isMan;
         data.customizingIdx = currentCustomizeManager.GetCustomizingIdx();
 
-        DatabaseManager.Instance.SaveData(data);
+        DatabaseManager.Instance.SaveData<CharacterCustomizeData>(data);
     }
 }
 

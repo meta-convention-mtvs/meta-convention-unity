@@ -8,7 +8,7 @@ using UnityEngine;
 public class CreatePlayer : MonoBehaviour
 {
     public CinemachineVirtualCamera cinemachine;
-    public bool isPlayerExchangeCard;
+    public Transform[] playerStartPosition;
     GameObject player;
 
     private void Start()
@@ -26,7 +26,13 @@ public class CreatePlayer : MonoBehaviour
     public GameObject Create()
     {
         // 플레이어 prefab 생성
-        return PhotonNetwork.Instantiate("Player", new Vector3(0, 3, 0), Quaternion.identity);
+        int idx = PhotonNetwork.CurrentRoom.PlayerCount - 1;
+        print(idx);
+        if(idx > playerStartPosition.Length)
+        {
+            idx = playerStartPosition.Length;
+        }
+        return PhotonNetwork.Instantiate("Player", playerStartPosition[idx].position, Quaternion.identity);
     }
 
     void SaveCardInProperties(Player player, Card myCard)

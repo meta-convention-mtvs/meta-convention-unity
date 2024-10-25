@@ -21,7 +21,7 @@ public class DatabaseManager : Singleton<DatabaseManager>
     IEnumerator CoSaveUserInfo<T>(T info) where T : class
     {
         // 저장 경로 USER/ID/내정보
-        string path = "USER/" + FireAuth.instance.auth.CurrentUser.UserId + "/" + "Data/" + typeof(T).ToString();
+        string path = "USER/" + FireAuthManager.Instance.GetCurrentUser().UserId + "/" + "Data/" + typeof(T).ToString();
         // 정보 저장 요청
         Task task = FirebaseFirestore.DefaultInstance.Document(path).SetAsync(info);
         // 통신이 완료 될 때 까지 기다린다.
@@ -46,7 +46,7 @@ public class DatabaseManager : Singleton<DatabaseManager>
     IEnumerator CoLoadUserInfo<T>(Action<T> onComplete)
     {
         // 저장 경로 USER/ID/내 정보
-        string path = "USER/" + FireAuth.instance.auth.CurrentUser.UserId + "/" + "Data/" + typeof(T).ToString();
+        string path = "USER/" + FireAuthManager.Instance.GetCurrentUser().UserId + "/" + "Data/" + typeof(T).ToString();
         // 정보 조회 요청
         Task<DocumentSnapshot> task = FirebaseFirestore.DefaultInstance.Document(path).GetSnapshotAsync();
         // 통신이 완료 될 때 까지 기다린다.

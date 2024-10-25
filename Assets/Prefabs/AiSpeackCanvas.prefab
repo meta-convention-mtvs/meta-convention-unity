@@ -180,7 +180,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 0, y: 32.310047}
+  m_AnchoredPosition: {x: 0, y: 32.310524}
   m_SizeDelta: {x: 983, y: 215.31}
   m_Pivot: {x: 0, y: 1}
 --- !u!222 &1642919288404828806
@@ -472,8 +472,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 5956963700670388378}
   m_HandleRect: {fileID: 8114609466607736070}
   m_Direction: 2
-  m_Value: -0.0000018890486
-  m_Size: 0.8352276
+  m_Value: -0.000016056913
+  m_Size: 0.8307718
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -565,9 +565,10 @@ GameObject:
   - component: {fileID: 1957624951177061186}
   - component: {fileID: 7565733587795998264}
   - component: {fileID: 4159223575219036168}
+  - component: {fileID: 2838063762004723157}
   m_Layer: 5
   m_Name: AiSpeackCanvas
-  m_TagString: Untagged
+  m_TagString: AISpeackUI
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -655,6 +656,18 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
+--- !u!225 &2838063762004723157
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6722426477219761121}
+  m_Enabled: 1
+  m_Alpha: 0
+  m_Interactable: 1
+  m_BlocksRaycasts: 0
+  m_IgnoreParentGroups: 0
 --- !u!1 &8356309940254100347
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,4 +1,4 @@
-using UnityEditor;
+﻿using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -16,7 +16,7 @@ public class ProfileUIEditor : EditorWindow
 
     public void CreateGUI()
     {
-        // Each editor window contains a root VisualElement object
+        // Each editor window contains aroot VisualElement object
         VisualElement root = rootVisualElement;
 
         // VisualElements objects can contain other VisualElement following a tree hierarchy.
