@@ -2213,6 +2213,10 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 1921149641}
+    - targetCorrespondingSourceObject: {fileID: 5817510849166728198, guid: 6f9621007d775495f9c8de66058392bc,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1921149642}
   m_SourcePrefab: {fileID: 100100000, guid: 6f9621007d775495f9c8de66058392bc, type: 3}
 --- !u!224 &1921149639 stripped
 RectTransform:
@@ -2238,9 +2242,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 29eb4a5a725ae4a07a39820fbbcc201d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  scene: Home
+  scene: UserInfoScene_HJK
   duration: 0.5
   color: {r: 0.15294118, g: 0.16862746, b: 0.20392159, a: 1}
+--- !u!114 &1921149642
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1921149640}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 40b3d576ae6a10b4899da9ee43a6fbcb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1940359530
 PrefabInstance:
   m_ObjectHideFlags: 0

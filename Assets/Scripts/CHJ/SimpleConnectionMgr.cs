@@ -19,6 +19,7 @@ public class SimpleConnectionMgr : MonoBehaviourPunCallbacks
     public override void OnConnectedToMaster()
     {
         print("Connected to Master");
+        JoinOrCreateRoom("MainHall");
     }
     #endregion
 
