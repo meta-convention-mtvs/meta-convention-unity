@@ -20,7 +20,7 @@ public class TextItem : MonoBehaviour
         rt = GetComponent<RectTransform>();
     }
 
-    public void SetText(string s)
+    public void AddText(string s)
     {
         // 텍스트 갱신
         chatText.text += s;
