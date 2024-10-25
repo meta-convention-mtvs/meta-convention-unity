@@ -1,10 +1,10 @@
-// Copyright (C) 2023 ricimi. All rights reserved.
+﻿// Copyright (C) 2023 ricimi. All rights reserved.
 // This code can only be used under the standard Unity Asset Store EULA,
 // a copy of which is available at https://unity.com/legal/as-terms.
 
-using TMPro;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Ricimi
 {
@@ -13,7 +13,7 @@ namespace Ricimi
 	public class TextSelectionSlider : MonoBehaviour
 	{
 		public List<string> Options;
-		public TextMeshProUGUI OptionText;
+		public Text OptionText;
 
 		private int selectedOption;
 
