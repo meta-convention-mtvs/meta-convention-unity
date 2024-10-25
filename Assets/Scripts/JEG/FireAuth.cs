@@ -1,4 +1,4 @@
-using Firebase.Auth;
+ï»¿using Firebase.Auth;
 using JetBrains.Annotations;
 using System;
 using System.Collections;
@@ -12,10 +12,6 @@ public class FireAuth : MonoBehaviour
     public static FireAuth instance;
     public FirebaseAuth auth;
 
-    public GameObject loginUI;
-    public InputField inputEmail;
-    public InputField inputPassword;
-
     private void Awake()
     {
         instance = this;
@@ -26,28 +22,20 @@ public class FireAuth : MonoBehaviour
         auth.StateChanged += OnChangeAuthState;
     }
 
-    void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.Alpha0))
-        {
-            loginUI.SetActive(!loginUI.activeInHierarchy);
-        }
-    }
-
     void OnChangeAuthState(object sender, EventArgs e)
     {
-        // ¸¸¾à, À¯Àú Á¤º¸°¡ ÀÖ´Ù¸é
+        // ë§Œì•½, ìœ ì € ì •ë³´ê°€ ìˆë‹¤ë©´
         if(auth.CurrentUser != null)
         {
             print(auth.CurrentUser.Email + " , " + auth.CurrentUser.UserId);
-            // ·Î±×ÀÎ µÇ¾î ÀÖÀ½
-            print("·Î±×ÀÎ »óÅÂ");
+            // ë¡œê·¸ì¸ ë˜ì–´ ìˆìŒ
+            print("ë¡œê·¸ì¸ ìƒíƒœ");
         }
-        // ±×·¸Áö ¾ÊÀ¸¸é
+        // ê·¸ë ‡ì§€ ì•Šìœ¼ë©´
         else
         {
-            print("·Î±× ¾Æ¿ô »óÅÂ");
-            // ·Î±× ¾Æ¿ô
+            print("ë¡œê·¸ ì•„ì›ƒ ìƒíƒœ");
+            // ë¡œê·¸ ì•„ì›ƒ
         }
     }
 
@@ -58,18 +46,18 @@ public class FireAuth : MonoBehaviour
 
     IEnumerator CoSignUp(string email, string password)
     {
-        // È¸¿ø °¡ÀÔ ½Ãµµ
+        // íšŒì› ê°€ì… ì‹œë„
         Task<AuthResult> task = auth.CreateUserWithEmailAndPasswordAsync(email, password);
-        // Åë½ÅÀÌ ¿Ï·á µÉ ¶§ ±îÁö ±â´Ù¸°´Ù.
+        // í†µì‹ ì´ ì™„ë£Œ ë  ë•Œ ê¹Œì§€ ê¸°ë‹¤ë¦°ë‹¤.
         yield return new WaitUntil(() => task.IsCompleted);
-        // ¸¸¾à¿¡ ¿¹¿Ü°¡ ¾ø´Ù¸é
+        // ë§Œì•½ì— ì˜ˆì™¸ê°€ ì—†ë‹¤ë©´
         if(task.Exception == null)
         {
-            print("È¸¿ø °¡ÀÔ ¼º°ø");
+            print("íšŒì› ê°€ì… ì„±ê³µ");
         }
         else
         {
-            print("È¸¿ø °¡ÀÔ ½ÇÆĞ : " + task.Exception);
+            print("íšŒì› ê°€ì… ì‹¤íŒ¨ : " + task.Exception);
         }
     }
 
@@ -80,40 +68,24 @@ public class FireAuth : MonoBehaviour
 
     IEnumerator CoLogin(string email, string password)
     {
-        // ·Î±×ÀÎ ½Ãµµ
+        // ë¡œê·¸ì¸ ì‹œë„
         Task<AuthResult> task = auth.SignInWithEmailAndPasswordAsync(email, password);
-        // Åë½ÅÀÌ ¿Ï·á µÉ ¶§ ±îÁö ±â´Ù¸°´Ù.
+        // í†µì‹ ì´ ì™„ë£Œ ë  ë•Œ ê¹Œì§€ ê¸°ë‹¤ë¦°ë‹¤.
         yield return new WaitUntil(() => task.IsCompleted);
-        // ¸¸¾à¿¡ ¿¹¿Ü°¡ ¾ø´Ù¸é
+        // ë§Œì•½ì— ì˜ˆì™¸ê°€ ì—†ë‹¤ë©´
         if (task.Exception == null)
         {
-            print("·Î±×ÀÎ ¼º°ø");
+            print("ë¡œê·¸ì¸ ì„±ê³µ");
         }
         else
         {
-            print("·Î±×ÀÎ ½ÇÆĞ : " + task.Exception);
+            print("ë¡œê·¸ì¸ ì‹¤íŒ¨ : " + task.Exception);
         }
     }
 
     public void Logout()
     {
         auth.SignOut();
-        print("·Î±× ¾Æ¿ô!");
-    }
-
-
-    public void OnClickSignUp()
-    {
-        instance.SignUp(inputEmail.text, inputPassword.text);
-    }
-
-    public void OnClickLogIn()
-    {
-        instance.LogIn(inputEmail.text, inputPassword.text);
-    }
-
-    public void OnClickLogOut()
-    {
-        instance.Logout();
+        print("ë¡œê·¸ ì•„ì›ƒ!");
     }
 }
