@@ -1464,7 +1464,7 @@ MonoBehaviour:
     m_SelectedTrigger: Selected
     m_DisabledTrigger: Disabled
   m_Interactable: 1
-  m_TargetGraphic: {fileID: 5933853187625605158}
+  m_TargetGraphic: {fileID: 7086629441071072792}
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
@@ -1474,16 +1474,16 @@ RectTransform:
     type: 3}
   m_PrefabInstance: {fileID: 2742365751717388950}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &5933853187625605158 stripped
+--- !u!114 &7086629441071072792 stripped
 MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 8383344148730722992, guid: 9392a7e58d4c142e4ba373a8efc05e26,
+  m_CorrespondingSourceObject: {fileID: 4924146267939021966, guid: 9392a7e58d4c142e4ba373a8efc05e26,
     type: 3}
   m_PrefabInstance: {fileID: 2742365751717388950}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2258567218623323186}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Script: {fileID: 11500000, guid: 5f7201a12d95ffc409449d95f23cf332, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1001 &2742365752089155035
@@ -1523,6 +1523,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_KeyboardType
       value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 5438914191887467362, guid: cc1e84b009e8e46eba840fd4e3825f4c,
+        type: 3}
+      propertyPath: m_CharacterLimit
+      value: 30
       objectReference: {fileID: 0}
     - target: {fileID: 5438914191887467362, guid: cc1e84b009e8e46eba840fd4e3825f4c,
         type: 3}
@@ -2008,6 +2013,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 2878548744757184652}
     m_Modifications:
+    - target: {fileID: 1508116238268087379, guid: 6f9621007d775495f9c8de66058392bc,
+        type: 3}
+      propertyPath: m_Text
+      value: Sign up
+      objectReference: {fileID: 0}
     - target: {fileID: 2660620628328194669, guid: 6f9621007d775495f9c8de66058392bc,
         type: 3}
       propertyPath: m_text
@@ -2419,7 +2429,7 @@ MonoBehaviour:
     m_SelectedTrigger: Selected
     m_DisabledTrigger: Disabled
   m_Interactable: 1
-  m_TargetGraphic: {fileID: 5933853188975411079}
+  m_TargetGraphic: {fileID: 7086629441883939257}
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
@@ -2429,16 +2439,16 @@ RectTransform:
     type: 3}
   m_PrefabInstance: {fileID: 2742365752479909175}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &5933853188975411079 stripped
+--- !u!114 &7086629441883939257 stripped
 MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 8383344148730722992, guid: 9392a7e58d4c142e4ba373a8efc05e26,
+  m_CorrespondingSourceObject: {fileID: 4924146267939021966, guid: 9392a7e58d4c142e4ba373a8efc05e26,
     type: 3}
   m_PrefabInstance: {fileID: 2742365752479909175}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2258567219387464595}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Script: {fileID: 11500000, guid: 5f7201a12d95ffc409449d95f23cf332, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1001 &2742365753141590283
@@ -2808,6 +2818,21 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 5821612756006011967}
     m_Modifications:
+    - target: {fileID: 1696309746102533739, guid: d4a58b174c6ba4811bc18146717acfd8,
+        type: 3}
+      propertyPath: m_Text
+      value: Sign up
+      objectReference: {fileID: 0}
+    - target: {fileID: 1696309746102533739, guid: d4a58b174c6ba4811bc18146717acfd8,
+        type: 3}
+      propertyPath: m_FontData.m_VerticalOverflow
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1696309746102533739, guid: d4a58b174c6ba4811bc18146717acfd8,
+        type: 3}
+      propertyPath: m_FontData.m_HorizontalOverflow
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2849383683723026517, guid: d4a58b174c6ba4811bc18146717acfd8,
         type: 3}
       propertyPath: m_text

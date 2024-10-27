@@ -7,7 +7,7 @@ using Photon.Pun;
 
 public class InteractableAIEmployeeObject : MonoBehaviourPun, IKeyInteractableObject
 {
-    public Text text_1;
+    public GameObject text_1;
 
     GameObject AISpeackUI;
     BusinessRoomReservator businessRoomReservator;
@@ -16,11 +16,11 @@ public class InteractableAIEmployeeObject : MonoBehaviourPun, IKeyInteractableOb
     bool isInteracting = false;
     public void ShowText()
     {
-        text_1.gameObject.SetActive(true);
+        text_1.SetActive(true);
     }
     public void HideText()
     {
-        text_1.gameObject.SetActive(false);
+        text_1.SetActive(false);
     }
     public void Interact()
     {
@@ -40,6 +40,8 @@ public class InteractableAIEmployeeObject : MonoBehaviourPun, IKeyInteractableOb
             Debug.LogError("Can't find voiceManager, set tag");
         if (AISpeackUI == null)
             Debug.LogError("Can't find AISpeackUI, set tag");
+        if (businessRoomReservator == null)
+            Debug.LogError("Can't find BusinessRoomReservator, set tag");
     }
 
     async void Update()
