@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class BusinessRoomLoader : MonoBehaviourPunCallbacks
 {
-    public void GoToBuisnessRoom()
+    public void GoToBusinessRoom()
     {
         if(PhotonNetwork.InRoom)
             PhotonNetwork.LeaveRoom();

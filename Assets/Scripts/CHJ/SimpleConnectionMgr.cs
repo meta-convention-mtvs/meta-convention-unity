@@ -30,6 +30,7 @@ public class SimpleConnectionMgr : MonoBehaviourPunCallbacks
         {
             RoomOptions roomOptions = new RoomOptions();
             roomOptions.MaxPlayers = 20;
+            roomOptions.PublishUserId = true;
             PhotonNetwork.JoinOrCreateRoom(roomName, roomOptions, TypedLobby.Default);
         }
         else
