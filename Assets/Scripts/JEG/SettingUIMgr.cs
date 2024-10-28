@@ -7,33 +7,19 @@ using UnityEngine.UI;
 public class SettingUIMgr : MonoBehaviour
 {
     public GameObject settingUI;
-    public GameObject btnUI;
 
     public string ssName = "screenshot.png"; 
 
-
-    
-    void Start()
-    {
-        
-    }
-
-    void Update()
-    {
-        // setting 버튼을 누르면 SettingUI activation
-        // 
-    }
-
     public void OnClickSettingBTN()
     {
-        settingUI.SetActive(true);
-        btnUI.SetActive(false);
+        UIManager.Instance.ShowUI(settingUI, UIType.Normal);
     }
 
     public void OnClickCloseSettingBTN()
     {
-        settingUI.SetActive(false);
-        btnUI.SetActive(true);
+        CanvasGroup canvas = settingUI.GetComponent<CanvasGroup>();
+        canvas.alpha = 0;
+        canvas.blocksRaycasts = false;
     }
 
     public void OnClickScreenShot()

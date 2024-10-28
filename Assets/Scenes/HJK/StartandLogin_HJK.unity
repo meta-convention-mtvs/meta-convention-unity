@@ -2089,7 +2089,7 @@ PrefabInstance:
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 1921149641}
+      objectReference: {fileID: 1921149645}
     - target: {fileID: 5817510849166728196, guid: 6f9621007d775495f9c8de66058392bc,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
@@ -2098,12 +2098,12 @@ PrefabInstance:
     - target: {fileID: 5817510849166728196, guid: 6f9621007d775495f9c8de66058392bc,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: PerformTransition
+      value: LoadUserDataFromServer
       objectReference: {fileID: 0}
     - target: {fileID: 5817510849166728196, guid: 6f9621007d775495f9c8de66058392bc,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
-      value: Ricimi.SceneTransition, Assembly-CSharp
+      value: LoadDataFromServer, Assembly-CSharp
       objectReference: {fileID: 0}
     - target: {fileID: 5817510849166728196, guid: 6f9621007d775495f9c8de66058392bc,
         type: 3}
@@ -2262,6 +2262,14 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 1921149642}
+    - targetCorrespondingSourceObject: {fileID: 5817510849166728198, guid: 6f9621007d775495f9c8de66058392bc,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1921149646}
+    - targetCorrespondingSourceObject: {fileID: 5817510849166728198, guid: 6f9621007d775495f9c8de66058392bc,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1921149645}
   m_SourcePrefab: {fileID: 100100000, guid: 6f9621007d775495f9c8de66058392bc, type: 3}
 --- !u!224 &1921149639 stripped
 RectTransform:
@@ -2303,6 +2311,35 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isLogin: 0
+--- !u!114 &1921149645
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1921149640}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 59c191cef3c54e24d83c29d1f43cd4db, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cardTransition: {fileID: 1921149641}
+  universeTransition: {fileID: 1921149646}
+--- !u!114 &1921149646
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1921149640}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 29eb4a5a725ae4a07a39820fbbcc201d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  scene: Start_Universe
+  duration: 0.5
+  color: {r: 0, g: 0, b: 0, a: 1}
 --- !u!1001 &1940359530
 PrefabInstance:
   m_ObjectHideFlags: 0
