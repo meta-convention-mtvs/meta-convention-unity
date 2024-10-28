@@ -15740,6 +15740,8 @@ PrefabInstance:
     - {fileID: 5392398322951045289, guid: fc30159cfd9e97541a859f7acc780c51, type: 3}
     - {fileID: -1131229377058590428, guid: fc30159cfd9e97541a859f7acc780c51, type: 3}
     - {fileID: -8391222552659086748, guid: fc30159cfd9e97541a859f7acc780c51, type: 3}
+    - {fileID: -4500217176763728788, guid: fc30159cfd9e97541a859f7acc780c51, type: 3}
+    - {fileID: -2208469543565436234, guid: fc30159cfd9e97541a859f7acc780c51, type: 3}
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: fc30159cfd9e97541a859f7acc780c51,
         type: 3}
@@ -16884,7 +16886,11 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: -5609321221556402741, guid: 8c1971696467e7643869acc98a148fc2,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4412287733652350833}
   m_SourcePrefab: {fileID: 9199261849990390558, guid: 8c1971696467e7643869acc98a148fc2,
     type: 3}
 --- !u!4 &4532885672166933961 stripped
@@ -16893,6 +16899,33 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 8756304177577461626}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &5450222308815012529 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: -5609321221556402741, guid: 8c1971696467e7643869acc98a148fc2,
+    type: 3}
+  m_PrefabInstance: {fileID: 8756304177577461626}
+  m_PrefabAsset: {fileID: 0}
+--- !u!95 &4412287733652350833
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5450222308815012529}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 9790e6b48ee4f4e4197307808f46bc05, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 1
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1001 &8809983162540023041
 PrefabInstance:
   m_ObjectHideFlags: 0
