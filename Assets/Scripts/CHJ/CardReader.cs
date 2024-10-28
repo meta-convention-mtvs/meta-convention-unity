@@ -1,4 +1,4 @@
-using Photon.Realtime;
+ï»¿using Photon.Realtime;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -9,26 +9,31 @@ public class CardReader : MonoBehaviour
     public GameObject uiCardObject;
     public Button saveButton;
 
-    public CardBook cardBook;
+    CardBook cardBook;
+
+    private void Start()
+    {
+        cardBook = GameObject.FindWithTag("CardBook").GetComponent<CardBook>();
+    }
 
     public void ShowCardUI(Player player)
     {
         //uiCardPopup.SetActive(true);
         UIManager.Instance.ShowUI(uiCardObject, UIType.Normal);
         UICard uiCard = uiCardObject.GetComponentInChildren<UICard>();
-        // ³²ÀÇ Ä«µå¸¦ ÀĞ¾î¿Â´Ù.
+        // ë‚¨ì˜ ì¹´ë“œë¥¼ ì½ì–´ì˜¨ë‹¤.
         Card opponentCard = ReadCard(player);
-        // ±× Ä«µå¸¦ UI¿¡ ¶ç¿î´Ù.
+        // ê·¸ ì¹´ë“œë¥¼ UIì— ë„ìš´ë‹¤.
         uiCard.ShowCardUI(opponentCard);
-        // save ¹öÆ°ÀÌ ´­·ÁÁö¸é, ±× Ä«µå¸¦ ÀúÀåÇÑ´Ù.
+        // save ë²„íŠ¼ì´ ëˆŒë ¤ì§€ë©´, ê·¸ ì¹´ë“œë¥¼ ì €ì¥í•œë‹¤.
         saveButton.onClick.AddListener(() => OnAddCard(opponentCard));
     }
 
     public void OnAddCard(Card card)
     {
         cardBook.addCard(card);
+        UIManager.Instance.ShowPopupUI("ì¹´ë“œê°€ ì¶”ê°€ë˜ì—ˆìŠµë‹ˆë‹¤.");
     }
-
     public static Card ReadCard(Player player)
     {
         Card newCard = new Card((string)player.CustomProperties["id"], player.NickName, (string)player.CustomProperties["institute"], (string)player.CustomProperties["major"], (string)player.CustomProperties["email"]);

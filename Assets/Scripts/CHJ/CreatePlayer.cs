@@ -38,9 +38,9 @@ public class CreatePlayer : MonoBehaviour
         // 플레이어 prefab 생성
         int idx = PhotonNetwork.CurrentRoom.PlayerCount - 1;
         print(idx);
-        if(idx > playerStartPosition.Length)
+        if(idx >= playerStartPosition.Length)
         {
-            idx = playerStartPosition.Length;
+            idx = playerStartPosition.Length-1;
         }
         return PhotonNetwork.Instantiate("Player", playerStartPosition[idx].position, playerStartPosition[idx].rotation);
     }
