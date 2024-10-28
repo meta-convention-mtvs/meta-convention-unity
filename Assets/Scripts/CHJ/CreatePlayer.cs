@@ -4,6 +4,7 @@ using Photon.Realtime;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 public class CreatePlayer : MonoBehaviour
 {
@@ -32,20 +33,24 @@ public class CreatePlayer : MonoBehaviour
         {
             idx = playerStartPosition.Length;
         }
-        return PhotonNetwork.Instantiate("Player", playerStartPosition[idx].position, Quaternion.identity);
+        return PhotonNetwork.Instantiate("Player", playerStartPosition[idx].position, playerStartPosition[idx].rotation);
     }
 
     void SaveCardInProperties(Player player, Card myCard)
     {
+        string[] emptyMeetingList = Enumerable.Repeat("", 100).ToArray();
         Hashtable myInformation = new Hashtable
         {
             {"id", myCard.id },
             {"nickname",myCard.nickname },
             {"institute", myCard.institute },
             {"major", myCard.major },
-            {"email", myCard.email }
+            {"email", myCard.email },
+            {"MeetingList",emptyMeetingList },
+            {"MeetingListIndex", 0 }
         };
 
+        
         player.SetCustomProperties(myInformation);
     }
 

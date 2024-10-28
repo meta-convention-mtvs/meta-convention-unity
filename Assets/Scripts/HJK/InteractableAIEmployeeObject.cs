@@ -3,42 +3,48 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using System.Threading.Tasks;
+using Photon.Pun;
 
-public class InteractableAIEmployeeObject : MonoBehaviour, IKeyInteractableObject
+public class InteractableAIEmployeeObject : MonoBehaviourPun, IKeyInteractableObject
 {
-    public Text text_1;
+    public GameObject interactPopupUIFactory;
 
     GameObject AISpeackUI;
+    BusinessRoomReservator businessRoomReservator;
     VoiceManager voiceManager;
 
     bool isInteracting = false;
     public void ShowText()
     {
-        text_1.gameObject.SetActive(true);
+        GameObject go = Instantiate(interactPopupUIFactory);
+        go.GetComponent<SetPopupText>()?.SetText("(F)키를 눌러 AI 직원과 실시간 상담을 시작해 보세요!");
     }
     public void HideText()
     {
-        text_1.gameObject.SetActive(false);
+        
     }
     public void Interact()
     {
         isInteracting = true;
         //UI를 띄운다
         UIManager.Instance.ShowUI(AISpeackUI, UIType.Conversation);
+        // Button을 활성화시킨다.
+        AISpeackUI.GetComponentInChildren<Button>()?.onClick.AddListener(() => businessRoomReservator.MakeAppointmentWith(photonView.Owner));
     }
 
-    // Start is called before the first frame update
     void Start()
     {
         voiceManager = GameObject.FindWithTag("VoiceManager").GetComponent<VoiceManager>();
         AISpeackUI = GameObject.FindWithTag("AISpeackUI");
+        businessRoomReservator = GameObject.FindWithTag("BusinessRoomReservator").GetComponent<BusinessRoomReservator>();
         if (voiceManager == null)
             Debug.LogError("Can't find voiceManager, set tag");
         if (AISpeackUI == null)
             Debug.LogError("Can't find AISpeackUI, set tag");
+        if (businessRoomReservator == null)
+            Debug.LogError("Can't find BusinessRoomReservator, set tag");
     }
 
-    // Update is called once per frame
     async void Update()
     {
         if (isInteracting)
