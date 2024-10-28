@@ -5,11 +5,15 @@ using Hashtable = ExitGames.Client.Photon.Hashtable;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
+using System;
+using System.Collections;
 
 public class CreatePlayer : MonoBehaviour
 {
     public CinemachineVirtualCamera cinemachine;
     public Transform[] playerStartPosition;
+    public Action<GameObject> OnPlayerCreate;
+
     GameObject player;
 
     private void Start()
@@ -17,9 +21,14 @@ public class CreatePlayer : MonoBehaviour
         player = Create();
         DatabaseManager.Instance.GetData<Card>(onCardLoad);
 
-        CameraFollow(player, cinemachine);
+        StartCoroutine(WaitAndInvoke());
     }
 
+    IEnumerator WaitAndInvoke()
+    {
+        yield return null;
+        OnPlayerCreate?.Invoke(player);
+    }
     private void onCardLoad(Card myCard)
     {
         SaveCardInProperties(player.GetPhotonView().Owner, myCard);
@@ -54,9 +63,5 @@ public class CreatePlayer : MonoBehaviour
         player.SetCustomProperties(myInformation);
     }
 
-    public void CameraFollow(GameObject player, CinemachineVirtualCamera cinemachine)
-    {
-        // Cinemachine 카메라가 캐릭터를 바라볼 수 있게 한다.
-        cinemachine.Follow = player.transform.Find("PlayerCameraRoot");
-    }
+
 }

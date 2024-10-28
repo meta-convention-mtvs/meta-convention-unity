@@ -29,4 +29,9 @@ public class InteractablePlayerObject : MonoBehaviourPun, IKeyInteractableObject
     {
         UIManager.Instance.ShowPopupUI("(F)키를 눌러 명함을 주고 받으세요!");
     }
+
+    public void InteractEnd()
+    {
+        
+    }
 }

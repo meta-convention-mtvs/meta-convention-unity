@@ -27,6 +27,12 @@ public class InteractableAIEmployeeObject : MonoBehaviourPun, IKeyInteractableOb
         UIManager.Instance.ShowUI(AISpeackUI, UIType.Conversation);
         // Button을 활성화시킨다.
         AISpeackUI.GetComponentInChildren<Button>()?.onClick.AddListener(() => businessRoomReservator.MakeAppointmentWith(photonView.Owner));
+        MainHallVirtualCameraMovement.Instance.SetAiSpeackUICamera();
+    }
+    public void InteractEnd()
+    {
+        isInteracting = false;
+        MainHallVirtualCameraMovement.Instance.SetPlayerFollowCamera();
     }
 
     void Start()
@@ -65,4 +71,5 @@ public class InteractableAIEmployeeObject : MonoBehaviourPun, IKeyInteractableOb
             }
         }
     }
+
 }

@@ -12,7 +12,7 @@ public class PlayerInteract : MonoBehaviourPun
     public LayerMask interactionMask;
 
     GameObject previousClosestObject;
-
+    GameObject interactingObject;
 
     private void Update()
     {
@@ -20,6 +20,14 @@ public class PlayerInteract : MonoBehaviourPun
             return;
 
         Collider[] colliders = Physics.OverlapSphere(transform.position, interactionDistance, interactionMask);
+
+        // interaction종료를 확인하는 코드
+        if (interactingObject != null && !isCollidersHave(colliders, interactingObject))
+        {
+            interactingObject.GetComponent<IKeyInteractableObject>().InteractEnd();
+            interactingObject = null;
+        }
+
 
         GameObject closestObject = FindClosestGameObject(colliders, interactionDistance);
 
@@ -41,6 +49,7 @@ public class PlayerInteract : MonoBehaviourPun
             {
                 IKeyInteractableObject go = closestObject.GetComponent<IKeyInteractableObject>();
                 go.Interact();
+                interactingObject = closestObject;
             }
         }
 
@@ -73,5 +82,15 @@ public class PlayerInteract : MonoBehaviourPun
         return closestObject;
     }
 
-
+    bool isCollidersHave(Collider[] colliders, GameObject value)
+    {
+        foreach(Collider collider in colliders)
+        {
+            if(collider.gameObject == value)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
 }

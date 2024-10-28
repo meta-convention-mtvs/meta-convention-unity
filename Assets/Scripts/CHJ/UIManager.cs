@@ -98,7 +98,7 @@ public class UIManager : MonoBehaviour
             return false;
     }
 
-    void HideUIInStack()
+    public void HideUIInStack()
     {
         UI ui = uiStack.Pop();
         if (ui != null)
