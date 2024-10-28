@@ -10,7 +10,6 @@ using System.Collections;
 
 public class CreatePlayer : MonoBehaviour
 {
-    public CinemachineVirtualCamera cinemachine;
     public Transform[] playerStartPosition;
     public Action<GameObject> OnPlayerCreate;
 
