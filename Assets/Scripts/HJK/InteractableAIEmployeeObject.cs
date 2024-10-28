@@ -7,8 +7,6 @@ using Photon.Pun;
 
 public class InteractableAIEmployeeObject : MonoBehaviourPun, IKeyInteractableObject
 {
-    public GameObject interactPopupUIFactory;
-
     GameObject AISpeackUI;
     BusinessRoomReservator businessRoomReservator;
     VoiceManager voiceManager;
@@ -16,8 +14,7 @@ public class InteractableAIEmployeeObject : MonoBehaviourPun, IKeyInteractableOb
     bool isInteracting = false;
     public void ShowText()
     {
-        GameObject go = Instantiate(interactPopupUIFactory);
-        go.GetComponent<SetPopupText>()?.SetText("(F)키를 눌러 AI 직원과 실시간 상담을 시작해 보세요!");
+        UIManager.Instance.ShowPopupUI("(F)키를 눌러 AI 직원과 실시간 상담을 시작해 보세요!");
     }
     public void HideText()
     {

@@ -31,6 +31,10 @@ public class UIManager : MonoBehaviour
 
     public float UIAnimationTime = 1.0f;
 
+    public GameObject popupUiFactory;
+
+    public Canvas popupCanvas;
+
     private void Awake()
     {
         if(Instance == null)
@@ -141,5 +145,11 @@ public class UIManager : MonoBehaviour
         if ((int)prevUI.uiType > (int)currUI.uiType)
             return true;
         return false;
+    }
+
+    public void ShowPopupUI(string text) {
+        GameObject go = Instantiate(popupUiFactory);
+        go.transform.SetParent(popupCanvas.transform, false);
+        go.GetComponent<SetPopupText>()?.SetText(text);
     }
 }
