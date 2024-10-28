@@ -733,7 +733,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Log In
+  m_Text: "\uB85C\uADF8\uC778"
 --- !u!1 &826327615
 GameObject:
   m_ObjectHideFlags: 0
@@ -770,7 +770,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 80}
+  m_SizeDelta: {x: 0, y: 250.7}
   m_Pivot: {x: 0, y: 0}
 --- !u!114 &826327617
 MonoBehaviour:
@@ -1167,7 +1167,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: -150.17}
+  m_SizeDelta: {x: 0, y: -125.3}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1068912504
 MonoBehaviour:
@@ -1741,7 +1741,7 @@ MonoBehaviour:
       m_Calls: []
   m_FontData:
     m_Font: {fileID: 12800000, guid: ad5002ee7d583c043868696ca96b6c01, type: 3}
-    m_FontSize: 85
+    m_FontSize: 124
     m_FontStyle: 0
     m_BestFit: 0
     m_MinSize: 10
@@ -1752,7 +1752,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 1
     m_LineSpacing: 1
-  m_Text: Welcome to Meta Convention
+  m_Text: Meta Convention
 --- !u!1001 &1352894115
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1920,20 +1920,20 @@ MonoBehaviour:
       m_Calls: []
   m_FontData:
     m_Font: {fileID: 12800000, guid: 21ebbc0a721518145b069e31bca59a54, type: 3}
-    m_FontSize: 29
+    m_FontSize: 38
     m_FontStyle: 0
     m_BestFit: 0
     m_MinSize: 10
-    m_MaxSize: 67
+    m_MaxSize: 72
     m_Alignment: 0
     m_AlignByGeometry: 0
     m_RichText: 1
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 1
     m_LineSpacing: 1.4
-  m_Text: "Experience seamless, real-time conversations with AI. \nExplore cutting-edge
-    innovations in the metaverse,\nwhere businesses, investors, and buyers come together\n
-    to discover new opportunities and forge valuable connections."
+  m_Text: "\uBE44\uC988\uB2C8\uC2A4 \uB9AC\uB354, \uD22C\uC790\uC790, \uBC14\uC774\uC5B4\uAC00
+    \uD568\uAED8\uD558\uB294 \uD601\uC2E0\uC801\uC778 \uBA54\uD0C0\uBC84\uC2A4\uC5D0\uC11C\r\n\uC0C8\uB85C\uC6B4
+    \uAC00\uB2A5\uC131\uACFC \uC778\uC5F0\uC744 \uBC1C\uACAC\uD574 \uBCF4\uC138\uC694."
 --- !u!1 &1541027154
 GameObject:
   m_ObjectHideFlags: 0
@@ -2002,7 +2002,7 @@ MonoBehaviour:
     m_Top: 120
     m_Bottom: 0
   m_ChildAlignment: 0
-  m_Spacing: 111.6
+  m_Spacing: 95.92
   m_ChildForceExpandWidth: 1
   m_ChildForceExpandHeight: 1
   m_ChildControlWidth: 1
@@ -2055,7 +2055,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Play Now
+  m_Text: "\uC2DC\uC791\uD558\uAE30"
 --- !u!224 &1913700503 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 8382041283875004320, guid: 6f9621007d775495f9c8de66058392bc,
@@ -2089,7 +2089,7 @@ PrefabInstance:
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 1921149645}
+      objectReference: {fileID: 1921149641}
     - target: {fileID: 5817510849166728196, guid: 6f9621007d775495f9c8de66058392bc,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
@@ -2098,12 +2098,12 @@ PrefabInstance:
     - target: {fileID: 5817510849166728196, guid: 6f9621007d775495f9c8de66058392bc,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: LoadUserDataFromServer
+      value: PerformTransition
       objectReference: {fileID: 0}
     - target: {fileID: 5817510849166728196, guid: 6f9621007d775495f9c8de66058392bc,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
-      value: LoadDataFromServer, Assembly-CSharp
+      value: Ricimi.SceneTransition, Assembly-CSharp
       objectReference: {fileID: 0}
     - target: {fileID: 5817510849166728196, guid: 6f9621007d775495f9c8de66058392bc,
         type: 3}
@@ -2262,14 +2262,6 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 1921149642}
-    - targetCorrespondingSourceObject: {fileID: 5817510849166728198, guid: 6f9621007d775495f9c8de66058392bc,
-        type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1921149646}
-    - targetCorrespondingSourceObject: {fileID: 5817510849166728198, guid: 6f9621007d775495f9c8de66058392bc,
-        type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1921149645}
   m_SourcePrefab: {fileID: 100100000, guid: 6f9621007d775495f9c8de66058392bc, type: 3}
 --- !u!224 &1921149639 stripped
 RectTransform:
@@ -2311,35 +2303,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isLogin: 0
---- !u!114 &1921149645
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1921149640}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 59c191cef3c54e24d83c29d1f43cd4db, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  cardTransition: {fileID: 1921149641}
-  universeTransition: {fileID: 1921149646}
---- !u!114 &1921149646
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1921149640}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 29eb4a5a725ae4a07a39820fbbcc201d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  scene: Start_Universe
-  duration: 0.5
-  color: {r: 0, g: 0, b: 0, a: 1}
 --- !u!1001 &1940359530
 PrefabInstance:
   m_ObjectHideFlags: 0
