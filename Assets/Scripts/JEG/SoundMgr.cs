@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEditor.Experimental;
 using UnityEngine;
 
-public class SoundMgr : MonoBehaviour
+public class SoundMgr : Singleton<SoundMgr>
 {
     // 재생 할 오디오 파일
     public AudioSource audioSource;
@@ -23,10 +23,6 @@ public class SoundMgr : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.P))
-        {
-            idx++;
-        }
         
         // 씬 이동 이나 음악 변경이 필요할때 
         // idx 를 변경하면 idx가 변화를 감지하고 음악을 바꿔 줌
@@ -34,10 +30,12 @@ public class SoundMgr : MonoBehaviour
             curidx = idx;
             PlayAudio(audios, idx);
         }
+    }    
 
-
+    public void StopAudio()
+    {
+        audioSource.Stop();
     }
-    
     public void PlayAudio(AudioClip[] clips, int idx)
     {
         audioSource.Stop();

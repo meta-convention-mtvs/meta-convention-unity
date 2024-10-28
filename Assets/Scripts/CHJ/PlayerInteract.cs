@@ -22,7 +22,6 @@ public class PlayerInteract : MonoBehaviourPun
         Collider[] colliders = Physics.OverlapSphere(transform.position, interactionDistance, interactionMask);
 
         GameObject closestObject = FindClosestGameObject(colliders, interactionDistance);
-        print(closestObject);
 
         // 만약 이전에 가장 가까운 오브젝트가 존재하고, 그 오브젝트가 현재 오브젝트랑 다를 때
         if(closestObject != null && closestObject != previousClosestObject)
