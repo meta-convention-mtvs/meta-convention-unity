@@ -33,7 +33,7 @@ public class CreatePlayer : MonoBehaviour
         {
             idx = playerStartPosition.Length;
         }
-        return PhotonNetwork.Instantiate("Player", playerStartPosition[idx].position, Quaternion.identity);
+        return PhotonNetwork.Instantiate("Player", playerStartPosition[idx].position, playerStartPosition[idx].rotation);
     }
 
     void SaveCardInProperties(Player player, Card myCard)

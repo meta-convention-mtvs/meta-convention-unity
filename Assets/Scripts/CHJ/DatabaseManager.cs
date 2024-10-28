@@ -43,7 +43,7 @@ public class DatabaseManager : Singleton<DatabaseManager>
     {
         StartCoroutine(CoLoadUserInfo<T>( OnComplete));
     }
-    IEnumerator CoLoadUserInfo<T>(Action<T> onComplete)
+    IEnumerator CoLoadUserInfo<T>(Action<T> onComplete) where T: class
     {
         // 저장 경로 USER/ID/내 정보
         string path = "USER/" + FireAuthManager.Instance.GetCurrentUser().UserId + "/" + "Data/" + typeof(T).ToString();
@@ -61,6 +61,10 @@ public class DatabaseManager : Singleton<DatabaseManager>
             if (onComplete != null)
             {
                 onComplete(loadInfo);
+            }
+            else
+            {
+                onComplete(null);
             }
         }
         else
