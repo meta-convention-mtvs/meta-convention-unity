@@ -276,6 +276,7 @@ GameObject:
   - component: {fileID: 399286357}
   - component: {fileID: 399286356}
   - component: {fileID: 399286355}
+  - component: {fileID: 399286358}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -357,6 +358,50 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &399286358
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 399286354}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a79441f348de89743a2939f4d699eac1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_RenderShadows: 1
+  m_RequiresDepthTextureOption: 2
+  m_RequiresOpaqueTextureOption: 2
+  m_CameraType: 0
+  m_Cameras: []
+  m_RendererIndex: -1
+  m_VolumeLayerMask:
+    serializedVersion: 2
+    m_Bits: 1
+  m_VolumeTrigger: {fileID: 0}
+  m_VolumeFrameworkUpdateModeOption: 2
+  m_RenderPostProcessing: 0
+  m_Antialiasing: 0
+  m_AntialiasingQuality: 2
+  m_StopNaN: 0
+  m_Dithering: 0
+  m_ClearDepth: 1
+  m_AllowXRRendering: 1
+  m_AllowHDROutput: 1
+  m_UseScreenCoordOverride: 0
+  m_ScreenSizeOverride: {x: 0, y: 0, z: 0, w: 0}
+  m_ScreenCoordScaleBias: {x: 0, y: 0, z: 0, w: 0}
+  m_RequiresDepthTexture: 0
+  m_RequiresColorTexture: 0
+  m_Version: 2
+  m_TaaSettings:
+    m_Quality: 3
+    m_FrameInfluence: 0.1
+    m_JitterScale: 1
+    m_MipBias: 0
+    m_VarianceClampScale: 0.9
+    m_ContrastAdaptiveSharpening: 0
 --- !u!224 &499796417 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 5683058467861386678, guid: 349a7eff620cb4facb09f8477de7222e,
@@ -688,7 +733,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Log In
+  m_Text: "\uB85C\uADF8\uC778"
 --- !u!1 &826327615
 GameObject:
   m_ObjectHideFlags: 0
@@ -725,7 +770,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 80}
+  m_SizeDelta: {x: 0, y: 250.7}
   m_Pivot: {x: 0, y: 0}
 --- !u!114 &826327617
 MonoBehaviour:
@@ -1122,7 +1167,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: -150.17}
+  m_SizeDelta: {x: 0, y: -125.3}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1068912504
 MonoBehaviour:
@@ -1696,7 +1741,7 @@ MonoBehaviour:
       m_Calls: []
   m_FontData:
     m_Font: {fileID: 12800000, guid: ad5002ee7d583c043868696ca96b6c01, type: 3}
-    m_FontSize: 85
+    m_FontSize: 124
     m_FontStyle: 0
     m_BestFit: 0
     m_MinSize: 10
@@ -1707,7 +1752,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 1
     m_LineSpacing: 1
-  m_Text: Welcome to Meta Convention
+  m_Text: Meta Convention
 --- !u!1001 &1352894115
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1875,20 +1920,20 @@ MonoBehaviour:
       m_Calls: []
   m_FontData:
     m_Font: {fileID: 12800000, guid: 21ebbc0a721518145b069e31bca59a54, type: 3}
-    m_FontSize: 29
+    m_FontSize: 38
     m_FontStyle: 0
     m_BestFit: 0
     m_MinSize: 10
-    m_MaxSize: 67
+    m_MaxSize: 72
     m_Alignment: 0
     m_AlignByGeometry: 0
     m_RichText: 1
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 1
     m_LineSpacing: 1.4
-  m_Text: "Experience seamless, real-time conversations with AI. \nExplore cutting-edge
-    innovations in the metaverse,\nwhere businesses, investors, and buyers come together\n
-    to discover new opportunities and forge valuable connections."
+  m_Text: "\uBE44\uC988\uB2C8\uC2A4 \uB9AC\uB354, \uD22C\uC790\uC790, \uBC14\uC774\uC5B4\uAC00
+    \uD568\uAED8\uD558\uB294 \uD601\uC2E0\uC801\uC778 \uBA54\uD0C0\uBC84\uC2A4\uC5D0\uC11C\r\n\uC0C8\uB85C\uC6B4
+    \uAC00\uB2A5\uC131\uACFC \uC778\uC5F0\uC744 \uBC1C\uACAC\uD574 \uBCF4\uC138\uC694."
 --- !u!1 &1541027154
 GameObject:
   m_ObjectHideFlags: 0
@@ -1957,7 +2002,7 @@ MonoBehaviour:
     m_Top: 120
     m_Bottom: 0
   m_ChildAlignment: 0
-  m_Spacing: 111.6
+  m_Spacing: 95.92
   m_ChildForceExpandWidth: 1
   m_ChildForceExpandHeight: 1
   m_ChildControlWidth: 1
@@ -2010,7 +2055,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Play Now
+  m_Text: "\uC2DC\uC791\uD558\uAE30"
 --- !u!224 &1913700503 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 8382041283875004320, guid: 6f9621007d775495f9c8de66058392bc,
@@ -2257,6 +2302,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 40b3d576ae6a10b4899da9ee43a6fbcb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isLogin: 0
 --- !u!1001 &1940359530
 PrefabInstance:
   m_ObjectHideFlags: 0
