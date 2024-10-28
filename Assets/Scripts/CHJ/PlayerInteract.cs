@@ -22,23 +22,30 @@ public class PlayerInteract : MonoBehaviourPun
         Collider[] colliders = Physics.OverlapSphere(transform.position, interactionDistance, interactionMask);
 
         GameObject closestObject = FindClosestGameObject(colliders, interactionDistance);
+        print(closestObject);
 
-
-        if(previousClosestObject != null && closestObject != previousClosestObject)
+        // 만약 이전에 가장 가까운 오브젝트가 존재하고, 그 오브젝트가 현재 오브젝트랑 다를 때
+        if(closestObject != null && closestObject != previousClosestObject)
         {
-            IKeyInteractableObject go = previousClosestObject.GetComponent<IKeyInteractableObject>();
-            go.HideText();
+            // 이전 오브젝트의 Text를 숨기는 코드
+            //IKeyInteractableObject go = previousClosestObject?.GetComponent<IKeyInteractableObject>();
+            //go?.HideText();
+
+            // 현재 오브젝트의 Text를 보여주는 코드
+            closestObject.GetComponent<IKeyInteractableObject>()?.ShowText();
         }
 
+        // 만약 가장 가까운 오브젝트가 존재하고, F키가 눌렸으면
         if (closestObject != null)
         {
-            IKeyInteractableObject go = closestObject.GetComponent<IKeyInteractableObject>();
-            go.ShowText();
             if (Input.GetKeyDown(KeyCode.F))
             {
+                IKeyInteractableObject go = closestObject.GetComponent<IKeyInteractableObject>();
                 go.Interact();
             }
         }
+
+        // 이전 오브젝트를 갱신한다.
         previousClosestObject = closestObject;
     }
 

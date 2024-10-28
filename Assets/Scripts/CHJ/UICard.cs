@@ -1,4 +1,4 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -8,13 +8,10 @@ using System;
 
 public class UICard : MonoBehaviour
 {
-    public TMP_Text nameText;
-    public TMP_Text instituteText;
-    public TMP_Text majorText;
-    public TMP_Text emailText;
-
-    // todo: Player °´Ã¼¸¦
-
+    public Text nameText;
+    public Text instituteText;
+    public Text majorText;
+    public Text emailText;
 
     public void ShowCardUI(Card card)
     {

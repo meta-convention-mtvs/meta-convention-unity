@@ -7,7 +7,7 @@ public class SetPopupText : MonoBehaviour
 {
     Text popupText;
 
-    private void Start()
+    private void Awake()
     {
         popupText = GetComponentInChildren<Text>();
     }

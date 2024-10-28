@@ -6,8 +6,6 @@ using TMPro;
 
 public class InteractablePlayerObject : MonoBehaviourPun, IKeyInteractableObject
 {
-    public TMP_Text infoText;
-
     CardBook cardBook;
     CardReader cardReader;
 
@@ -18,7 +16,7 @@ public class InteractablePlayerObject : MonoBehaviourPun, IKeyInteractableObject
     }
     public void HideText()
     {
-        infoText.gameObject.SetActive(false);
+        
     }
 
     public void Interact()
@@ -29,6 +27,6 @@ public class InteractablePlayerObject : MonoBehaviourPun, IKeyInteractableObject
 
     public void ShowText()
     {
-        infoText.gameObject.SetActive(true);
+        UIManager.Instance.ShowPopupUI("(F)키를 눌러 명함을 주고 받으세요!");
     }
 }
