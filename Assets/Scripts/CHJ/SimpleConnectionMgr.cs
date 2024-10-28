@@ -7,6 +7,7 @@ using UnityEngine;
 
 public class SimpleConnectionMgr : MonoBehaviourPunCallbacks
 {
+    public GameObject blackUi;
 
     #region 메인서버에 연결
     private void Start()
@@ -44,9 +45,16 @@ public class SimpleConnectionMgr : MonoBehaviourPunCallbacks
     public override void OnJoinedRoom()
     {
         print("Entered the Room");
-        PhotonNetwork.LoadLevel("MainScene_CHJ");
+
+        Instantiate(blackUi);
+        StartCoroutine(NextScene());
     }
 
+    IEnumerator NextScene()
+    {
+        yield return null;
+        PhotonNetwork.LoadLevel("MainScene_CHJ");
+    }
 
     #endregion
 }
