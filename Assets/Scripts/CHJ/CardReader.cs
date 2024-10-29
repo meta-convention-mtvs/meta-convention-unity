@@ -36,7 +36,7 @@ public class CardReader : MonoBehaviour
     }
     public static Card ReadCard(Player player)
     {
-        Card newCard = new Card((string)player.CustomProperties["id"], player.NickName, (string)player.CustomProperties["institute"], (string)player.CustomProperties["major"], (string)player.CustomProperties["email"]);
+        Card newCard = new Card((string)player.CustomProperties["id"], (string)player.CustomProperties["nickname"], (string)player.CustomProperties["institute"], (string)player.CustomProperties["major"], (string)player.CustomProperties["email"], (string)player.CustomProperties["phoneNumber"]) ;
 
         return newCard;
     }

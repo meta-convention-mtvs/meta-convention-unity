@@ -8,6 +8,8 @@ using UnityEngine;
 public class SimpleConnectionMgr : MonoBehaviourPunCallbacks
 {
     public GameObject blackUi;
+    public float sceneTransitionTime = 3.0f;
+    public float fadeDuration = 2.0f;
 
     #region 메인서버에 연결
     private void Start()
@@ -15,6 +17,11 @@ public class SimpleConnectionMgr : MonoBehaviourPunCallbacks
         PhotonNetwork.SendRate = 120;
         PhotonNetwork.SerializationRate = 60;
         PhotonNetwork.ConnectUsingSettings();
+
+        GameObject go = Instantiate(blackUi);
+        CanvasGroup canvasGroup = go.GetComponent<CanvasGroup>();
+        canvasGroup.alpha = 0f;
+        StartCoroutine(NextScene(canvasGroup));
     }
 
     public override void OnConnectedToMaster()
@@ -46,13 +53,29 @@ public class SimpleConnectionMgr : MonoBehaviourPunCallbacks
     {
         print("Entered the Room");
 
-        Instantiate(blackUi);
-        StartCoroutine(NextScene());
     }
 
-    IEnumerator NextScene()
+    IEnumerator NextScene(CanvasGroup canvasGroup)
     {
+        yield return new WaitForSeconds(sceneTransitionTime);
+        while (!PhotonNetwork.InRoom)
+        {
+           yield return null;
+        }
+        canvasGroup.alpha = 0f; // 알파 값을 투명으로 설정
+
+        float elapsed = 0f;
+        while (elapsed < fadeDuration)
+        {
+            elapsed += Time.deltaTime;
+            canvasGroup.alpha = Mathf.Lerp(0f, 1f, elapsed / fadeDuration);
+            yield return null;
+        }
+
+        // 최종 알파 값 설정 (완전 불투명)
+        canvasGroup.alpha = 1f;
         yield return null;
+
         PhotonNetwork.LoadLevel("MainScene_CHJ");
     }
 

@@ -6,15 +6,15 @@ using UnityEngine.UI;
 public class ActiveWhenLogin : MonoBehaviour
 {
     Button button;
-    public bool isLogin;
 
     private void Start()
     {
         button = GetComponent<Button>();
+        FireAuthManager.Instance.OnLogin += () => ActiveButton(button);
     }
-    private void Update()
+ 
+    void ActiveButton(Button button)
     {
-        isLogin = FireAuthManager.Instance.isLogIn;
-        button.interactable = FireAuthManager.Instance.isLogIn;
+        button.interactable = true;
     }
 }
