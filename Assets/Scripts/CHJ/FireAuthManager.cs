@@ -9,19 +9,27 @@ using UnityEngine.UI;
 
 public class FireAuthManager : Singleton<FireAuthManager>
 {
-
-    public bool isLogIn;
+    public Action OnLogin;
 
    void Start()
     {
         FirebaseAuth.DefaultInstance.StateChanged += OnChangeAuthState;
-        FirebaseAuth.DefaultInstance.SignOut();
+    }
+
+    private void OnApplicationQuit()
+    {
+        if(FirebaseAuth.DefaultInstance.CurrentUser != null)
+        {
+            Logout();
+            Debug.Log("로그아웃 되었습니다");
+        }
     }
 
     public FirebaseUser GetCurrentUser()
     {
         return FirebaseAuth.DefaultInstance.CurrentUser;
     }
+
     void OnChangeAuthState(object sender, EventArgs e)
     {
         // 만약, 유저 정보가 있다면
@@ -29,13 +37,12 @@ public class FireAuthManager : Singleton<FireAuthManager>
         {
             print(FirebaseAuth.DefaultInstance.CurrentUser.Email + " , " + FirebaseAuth.DefaultInstance.CurrentUser.UserId);
             // 로그인 되어 있음
-            isLogIn = true;
             print("로그인 상태");
+            OnLogin?.Invoke();
         }
         // 그렇지 않으면
         else
         {
-            isLogIn = false;
             print("로그 아웃 상태");
             // 로그 아웃
         }
@@ -88,7 +95,7 @@ public class FireAuthManager : Singleton<FireAuthManager>
             print("로그인 실패 : " + task.Exception);
         }
     }
-
+    
     public void Logout()
     {
         FirebaseAuth.DefaultInstance.SignOut();

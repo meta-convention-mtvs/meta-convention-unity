@@ -10,7 +10,7 @@ public class UICardMaker : MonoBehaviour
     public InputField nameInput;
     public InputField instituteInput;
     public InputField majorInput;
-    public InputField email_Input;
+    public InputField phoneNumberInput;
     public Button saveButton;
     public Text cardErrorText;
 
@@ -23,12 +23,12 @@ public class UICardMaker : MonoBehaviour
 
     private void _OnSaveClick()
     {
-        if (nameInput.text == "" || instituteInput.text == "" || majorInput.text == "" || email_Input.text == "")
+        if (nameInput.text == "" || instituteInput.text == "" || majorInput.text == "" || phoneNumberInput.text == "")
         {
             cardErrorText.text = "모든 필드를 채워주세요";
             return;
         }
-        OnSaveClick?.Invoke(nameInput.text, instituteInput.text, majorInput.text, email_Input.text);
+        OnSaveClick?.Invoke(nameInput.text, instituteInput.text, majorInput.text, phoneNumberInput.text);
         saveButton.gameObject.GetComponent<SceneTransition>().PerformTransition();
     }
 

@@ -54,6 +54,7 @@ public class CreatePlayer : MonoBehaviour
             {"institute", myCard.institute },
             {"major", myCard.major },
             {"email", myCard.email },
+            {"phoneNumber",myCard.phoneNumber },
             {"MeetingList",emptyMeetingList },
             {"MeetingListIndex", 0 }
         };

@@ -22,6 +22,7 @@ public class LoadDataFromServer : MonoBehaviour
     {
         userCardData = new Card();
         userCharacterCustomizeData = new CharacterCustomizeData();
+        FireAuthManager.Instance.OnLogin += LoadUserDataFromServer;
     }
 
     private void Update()

@@ -17,14 +17,17 @@ public class Card
     public string major { get; set; }
     [FirestoreProperty]
     public string email { get; set; }
+    [FirestoreProperty]
+    public string phoneNumber { get; set; }
 
-    public Card(string id, string nickname, string institute, string major, string email)
+    public Card(string id, string nickname, string institute, string major, string email, string phoneNumber)
     {
         this.id = id;
         this.nickname = nickname;
         this.institute = institute;
         this.major = major;
         this.email = email;
+        this.phoneNumber = phoneNumber;
     }
 
     public Card()

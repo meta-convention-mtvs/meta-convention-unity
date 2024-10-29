@@ -12,6 +12,7 @@ public class UICard : MonoBehaviour
     public Text instituteText;
     public Text majorText;
     public Text emailText;
+    public Text phoneText;
 
     public void ShowCardUI(Card card)
     {
@@ -19,6 +20,7 @@ public class UICard : MonoBehaviour
         instituteText.text = card.institute;
         majorText.text = card.major;
         emailText.text = card.email;
+        phoneText.text = card.phoneNumber;
     }
 
 }

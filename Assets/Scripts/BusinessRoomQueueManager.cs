@@ -42,11 +42,12 @@ public class BusinessRoomQueueManager : MonoBehaviourPunCallbacks
 
             // 모든 meetingList를 출력한다.
             for (int i = 0; i < newMeetingListIndex; i++)
-                print(newMeetingList[i]);
+                print(newMeetingList[i] + newMeetingListIndex);
             
             // meetingList의 데이터를 Queue에 넣는다.
             if (newMeetingListIndex > 0)
             {
+                print("yes");
                 meetingQueue.Enqueue(newMeetingList[newMeetingListIndex - 1]);
                 UIManager.Instance.ShowUI(ui_br.gameObject, UIType.Option);
             }

@@ -33,6 +33,8 @@ public class UIManager : MonoBehaviour
 
     public GameObject popupUiFactory;
 
+    public GameObject yesNoPopupUIFactory;
+
     public Canvas popupCanvas;
 
     private void Awake()
@@ -77,6 +79,7 @@ public class UIManager : MonoBehaviour
         {
             switch (uiType)
             {
+                case UIType.Option:
                 case UIType.Conversation:
                 case UIType.Normal:
                     PlayNoramlUIAnimation(ui, UIAnimationTime, true);
