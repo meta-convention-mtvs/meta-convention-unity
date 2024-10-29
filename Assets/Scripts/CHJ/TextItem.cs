@@ -8,7 +8,7 @@ using TMPro;
 public class TextItem : MonoBehaviour
 {
     //Text 
-    TMP_Text chatText;
+    Text chatText;
 
     public RectTransform Content;
 
@@ -17,7 +17,7 @@ public class TextItem : MonoBehaviour
     private void Awake()
     {
         // Text 컴포넌트 가져오자
-        chatText = GetComponent<TMP_Text>();
+        chatText = GetComponent<Text>();
     }
 
     public void AddText(string s)
