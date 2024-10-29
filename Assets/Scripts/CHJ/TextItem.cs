@@ -3,21 +3,21 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using System;
+using TMPro;
 
 public class TextItem : MonoBehaviour
 {
     //Text 
-    Text chatText;
+    TMP_Text chatText;
 
-    RectTransform rt;
+    public RectTransform Content;
 
     public RectTransform viewport;
 
     private void Awake()
     {
         // Text 컴포넌트 가져오자
-        chatText = GetComponent<Text>();
-        rt = GetComponent<RectTransform>();
+        chatText = GetComponent<TMP_Text>();
     }
 
     public void AddText(string s)
@@ -34,13 +34,13 @@ public class TextItem : MonoBehaviour
         yield return null;
 
         // 텍스트의 내용에 맞춰서 크기를 조절
-        rt.sizeDelta = new Vector2(rt.sizeDelta.x, chatText.preferredHeight);
+        Content.sizeDelta = new Vector2(Content.sizeDelta.x, chatText.preferredHeight);
 
         yield return null;
 
-        if(viewport.sizeDelta.y < rt.sizeDelta.y)
+        if(viewport.sizeDelta.y < Content.sizeDelta.y)
         {
-            rt.anchoredPosition = new Vector2(0, rt.sizeDelta.y - viewport.sizeDelta.y);
+            Content.anchoredPosition = new Vector2(0, Content.sizeDelta.y - viewport.sizeDelta.y);
         }
     }
 }
