@@ -56,13 +56,14 @@ public class AIWebSocket : MonoBehaviour
     // Start 메서드: WebSocket 연결을 초기화하고 이벤트 핸들러를 설정합니다.
     async void Start()
     {
-        ConnectToWebsocket("ws://metaai2.iptime.org:44444", messageQueue);
+        //ConnectToWebsocket("ws://metaai2.iptime.org:44444", messageQueue);
+        ConnectToWebsocket("ws://ec2-13-125-234-38.ap-northeast-2.compute.amazonaws.com:44444", messageQueue);
         await WaitForConnection();
         if (isConnected)
         {
             await SendConfigUpdate();
         }
-//        NetworkManager.Instance.RegisterAI(this, aiId);
+        // NetworkManager.Instance.RegisterAI(this, aiId);
 
     }
 
