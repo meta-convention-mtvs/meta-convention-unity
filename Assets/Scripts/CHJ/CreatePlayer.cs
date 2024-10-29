@@ -7,17 +7,28 @@ using UnityEngine;
 using System.Linq;
 using System;
 using System.Collections;
+using Photon.Voice.PUN;
 
 public class CreatePlayer : MonoBehaviour
 {
     public Transform[] playerStartPosition;
     public Action<GameObject> OnPlayerCreate;
+    public enum RoomType
+    {
+        MainHall,
+        BusinessRoom
+    };
+    public RoomType roomType;
 
     GameObject player;
 
     private void Start()
     {
         player = Create();
+        if(roomType == RoomType.BusinessRoom)
+        {
+            player.AddComponent<PhotonVoiceView>();
+        }
         DatabaseManager.Instance.GetData<Card>(onCardLoad);
 
         StartCoroutine(WaitAndInvoke());
