@@ -40,6 +40,7 @@ public class SimpleConnetToMasterServer : MonoBehaviourPunCallbacks
 
         RoomOptions roomOptions = new RoomOptions();
         roomOptions.MaxPlayers = 20;
+        roomOptions.PublishUserId = true;
         PhotonNetwork.JoinOrCreateRoom("MainHall", roomOptions, TypedLobby.Default);
     }
     #region 메인서버에 연결
