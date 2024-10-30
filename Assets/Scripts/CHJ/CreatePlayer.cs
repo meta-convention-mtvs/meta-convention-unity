@@ -24,11 +24,7 @@ public class CreatePlayer : MonoBehaviour
 
     private void Start()
     {
-        player = Create();
-        if(roomType == RoomType.BusinessRoom)
-        {
-            player.AddComponent<PhotonVoiceView>();
-        }
+        player = Create(roomType);
         DatabaseManager.Instance.GetData<Card>(onCardLoad);
 
         StartCoroutine(WaitAndInvoke());
@@ -44,7 +40,7 @@ public class CreatePlayer : MonoBehaviour
     {
         SaveCardInProperties(player.GetPhotonView().Owner, myCard);
     }
-    public GameObject Create()
+    public GameObject Create(RoomType roomType)
     {
         // 플레이어 prefab 생성
         int idx = PhotonNetwork.CurrentRoom.PlayerCount - 1;
@@ -53,7 +49,12 @@ public class CreatePlayer : MonoBehaviour
         {
             idx = playerStartPosition.Length-1;
         }
-        return PhotonNetwork.Instantiate("Player", playerStartPosition[idx].position, playerStartPosition[idx].rotation);
+        string resourceName = "";
+        if (roomType == RoomType.MainHall)
+            resourceName = "Player";
+        else if (roomType == RoomType.BusinessRoom)
+            resourceName = "Player_BusinessRoom";
+        return PhotonNetwork.Instantiate(resourceName, playerStartPosition[idx].position, playerStartPosition[idx].rotation);
     }
 
     void SaveCardInProperties(Player player, Card myCard)
