@@ -338,7 +338,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -0.000021242062, y: 0}
+  m_AnchoredPosition: {x: -0.000021242062, y: 119.60038}
   m_SizeDelta: {x: -31.08088, y: 300}
   m_Pivot: {x: 0, y: 1}
 --- !u!1 &6722426477219761121
@@ -577,8 +577,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 308727664513722630}
   m_HandleRect: {fileID: 467974200198282606}
   m_Direction: 2
-  m_Value: 1
-  m_Size: 0.6013333
+  m_Value: -0.0000030619642
+  m_Size: 0.6004947
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -672,7 +672,7 @@ PrefabInstance:
     - target: {fileID: 3560829795126510856, guid: 5d71ea37b0e30430281103deb4484a35,
         type: 3}
       propertyPath: m_SizeDelta.y
-      value: 106.31
+      value: 118
       objectReference: {fileID: 0}
     - target: {fileID: 3560829795126510856, guid: 5d71ea37b0e30430281103deb4484a35,
         type: 3}
@@ -682,7 +682,7 @@ PrefabInstance:
     - target: {fileID: 3560829795126510856, guid: 5d71ea37b0e30430281103deb4484a35,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -53.155
+      value: -59
       objectReference: {fileID: 0}
     - target: {fileID: 4302250313422832551, guid: 5d71ea37b0e30430281103deb4484a35,
         type: 3}
@@ -906,7 +906,8 @@ PrefabInstance:
       propertyPath: m_ConstrainProportionsScale
       value: 1
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 1118642246363344052, guid: 5d71ea37b0e30430281103deb4484a35, type: 3}
     m_RemovedGameObjects:
     - {fileID: 8554001725638133683, guid: 5d71ea37b0e30430281103deb4484a35, type: 3}
     m_AddedGameObjects:
@@ -1177,7 +1178,7 @@ PrefabInstance:
     - target: {fileID: 1098255898888365363, guid: 9eb85e4633b7e44f89c50c1b5fbb9760,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 93.80002
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1098255898888365363, guid: 9eb85e4633b7e44f89c50c1b5fbb9760,
         type: 3}
@@ -1226,7 +1227,8 @@ PrefabInstance:
       propertyPath: m_enableWordWrapping
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 8383344148730722992, guid: 9eb85e4633b7e44f89c50c1b5fbb9760, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
@@ -1238,6 +1240,10 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 8450228463654567702}
+    - targetCorrespondingSourceObject: {fileID: 4131733748807728804, guid: 9eb85e4633b7e44f89c50c1b5fbb9760,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2155414927372756501}
   m_SourcePrefab: {fileID: 100100000, guid: 9eb85e4633b7e44f89c50c1b5fbb9760, type: 3}
 --- !u!1 &4954770716179012465 stripped
 GameObject:
@@ -1258,7 +1264,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Content: {fileID: 1020356017380317363}
-  viewport: {fileID: 7845814837361172174}
+  viewport: {fileID: 7435541703729626726}
 --- !u!114 &8450228463654567702
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1273,6 +1279,40 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_HorizontalFit: 0
   m_VerticalFit: 2
+--- !u!114 &2155414927372756501
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4954770716179012465}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f7201a12d95ffc409449d95f23cf332, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_FontData:
+    m_Font: {fileID: 12800000, guid: a115333f36149aa409b6990a70077bf2, type: 3}
+    m_FontSize: 20
+    m_FontStyle: 0
+    m_BestFit: 0
+    m_MinSize: 2
+    m_MaxSize: 40
+    m_Alignment: 0
+    m_AlignByGeometry: 0
+    m_RichText: 1
+    m_HorizontalOverflow: 0
+    m_VerticalOverflow: 0
+    m_LineSpacing: 1.33
+  m_Text: 
 --- !u!224 &8262405097330376934 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 1098255898888365363, guid: 9eb85e4633b7e44f89c50c1b5fbb9760,

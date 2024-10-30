@@ -57,13 +57,13 @@ public class AIWebSocket : MonoBehaviour
     async void Start()
     {
         //ConnectToWebsocket("ws://metaai2.iptime.org:44444", messageQueue);
-        ConnectToWebsocket("ws://ec2-13-125-234-38.ap-northeast-2.compute.amazonaws.com:44444", messageQueue);
+        ConnectToWebsocket("ws://ec2-13-125-234-38.ap-northeast-2.compute.amazonaws.com:44444", messageQueue); 
         await WaitForConnection();
         if (isConnected)
         {
             await SendConfigUpdate();
         }
-        // NetworkManager.Instance.RegisterAI(this, aiId);
+//        NetworkManager.Instance.RegisterAI(this, aiId);
 
     }
 

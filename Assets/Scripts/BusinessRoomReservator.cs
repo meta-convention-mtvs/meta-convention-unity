@@ -18,5 +18,7 @@ public class BusinessRoomReservator : MonoBehaviour
         newProperties.Add("MeetingList", meetingList);
         newProperties.Add("MeetingListIndex", meetingListIndex);
         player.SetCustomProperties(newProperties);
+
+        UIManager.Instance.ShowPopupUI("약속을 잡았습니다! 승인을 기다려주세요");
     }  
 }
