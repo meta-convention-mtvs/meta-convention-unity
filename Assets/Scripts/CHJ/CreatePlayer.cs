@@ -37,6 +37,7 @@ public class CreatePlayer : MonoBehaviour
     IEnumerator WaitAndInvoke()
     {
         yield return null;
+        // player 객체를 카메라에 등록시킨다.
         OnPlayerCreate?.Invoke(player);
     }
     private void onCardLoad(Card myCard)

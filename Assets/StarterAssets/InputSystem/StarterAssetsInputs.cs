@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
 #endif
@@ -19,6 +19,14 @@ namespace StarterAssets
 		[Header("Mouse Cursor Settings")]
 		public bool cursorLocked = true;
 		public bool cursorInputForLook = true;
+
+		private bool isChatting = false; // 채팅 중인지 여부를 저장할 변수
+
+		public void OnChatToggle(bool isChatting)
+		{
+			// 채팅창 활성화/비활성화 메서드
+			this.isChatting = isChatting;
+		}
 
 
 #if ENABLE_INPUT_SYSTEM
@@ -49,7 +57,10 @@ namespace StarterAssets
 
 		public void MoveInput(Vector2 newMoveDirection)
 		{
-			move = newMoveDirection;
+			if (!isChatting)
+				move = newMoveDirection;
+			else
+				move = Vector2.zero;
 		} 
 
 		public void LookInput(Vector2 newLookDirection)
@@ -59,12 +70,18 @@ namespace StarterAssets
 
 		public void JumpInput(bool newJumpState)
 		{
-			jump = newJumpState;
+			if (!isChatting)
+				jump = newJumpState;
+			else
+				jump = false;
 		}
 
 		public void SprintInput(bool newSprintState)
 		{
-			sprint = newSprintState;
+			if (!isChatting)
+				sprint = newSprintState;
+			else
+				sprint = false;
 		}
 
 		private void OnApplicationFocus(bool hasFocus)
