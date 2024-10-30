@@ -23,9 +23,6 @@ public class DocumentWriter : MonoBehaviourPun
     {
         meetingDate.text = DateTime.Today.Date.ToString();
 
-        title.onValueChanged.AddListener(SetTitleString);
-        document.onValueChanged.AddListener(SetDocumentString);
-
         // playerfactory에서 플레이어 객체에서 StarterAssetsInputs 받아오기
         playerFactory = GameObject.FindWithTag("PlayerFactory").GetComponent<CreatePlayer>();
         if (playerFactory == null)
