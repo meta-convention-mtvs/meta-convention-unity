@@ -6,30 +6,13 @@ using UnityEngine.UI;
 
 public class SettingUIMgr : MonoBehaviour
 {
-    public GameObject settingUI;
-    public GameObject myPageUI;
     public Button screenshotButton;
 
     private void Start()
     {
         screenshotButton.onClick.AddListener(() => OnClickScreenShot());
     }
-    public void OnClickMyPageBTN()
-    {
-        UIManager.Instance.ShowUI(myPageUI, UIType.Normal);
-    }
-    public void OnClickSettingBTN()
-    {
-        UIManager.Instance.ShowUI(settingUI, UIType.Normal);
-    }
-
-    public void OnClickCloseSettingBTN()
-    {
-        CanvasGroup canvas = settingUI.GetComponent<CanvasGroup>();
-        canvas.alpha = 0;
-        canvas.blocksRaycasts = false;
-    }
-
+    
     public void OnClickScreenShot()
     {
         screenshotButton.interactable = false;

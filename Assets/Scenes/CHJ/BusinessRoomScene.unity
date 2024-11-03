@@ -206,7 +206,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1104155822}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: UnityEngine.CanvasGroup, UnityEngine
         m_MethodName: set_alpha
         m_Mode: 4
@@ -218,7 +218,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 1104155822}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: UnityEngine.CanvasGroup, UnityEngine
         m_MethodName: set_interactable
         m_Mode: 6
@@ -954,7 +954,6 @@ GameObject:
   - component: {fileID: 506413537}
   - component: {fileID: 506413540}
   - component: {fileID: 506413539}
-  - component: {fileID: 506413538}
   m_Layer: 5
   m_Name: Panel
   m_TagString: Untagged
@@ -982,18 +981,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 500, y: 500}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!225 &506413538
-CanvasGroup:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 506413536}
-  m_Enabled: 1
-  m_Alpha: 0
-  m_Interactable: 1
-  m_BlocksRaycasts: 0
-  m_IgnoreParentGroups: 0
 --- !u!114 &506413539
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1044,6 +1031,8 @@ GameObject:
   - component: {fileID: 630795709}
   - component: {fileID: 630795708}
   - component: {fileID: 630795707}
+  - component: {fileID: 630795712}
+  - component: {fileID: 630795711}
   m_Layer: 5
   m_Name: QuitCanvas
   m_TagString: Untagged
@@ -1134,6 +1123,31 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!114 &630795711
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 630795706}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e6171a3b822efcb43a3310e8ae07fd2c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hideKeys: 1b000000
+--- !u!225 &630795712
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 630795706}
+  m_Enabled: 1
+  m_Alpha: 0
+  m_Interactable: 1
+  m_BlocksRaycasts: 0
+  m_IgnoreParentGroups: 0
 --- !u!1 &664290696
 GameObject:
   m_ObjectHideFlags: 0
@@ -1728,7 +1742,6 @@ GameObject:
   - component: {fileID: 1104155819}
   - component: {fileID: 1104155821}
   - component: {fileID: 1104155820}
-  - component: {fileID: 1104155822}
   m_Layer: 5
   m_Name: Panel
   m_TagString: Untagged
@@ -1795,18 +1808,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1104155818}
   m_CullTransparentMesh: 1
---- !u!225 &1104155822
-CanvasGroup:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1104155818}
-  m_Enabled: 1
-  m_Alpha: 0
-  m_Interactable: 1
-  m_BlocksRaycasts: 0
-  m_IgnoreParentGroups: 0
 --- !u!114 &1146926555 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 434994597704342017, guid: 4aede057cad937949997e53578cc04f8,
@@ -2039,9 +2040,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ui_br: {fileID: 370395877}
-  documentUI: {fileID: 1528181810}
-  qrcodeUI: {fileID: 506413536}
-  quitUI: {fileID: 1104155818}
+  documentUI: {fileID: 1528181811}
+  qrcodeUI: {fileID: 1797500991}
+  quitUI: {fileID: 630795706}
 --- !u!4 &1290689865
 Transform:
   m_ObjectHideFlags: 0
@@ -2439,17 +2440,51 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 12800000, guid: a115333f36149aa409b6990a70077bf2,
         type: 3}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 1877719200358001404, guid: 4aede057cad937949997e53578cc04f8, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 5394308304776644110, guid: 4aede057cad937949997e53578cc04f8,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1528181813}
+    - targetCorrespondingSourceObject: {fileID: 5394308304776644110, guid: 4aede057cad937949997e53578cc04f8,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1528181812}
   m_SourcePrefab: {fileID: 100100000, guid: 4aede057cad937949997e53578cc04f8, type: 3}
---- !u!1 &1528181810 stripped
+--- !u!1 &1528181811 stripped
 GameObject:
-  m_CorrespondingSourceObject: {fileID: 6747322147887870504, guid: 4aede057cad937949997e53578cc04f8,
+  m_CorrespondingSourceObject: {fileID: 5394308304776644110, guid: 4aede057cad937949997e53578cc04f8,
     type: 3}
   m_PrefabInstance: {fileID: 1528181809}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1528181812
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1528181811}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e6171a3b822efcb43a3310e8ae07fd2c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hideKeys: 1b000000
+--- !u!225 &1528181813
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1528181811}
+  m_Enabled: 1
+  m_Alpha: 0
+  m_Interactable: 1
+  m_BlocksRaycasts: 0
+  m_IgnoreParentGroups: 0
 --- !u!1 &1532475277
 GameObject:
   m_ObjectHideFlags: 0
@@ -2990,6 +3025,8 @@ GameObject:
   - component: {fileID: 1797500994}
   - component: {fileID: 1797500993}
   - component: {fileID: 1797500992}
+  - component: {fileID: 1797500997}
+  - component: {fileID: 1797500996}
   m_Layer: 5
   m_Name: QrcodeCanvas
   m_TagString: Untagged
@@ -3080,6 +3117,62 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!114 &1797500996
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1797500991}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e6171a3b822efcb43a3310e8ae07fd2c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hideKeys: 1b000000
+--- !u!225 &1797500997
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1797500991}
+  m_Enabled: 1
+  m_Alpha: 0
+  m_Interactable: 1
+  m_BlocksRaycasts: 0
+  m_IgnoreParentGroups: 0
+--- !u!1 &1907109857
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1907109858}
+  m_Layer: 0
+  m_Name: =========Canvas========================
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1907109858
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1907109857}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -5.8840723, y: -1.8526522, z: -59.099987}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1993234827
 GameObject:
   m_ObjectHideFlags: 0
@@ -27252,14 +27345,18 @@ SceneRoots:
   - {fileID: 269682574}
   - {fileID: 875797277}
   - {fileID: 728772257}
-  - {fileID: 1290689865}
-  - {fileID: 1797500995}
-  - {fileID: 630795710}
   - {fileID: 1699132891}
   - {fileID: 370395876}
   - {fileID: 2076635155}
   - {fileID: 1102877418}
-  - {fileID: 1528181809}
   - {fileID: 401739821}
   - {fileID: 1048818085}
+<<<<<<< Updated upstream
   - {fileID: 959575110}
+=======
+  - {fileID: 1907109858}
+  - {fileID: 1290689865}
+  - {fileID: 1528181809}
+  - {fileID: 1797500995}
+  - {fileID: 630795710}
+>>>>>>> Stashed changes
