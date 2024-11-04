@@ -7,33 +7,48 @@ using UnityEngine.UI;
 
 public class UICharacterMaker : MonoBehaviour
 {
-    public Button[] btn_prev;
-    public Button[] btn_next;
+    public Button[] btn_top_prev;
+    public Button[] btn_top_next;
+    public Button[] btn_bottom_prev;
+    public Button[] btn_bottom_next;
     public Button btn_save;
     public Button[] btn_gender;
 
-    public Action OnPrevClick, OnNextClick, OnSaveClick, OnGenderClick;
+    public Action OnTopPrevClick, OnTopNextClick, OnSaveClick, OnGenderClick, OnBottomPrevClick, OnBottomNextClick;
 
     private void Start()
     {
-        foreach(Button button in btn_prev)
-            button.onClick.AddListener(_OnPrevClick);
-        foreach(Button button in btn_next)
-            button.onClick.AddListener(_OnNextClick);
+        foreach(Button button in btn_top_prev)
+            button.onClick.AddListener(_OnTopPrevClick);
+        foreach(Button button in btn_top_next)
+            button.onClick.AddListener(_OnTopNextClick);
+        foreach (Button button in btn_bottom_prev)
+            button.onClick.AddListener(_OnBottomPrevClick);
+        foreach (Button button in btn_bottom_next)
+            button.onClick.AddListener(_OnBottonNextClick);
         btn_save.onClick.AddListener(_OnSaveClick);
         foreach(Button button in btn_gender)    
             button.onClick.AddListener(_OnGenderClick);
     }
 
-    private void _OnPrevClick()
+    private void _OnTopPrevClick()
     {
-        OnPrevClick?.Invoke();
+        OnTopPrevClick?.Invoke();
     }
-    private void _OnNextClick()
+    private void _OnTopNextClick()
     {
-        OnNextClick?.Invoke();
+        OnTopNextClick?.Invoke();
     }
 
+    public void _OnBottomPrevClick()
+    {
+        OnBottomPrevClick?.Invoke();
+    }
+
+    public void _OnBottonNextClick()
+    {
+        OnBottomNextClick?.Invoke();
+    }
     private void _OnSaveClick()
     {
         OnSaveClick?.Invoke();

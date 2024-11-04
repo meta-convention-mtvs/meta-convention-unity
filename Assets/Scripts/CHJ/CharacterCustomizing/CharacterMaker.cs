@@ -20,8 +20,8 @@ public class CharacterMaker : MonoBehaviour
     {
         currentCustomizeManager = maleCustomMgr;
         currentCustomizeManager.SetCustomizingIdx(0);
-        ui_cm.OnNextClick += IncCustomizingIdx;
-        ui_cm.OnPrevClick += DecCustomizingIdx;
+        ui_cm.OnTopNextClick += IncCustomizingIdx;
+        ui_cm.OnTopPrevClick += DecCustomizingIdx;
         ui_cm.OnSaveClick += SaveCharacterInfo;
         ui_cm.OnGenderClick += ChangeGender;
     }
