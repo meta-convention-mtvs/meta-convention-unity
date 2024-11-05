@@ -1,4 +1,4 @@
-using Firebase.Firestore;
+ï»¿using Firebase.Firestore;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -99,7 +99,7 @@ public class FireMgr : MonoBehaviour
 
         FireStore.instance.SaveUserInfo(info);
     }
-    // °¡ÀÔ Á¤º¸ ±¸Ã¼È­, poll ¹Ş¾Æ¼­  UID ±â¹İÀ¸·Î DB¿¡ ÀúÀåÇÏ±â 
+    // ê°€ì… ì •ë³´ êµ¬ì²´í™”, poll ë°›ì•„ì„œ  UID ê¸°ë°˜ìœ¼ë¡œ DBì— ì €ì¥í•˜ê¸° 
 
     public InputField companyName;
     public Toggle isCompany;
@@ -150,18 +150,18 @@ public class FireMgr : MonoBehaviour
         print(info.products[0].description);
     }
 
-    // ±â¾÷ Á¤º¸¿¡ ÇÁ·Î´öÆ® Ãß°¡ÇÏ±â
-    // ÇÁ·Î´öÆ® Á¤º¸ ÀÔ·ÂÇÏ°í 
-    // Ãß°¡ÇÏ¸é products.add() ·Î ³Ö±â
-    // ÇÁ·Î´öÆ® ¸®½ºÆ® ´Ù½Ã ·£´õ¸µ
-    // ¿Ï·á currentCompaynInfo ÀúÀå
+    // ê¸°ì—… ì •ë³´ì— í”„ë¡œë•íŠ¸ ì¶”ê°€í•˜ê¸°
+    // í”„ë¡œë•íŠ¸ ì •ë³´ ì…ë ¥í•˜ê³  
+    // ì¶”ê°€í•˜ë©´ products.add() ë¡œ ë„£ê¸°
+    // í”„ë¡œë•íŠ¸ ë¦¬ìŠ¤íŠ¸ ë‹¤ì‹œ ëœë”ë§
+    // ì™„ë£Œ currentCompaynInfo ì €ì¥
 
-    // ·Îµå ÇßÀ» ¶§, ±â¾÷ ÀÌ¸§, ÇÁ·Î´öÆ® ¸®½ºÆ® ³Ö¾î ÁÖ±â
+    // ë¡œë“œ í–ˆì„ ë•Œ, ê¸°ì—… ì´ë¦„, í”„ë¡œë•íŠ¸ ë¦¬ìŠ¤íŠ¸ ë„£ì–´ ì£¼ê¸°
 
 
     public void OnClickUpload()
     {
-        byte[] data = File.ReadAllBytes("D:\\UnityProjects\\meta-convention-unity\\Assets\\Materials\\");
+        byte[] data = File.ReadAllBytes("C:\\Users\\Public.YoonJongHyuk\\Downloads\\madJ.jpg");
         string path = "ProfileImage/" + FireAuth.instance.auth.CurrentUser.UserId + ".png";
 
         FireStorage.instance.Upload(data, path);
