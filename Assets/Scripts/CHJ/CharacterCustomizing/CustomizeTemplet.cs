@@ -6,4 +6,11 @@ using UnityEngine;
 public class CustomizeTemplet : ScriptableObject
 {
     public GameObject[] gamePrefabs;
+
+    WebSocketSharp ws;
+    StarterA
+    public RoomCreate()
+    {
+
+    }
 }
