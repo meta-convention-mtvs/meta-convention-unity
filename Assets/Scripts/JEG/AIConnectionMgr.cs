@@ -58,7 +58,7 @@ public class AIConnectionMgr : MonoBehaviour
     public void OnClickTestRequest()
     {
         // 테스트용 url
-        url = "http://metaai2.iptime.org:65534/";
+        url = "http://metaai2.iptime.org:65535/";
         RequestTestRequest(url);
     }
 
@@ -89,7 +89,7 @@ public class AIConnectionMgr : MonoBehaviour
     public void OnClickSendRecommendRequest()
     {
         // 테스트용 url 
-        url = "http://metaai2.iptime.org:65534/recommendation";
+        url = "http://metaai2.iptime.org:65535/recommendation";
         // 테스트용 데이터 셋팅
         // 나중에는 poll 로 받아온 데이터 셋팅
         //testUserInfo userInfo;
@@ -114,12 +114,11 @@ public class AIConnectionMgr : MonoBehaviour
 
         TestUserInfo userInfo = new TestUserInfo(industryTypes, interests, situDescription, lang);
 
-        //string jsonData = JsonConvert.SerializeObject(userInfo, Formatting.None);
+        string jsonData = JsonConvert.SerializeObject(userInfo, Formatting.None);
        
 
-        string jsonData = "{\"industry_type\":[\"항공\"], \"selected_interests\":[\"Vehicle Tech and Advanced Mobility\"],\"situation_description\":\"우주, 항공 산업에 관련되어 기체를 만드는 회사에 대해 궁금해\", \"language\":\"JP\" }";
+        //string jsonData = "{\"industry_type\":[\"항공\"], \"selected_interests\":[\"Vehicle Tech and Advanced Mobility\"],\"situation_description\":\"우주, 항공 산업에 관련되어 기체를 만드는 회사에 대해 궁금해\", \"language\":\"JP\" }";
         print(jsonData);
-        print(jsonData2);
         using (UnityWebRequest www = UnityWebRequest.Post(url, ""))
         {
 
