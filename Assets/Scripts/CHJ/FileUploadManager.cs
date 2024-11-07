@@ -7,7 +7,7 @@ using System;
 
 public class FileUploadManager : Singleton<FileUploadManager>
 {
-    private void Start()
+    private void Awake()
     {
         SetUpFileBrowser();
     }
@@ -15,7 +15,6 @@ public class FileUploadManager : Singleton<FileUploadManager>
     void SetUpFileBrowser()
     {
         FileBrowser.SetFilters(true, new FileBrowser.Filter("Images", ".jpg", ".png"), new FileBrowser.Filter("Text Files", ".txt"), new FileBrowser.Filter("All Files", "*"));
-        FileBrowser.SetDefaultFilter(".png");
         FileBrowser.AddQuickLink("Users", "C:\\Users", null);
     }
 

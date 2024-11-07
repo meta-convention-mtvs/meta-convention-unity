@@ -91,9 +91,8 @@ GameObject:
   - component: {fileID: 6124345871188038306}
   - component: {fileID: 297231855890584062}
   - component: {fileID: 8571389524709532450}
-  - component: {fileID: 8134258554635307213}
   - component: {fileID: 552391650550171491}
-  - component: {fileID: 4122198596860710330}
+  - component: {fileID: -3685268483767289593}
   m_Layer: 5
   m_Name: PopUpUI
   m_TagString: Untagged
@@ -159,27 +158,6 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!95 &8134258554635307213
-Animator:
-  serializedVersion: 5
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8843778629740329882}
-  m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: d5649d9696c814d9f97999eda4da869a, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_StabilizeFeet: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorStateOnDisable: 0
-  m_WriteDefaultValuesOnDisable: 0
 --- !u!114 &552391650550171491
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -192,7 +170,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 727e2b028c9a0ef45902f48f3188cb95, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &4122198596860710330
+--- !u!114 &-3685268483767289593
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -201,7 +179,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 8843778629740329882}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e3f7d5438163f814986de2e29890b732, type: 3}
+  m_Script: {fileID: 11500000, guid: 22b53dac8da89e54c9d76f33270c8d07, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  displayTime: 3
+  DisplayTime: 3
