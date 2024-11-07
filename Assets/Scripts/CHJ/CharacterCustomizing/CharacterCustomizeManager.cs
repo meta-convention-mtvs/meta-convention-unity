@@ -1,6 +1,5 @@
 ﻿using Firebase.Firestore;
-using System.Collections;
-using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class CharacterCustomizeManager : MonoBehaviour
@@ -9,6 +8,9 @@ public class CharacterCustomizeManager : MonoBehaviour
     public CharacterTemplet CharacterPrefabs;
     public UICharacterMaker ui_cm;
     public CharacterCustomizingCameraMove cameraMove;
+
+    // Debug mode
+    public SkinnedMeshRenderer customTShirts;
 
     private GameObject[,] instantiatedMaleCharacter;
     private GameObject[,] instantiatedFemaleCharacter;
@@ -93,7 +95,47 @@ public class CharacterCustomizeManager : MonoBehaviour
         currentShowObject.SetActive(true);
     }
 
+    public void UploadTshirtsImage()
+    {
+        // image texture 를 읽어온다.
+        // 읽어온 texture를 적용시킨다.
+        FileUploadManager.Instance.ShowDialog(ImageFileLoad);
+    }
 
+    void ImageFileLoad(string[] paths)
+    {
+        string path = paths[0];
+
+        Texture2D texture = ImageUtility.LoadTexture(path);
+        customTShirts.materials[1].mainTexture = texture;
+
+        if (isMan)
+        {
+            var topGameObjects = instantiatedMaleCharacter[topClothesIndex, bottomClothesIndex].GetComponentsInChildren<SkinnedMeshRenderer>().Where(go => go != null && go.gameObject.name.Contains("top"));
+
+            foreach(var go in topGameObjects)
+            {
+                ChangeClothes(instantiatedMaleCharacter[topClothesIndex, bottomClothesIndex], go, customTShirts);
+            }
+        }
+        
+    }
+    void ChangeClothes(GameObject player, SkinnedMeshRenderer originalClothes, SkinnedMeshRenderer newClothes)
+    {
+        GameObject go = new GameObject();
+        go.transform.SetParent(player.transform);
+
+        SkinnedMeshRenderer mesh = go.AddComponent<SkinnedMeshRenderer>();
+        mesh.rootBone = originalClothes.rootBone;
+        mesh.bones = originalClothes.bones;
+        mesh.localBounds = originalClothes.localBounds;
+        mesh.sharedMesh = newClothes.sharedMesh;
+        mesh.sharedMaterials = newClothes.sharedMaterials;
+
+        originalClothes.gameObject.SetActive(false);
+    }
+
+    #region 상하의 인덱스 조절 함수
     void IncTopIndex()
     {
         topClothesIndex++;
@@ -125,7 +167,7 @@ public class CharacterCustomizeManager : MonoBehaviour
         isIndexChange = true;
         cameraMove.SetBottomCamera();
     }
-
+    #endregion
     void ChangeGender()
     {
         isMan = !isMan;

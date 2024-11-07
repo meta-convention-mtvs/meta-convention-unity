@@ -26,7 +26,7 @@ public class Gallery : MonoBehaviour
             foreach (string filePath in imageFiles)
             {
                 // Load each image file as a Texture2D
-                Texture2D texture = LoadTexture(filePath);
+                Texture2D texture = ImageUtility.LoadTexture(filePath);
                 if (texture != null)
                 {
                     
@@ -43,18 +43,5 @@ public class Gallery : MonoBehaviour
         }
     }
 
-    Texture2D LoadTexture(string filePath)
-    {
-        byte[] fileData = File.ReadAllBytes(filePath);
-        Texture2D texture = new Texture2D(2, 2); // Temporary size, will resize
-        if (texture.LoadImage(fileData))
-        {
-            return texture;
-        }
-        else
-        {
-            Debug.LogError("Failed to load texture from: " + filePath);
-            return null;
-        }
-    }
+
 }
