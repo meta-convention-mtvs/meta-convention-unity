@@ -14,13 +14,7 @@ public class TranslationManager : Singleton<TranslationManager>
     private WebSocket ws;
     private const string Endpoint = "ws://metaai2.iptime.org:4444/translation";
 
-    private bool isCurrentlySpeaking = false;
-    private string currentSpeakerId = "";
 
-    public bool CanSpeak(string userId)
-    {
-        return !isCurrentlySpeaking || currentSpeakerId == userId;
-    }
 
     public void Connect()
     {

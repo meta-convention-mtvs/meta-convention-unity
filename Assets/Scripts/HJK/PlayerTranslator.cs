@@ -56,9 +56,17 @@ public class PlayerTranslator : MonoBehaviourPunCallbacks
         }
     }
 
+    private bool isCurrentlySpeaking = false;
+    private string currentSpeakerId = "";
+
+    public bool CanSpeak(string userId)
+    {
+        return !isCurrentlySpeaking || currentSpeakerId == userId;
+    }
+
     private void TryStartRecording()
     {
-        if (!TranslationManager.Instance.CanSpeak(photonView.Owner.UserId))
+        if (CanSpeak(photonView.Owner.UserId))
         {
             ShowCantSpeakUI();
             return;

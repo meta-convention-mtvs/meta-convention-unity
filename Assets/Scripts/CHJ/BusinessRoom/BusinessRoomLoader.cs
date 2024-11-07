@@ -43,7 +43,7 @@ public class BusinessRoomLoader : MonoBehaviourPunCallbacks
         
         // 룸 입장 후 통역 서버 연결 초기화
         TranslationManager.Instance.Connect();
-        TranslationManager.Instance.CreateRoom(firebaseUserId, "ko");  // UserId와 언어 설정
+        TranslationManager.Instance.JoinRoom(firebaseUserId, "ko");  // UserId와 언어 설정
 
     }
     public override void OnJoinRoomFailed(short returnCode, string message)
