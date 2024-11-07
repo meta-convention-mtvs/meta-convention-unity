@@ -499,8 +499,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6b38bcfe608dd1a438ceaf70870f1819, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  title: {fileID: 0}
   meetingDate: {fileID: 434994597704342017}
-  meetingTime: {fileID: 1951255230843152678}
   companyName: {fileID: 3040699727083931053}
   customerName: {fileID: 6527317057248741085}
   document: {fileID: 8477348977364963350}
@@ -854,6 +854,7 @@ GameObject:
   - component: {fileID: 1900439901003834196}
   - component: {fileID: 1607255948432699281}
   - component: {fileID: 1877719200358001404}
+  - component: {fileID: 2356394292572911874}
   m_Layer: 5
   m_Name: Panel
   m_TagString: Untagged
@@ -935,6 +936,25 @@ CanvasGroup:
   m_Interactable: 1
   m_BlocksRaycasts: 0
   m_IgnoreParentGroups: 0
+--- !u!114 &2356394292572911874
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6747322147887870504}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f2ced88cfb35f264890d4c002b6df533, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  inputFieldGroup:
+  - {fileID: 434994597704342017}
+  - {fileID: 1951255230843152678}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  currentIdx: 0
 --- !u!1 &6914832869089168830
 GameObject:
   m_ObjectHideFlags: 0

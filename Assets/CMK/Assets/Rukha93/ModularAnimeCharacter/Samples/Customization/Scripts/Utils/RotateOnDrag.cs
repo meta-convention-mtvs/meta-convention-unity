@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -27,7 +27,7 @@ namespace Rukha93.ModularAnimeCharacter.Customization.Utils
                 m_SmoothRotate = true;
             }
 
-            if (m_SmoothRotate && Input.GetMouseButton(0))
+            if (Input.GetMouseButton(0))
             {
                 var pos = new Vector2(Input.mousePosition.x / Screen.width, Input.mousePosition.y / Screen.height);
                 Vector2 delta = pos - m_LastMousePosition;
