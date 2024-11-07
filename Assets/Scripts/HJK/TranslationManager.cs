@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using WebSocketSharp;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 
 /// <summary>
 /// AI 통역 서버와의 웹소켓 통신을 관리하는 싱글톤 매니저 클래스
@@ -13,8 +14,8 @@ public class TranslationManager : Singleton<TranslationManager>
 {
     private WebSocket ws;
     private const string Endpoint = "ws://metaai2.iptime.org:4444/translation";
-
-
+    // 1107 추가된 부분
+    public string CurrentRoomID { get; private set; } = string.Empty;
 
     public void Connect()
     {
@@ -67,6 +68,15 @@ public class TranslationManager : Singleton<TranslationManager>
 
     private void OnMessageReceived(object sender, MessageEventArgs e)
     {
+        // 1107 추가된 부분
+        var data = JsonConvert.DeserializeObject<Dictionary<string, object>>(e.Data);
+
+        // 방 생성 후 입장 성공 시 room.joined 이벤트 처리
+        if (data["type"] as string == "room.joined")
+        {
+            CurrentRoomID = data["roomid"] as string;
+        }
+
         TranslationEventHandler.Instance.ProcessServerMessage(e.Data);
     }
 

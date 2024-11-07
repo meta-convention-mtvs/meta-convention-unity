@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 
 /// <summary>
 /// AI 통역 서버로부터 받은 메시지를 처리하는 싱글톤 핸들러 클래스
@@ -12,7 +13,7 @@ public class TranslationEventHandler : Singleton<TranslationEventHandler>
 {
     public void ProcessServerMessage(string message)
     {
-        var data = JsonUtility.FromJson<Dictionary<string, object>>(message);
+        var data = JsonConvert.DeserializeObject<Dictionary<string, object>>(message);
 
         switch (data["type"] as string)
         {

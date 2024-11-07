@@ -3,9 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ttttt : MonoBehaviourPun
+// 원래 tttt.cs였던 바로 그 스크립트
+public class TranslationRoomIDSynchronizer : MonoBehaviourPun
 {
-
     string roomID = string.Empty;
 
     private void Start()
@@ -25,8 +25,13 @@ public class ttttt : MonoBehaviourPun
         // ToDo: 이 부분을 구현해주세요...
         if (photonView.IsMine)
         {
-            // room joined 메시지가 올 때까지 기다린다.
-            // 만약 room joined 메시지를 받으면, RPC로 roomID를 전달해준다.
+            // TranslationManager에서 roomID를 받았는지 확인하고 받았다면 다른 참가자들에게 전달
+            if (TranslationManager.Instance.CurrentRoomID != string.Empty && roomID == string.Empty)
+            {
+                roomID = TranslationManager.Instance.CurrentRoomID;
+                // RPC를 통해 모든 클라이언트에게 roomID 전달
+                photonView.RPC("SetRoomID", RpcTarget.All, roomID);
+            }
         }
         // 내가 방장이 아니라면...
         else

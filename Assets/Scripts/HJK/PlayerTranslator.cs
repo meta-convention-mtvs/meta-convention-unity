@@ -34,6 +34,8 @@ public class PlayerTranslator : MonoBehaviourPunCallbacks
     private Coroutine playCoroutine;
     private bool isAudioCancelled = false;
 
+    private bool isCurrentlySpeaking = false;
+    private string currentSpeakerId = "";
     private static bool isAnySpeaking = false;
 
     private void Start()
@@ -56,22 +58,21 @@ public class PlayerTranslator : MonoBehaviourPunCallbacks
         }
     }
 
-    private bool isCurrentlySpeaking = false;
-    private string currentSpeakerId = "";
-
     public bool CanSpeak(string userId)
     {
-        return !isCurrentlySpeaking || currentSpeakerId == userId;
+        return (!isAnySpeaking && !isCurrentlySpeaking) || currentSpeakerId == userId;
     }
 
     private void TryStartRecording()
     {
-        if (CanSpeak(photonView.Owner.UserId))
+        string userId = photonView.Owner.UserId;
+        if (!CanSpeak(userId))
         {
             ShowCantSpeakUI();
             return;
         }
 
+        photonView.RPC("RPC_OnStartSpeaking", RpcTarget.All, userId);
         StartRecording();
     }
 
@@ -91,13 +92,15 @@ public class PlayerTranslator : MonoBehaviourPunCallbacks
         }
 
         recordingClip = Microphone.Start(null, true, (int)maxRecordingTime, RECORDING_FREQUENCY);
-        photonView.RPC("RPC_OnStartSpeaking", RpcTarget.All);
     }
 
     private void StopRecording()
     {
         if (!isRecording) return;
 
+        string userId = photonView.Owner.UserId;
+        photonView.RPC("RPC_OnStopSpeaking", RpcTarget.All, userId);
+        
         Microphone.End(null);
         isRecording = false;
         isAnySpeaking = false;
@@ -107,8 +110,6 @@ public class PlayerTranslator : MonoBehaviourPunCallbacks
         {
             TranslationManager.Instance.SendAudioData(audioData);
         }
-
-        photonView.RPC("RPC_OnStopSpeaking", RpcTarget.All);
     }
 
     private string ConvertAudioToBase64()
@@ -228,17 +229,37 @@ public class PlayerTranslator : MonoBehaviourPunCallbacks
     }
 
     [PunRPC]
-    private void RPC_OnStartSpeaking()
+    private void RPC_OnStartSpeaking(string speakerId)
     {
+        if (isAnySpeaking && currentSpeakerId != speakerId)
+        {
+            Debug.LogWarning("다른 사용자가 이미 말하고 있습니다.");
+            return;
+        }
+
         isAnySpeaking = true;
+        isCurrentlySpeaking = true;
+        currentSpeakerId = speakerId;
+        
         if (cantSpeakUI != null)
-            cantSpeakUI.SetActive(!photonView.IsMine);
+        {
+            bool shouldShowUI = speakerId != photonView.Owner.UserId;
+            cantSpeakUI.SetActive(shouldShowUI);
+        }
+
+        Debug.Log($"발화 시작: {speakerId}");
     }
 
     [PunRPC]
-    private void RPC_OnStopSpeaking()
+    private void RPC_OnStopSpeaking(string speakerId)
     {
-        isAnySpeaking = false;
+        if (currentSpeakerId == speakerId)
+        {
+            isAnySpeaking = false;
+            isCurrentlySpeaking = false;
+            currentSpeakerId = "";
+        }
+        
         if (cantSpeakUI != null)
             cantSpeakUI.SetActive(false);
     }
