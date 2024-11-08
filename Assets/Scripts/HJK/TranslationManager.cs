@@ -2,6 +2,7 @@
 using WebSocketSharp;
 using System.Collections.Generic;
 using Newtonsoft.Json;
+using System;
 
 /// <summary>
 /// AI 통역 서버와의 웹소켓 통신을 관리하는 싱글톤 매니저 클래스
@@ -13,18 +14,39 @@ using Newtonsoft.Json;
 public class TranslationManager : Singleton<TranslationManager>
 {
     private WebSocket ws;
-    private const string Endpoint = "ws://metaai2.iptime.org:4444/translation";
+    private const string Endpoint = "ws://metaai2.iptime.org:64444/translation";
     // 1107 추가된 부분
     public string CurrentRoomID { get; private set; } = string.Empty;
 
+    public Action OnConnect, OnJoinRoom;
+
+    private void Update()
+    {
+        if (ws != null && ws.IsAlive)
+            print("ws is alive");
+    }
     public void Connect()
     {
         if (ws != null && ws.IsAlive)
             return;
 
         ws = new WebSocket(Endpoint);
+        ws.OnOpen += Ws_OnOpen;
         ws.OnMessage += OnMessageReceived;
+        ws.OnError += Ws_OnError;
         ws.Connect();
+        print("connecting...");
+    }
+
+    private void Ws_OnError(object sender, ErrorEventArgs e)
+    {
+        Debug.LogError(e.Message);
+    }
+
+    private void Ws_OnOpen(object sender, EventArgs e)
+    {
+        print("connected");
+        OnConnect?.Invoke();
     }
 
     public void CreateRoom(string userId, string language)
@@ -63,7 +85,11 @@ public class TranslationManager : Singleton<TranslationManager>
     private void Send(Dictionary<string, object> message)
     {
         if (ws != null && ws.IsAlive)
+        {
             ws.Send(JsonUtility.ToJson(message));
+            print("Send Successfully");
+        }
+        print("Send failed...");
     }
 
     private void OnMessageReceived(object sender, MessageEventArgs e)
@@ -71,12 +97,14 @@ public class TranslationManager : Singleton<TranslationManager>
         // 1107 추가된 부분
         var data = JsonConvert.DeserializeObject<Dictionary<string, object>>(e.Data);
 
+        print(data);
+
         // 방 생성 후 입장 성공 시 room.joined 이벤트 처리
         if (data["type"] as string == "room.joined")
         {
             CurrentRoomID = data["roomid"] as string;
+            OnJoinRoom?.Invoke();
         }
-
         TranslationEventHandler.Instance.ProcessServerMessage(e.Data);
     }
 

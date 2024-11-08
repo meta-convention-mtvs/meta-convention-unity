@@ -57,7 +57,8 @@ public class AIWebSocket : MonoBehaviour
     async void Start()
     {
         //ConnectToWebsocket("ws://metaai2.iptime.org:44444", messageQueue);
-        ConnectToWebsocket("ws://ec2-13-125-234-38.ap-northeast-2.compute.amazonaws.com:44444", messageQueue); 
+        //ConnectToWebsocket("ws://ec2-13-125-234-38.ap-northeast-2.compute.amazonaws.com:44444", messageQueue); 
+        ConnectToWebsocket("ws://metaai2.iptime.org:64444", messageQueue);
         await WaitForConnection();
         if (isConnected)
         {
@@ -148,6 +149,21 @@ public class AIWebSocket : MonoBehaviour
         }
     }
     // SendConfigUpdate 메서드: 서버에 초기 설정을 전송합니다.
+    //public async Task SendConfigUpdate()
+    //{
+    //    if (!isConnected)
+    //    {
+    //        Debug.LogError("WebSocket이 연결되지 않았습니다.");
+    //        return;
+    //    }
+    //    var configUpdate = new
+    //    {
+    //        type = "config.update",
+    //        org = "cf79ea17-a487-4b27-a20d-bbd11ff885da", // 실제 기업 ID로 교체
+    //        llm = "realtime" // 현재 지원되는 LLM
+    //    };
+    //    await SendRequestAsync(configUpdate);
+    //}
     public async Task SendConfigUpdate()
     {
         if (!isConnected)
@@ -155,11 +171,17 @@ public class AIWebSocket : MonoBehaviour
             Debug.LogError("WebSocket이 연결되지 않았습니다.");
             return;
         }
+
+        // FireAuthManager에서 현재 사용자 ID 가져오기
+        string userId = FireAuthManager.Instance.GetCurrentUser().UserId;
+
         var configUpdate = new
         {
             type = "config.update",
-            org = "cf79ea17-a487-4b27-a20d-bbd11ff885da", // 실제 기업 ID로 교체
-            llm = "realtime" // 현재 지원되는 LLM
+            org = "cf79ea17-a487-4b27-a20d-bbd11ff885da",
+            userid = userId,
+            lang = "ko",  // ISO 639 Language Code 형식 사용
+            llm = "realtime"
         };
         await SendRequestAsync(configUpdate);
     }
