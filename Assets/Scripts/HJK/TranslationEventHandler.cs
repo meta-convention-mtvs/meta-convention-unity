@@ -190,7 +190,7 @@ public class TranslationEventHandler : Singleton<TranslationEventHandler>
     private void HandleApprovedSpeech(Dictionary<string, object> data)
     {
         string userId = data["userid"] as string;
-        var translators = FindObjectsOfType<PlayerTranslator>();
+        //var translators = FindObjectsOfType<PlayerTranslator>();
         //foreach (var translator in translators)
         //{
         //    if (translator.photonView.Owner.UserId == userId)
