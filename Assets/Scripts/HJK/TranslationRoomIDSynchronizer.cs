@@ -9,7 +9,7 @@ public class TranslationRoomIDSynchronizer : MonoBehaviourPun
     private void Start()
     {
         TranslationManager.Instance.OnConnect += CreateRoom;
-        TranslationManager.Instance.OnJoinRoom += JoinRoom;
+        TranslationManager.Instance.OnRoomJoined += JoinRoom;
         TranslationManager.Instance.Connect();
     }
 
@@ -23,18 +23,18 @@ public class TranslationRoomIDSynchronizer : MonoBehaviourPun
             TranslationManager.Instance.CreateRoom(userID, "ko");
         }
     }
-    void JoinRoom()
+    void JoinRoom(string roomID)
     {
         // 내가 방장이면..
         // ToDo: 이 부분을 구현해주세요...
         if (photonView.IsMine)
         {
             // TranslationManager에서 roomID를 받았는지 확인하고 받았다면 다른 참가자들에게 전달
-            if (TranslationManager.Instance.CurrentRoomID != string.Empty)
+            if (roomID != string.Empty)
             {
-                print("Room ID: " + TranslationManager.Instance.CurrentRoomID);
+                print("Room ID: " + roomID);
                 // RPC를 통해 모든 클라이언트에게 roomID 전달
-                photonView.RPC("SetRoomID", RpcTarget.Others, TranslationManager.Instance.CurrentRoomID);
+                photonView.RPC("SetRoomID", RpcTarget.Others, roomID);
             }
         }
     }
