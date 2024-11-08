@@ -29,6 +29,9 @@ public class TranslationEventHandler : Singleton<TranslationEventHandler>
             case "conversation.audio.done":
                 DistributeCompleteTranslatedAudio(data);
                 break;
+            case "conversation.approved_speech":
+                HandleApprovedSpeech(data);
+                break;
             default:
                 Debug.Log("Unknown message type: " + data["type"]);
                 break;
@@ -65,5 +68,21 @@ public class TranslationEventHandler : Singleton<TranslationEventHandler>
         {
             translator.FinalizeAudioPlayback();
         }
+    }
+
+    public void HandleRoomUpdate(bool isReady, List<Dictionary<string, object>> users)
+    {
+        // 방 상태 업데이트 처리
+        Debug.Log($"Room Update - Ready: {isReady}, Users: {users.Count}");
+        
+        // 필요한 경우 사용자 목록 처리
+        foreach (var user in users)
+        {
+            string userId = user["userid"] as string;
+            string lang = user["lang"] as string;
+            Debug.Log($"User: {userId}, Language: {lang}");
+        }
+
+        // UI 업데이트나 다른 게임 로직에 필요한 처리를 여기에 추가
     }
 }
