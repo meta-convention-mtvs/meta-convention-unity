@@ -8,9 +8,9 @@ public class TranslationRoomIDSynchronizer : MonoBehaviourPun
 {
     private void Start()
     {
-        TranslationManager.Instance.Connect();
         TranslationManager.Instance.OnConnect += CreateRoom;
         TranslationManager.Instance.OnJoinRoom += JoinRoom;
+        TranslationManager.Instance.Connect();
     }
 
     void CreateRoom()

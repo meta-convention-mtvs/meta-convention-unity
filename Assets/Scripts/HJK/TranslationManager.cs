@@ -14,12 +14,17 @@ using System;
 public class TranslationManager : Singleton<TranslationManager>
 {
     private WebSocket ws;
-    private const string Endpoint = "ws://metaai2.iptime.org:4444/translation";
+    private const string Endpoint = "ws://metaai2.iptime.org:64444/translation";
     // 1107 추가된 부분
     public string CurrentRoomID { get; private set; } = string.Empty;
 
     public Action OnConnect, OnJoinRoom;
 
+    private void Update()
+    {
+        if (ws != null && ws.IsAlive)
+            print("ws is alive");
+    }
     public void Connect()
     {
         if (ws != null && ws.IsAlive)
@@ -35,12 +40,12 @@ public class TranslationManager : Singleton<TranslationManager>
 
     private void Ws_OnError(object sender, ErrorEventArgs e)
     {
-        Debug.LogError(e.ToString());
+        Debug.LogError(e.Message);
     }
 
     private void Ws_OnOpen(object sender, EventArgs e)
     {
-        print("connected: " + e.ToString());
+        print("connected");
         OnConnect?.Invoke();
     }
 
