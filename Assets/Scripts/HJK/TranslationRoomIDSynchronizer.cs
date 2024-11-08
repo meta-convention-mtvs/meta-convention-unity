@@ -29,6 +29,7 @@ public class TranslationRoomIDSynchronizer : MonoBehaviourPun
         // ToDo: 이 부분을 구현해주세요...
         if (photonView.IsMine)
         {
+            print(roomID);
             // TranslationManager에서 roomID를 받았는지 확인하고 받았다면 다른 참가자들에게 전달
             if (roomID != string.Empty)
             {

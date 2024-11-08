@@ -176,6 +176,7 @@ public class TranslationManager : Singleton<TranslationManager>
                 break;
                 
             case "room.joined":
+                print("OnMessageReceived: room.joined");
                 CurrentRoomID = data["roomid"] as string;
                 OnRoomJoined?.Invoke(CurrentRoomID);
                 break;
