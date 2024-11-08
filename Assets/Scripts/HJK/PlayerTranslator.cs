@@ -23,6 +23,7 @@ public class PlayerTranslator : MonoBehaviourPunCallbacks
     [SerializeField] private KeyCode speakKey = KeyCode.M;
     [SerializeField] private GameObject cantSpeakUI;
     [SerializeField] private float maxRecordingTime = 60f;
+    [SerializeField] private KeyCode cancelKey = KeyCode.Escape;
 
     private const int RECORDING_FREQUENCY = 24000;
     private readonly int RECORDING_BUFFER_SIZE = 24000 * 60;
@@ -34,9 +35,7 @@ public class PlayerTranslator : MonoBehaviourPunCallbacks
     private Coroutine playCoroutine;
     private bool isAudioCancelled = false;
 
-    private bool isCurrentlySpeaking = false;
-    private string currentSpeakerId = "";
-    private static bool isAnySpeaking = false;
+    private static string currentSpeakerId = "";
 
     private void Start()
     {
@@ -56,11 +55,15 @@ public class PlayerTranslator : MonoBehaviourPunCallbacks
         {
             StopRecording();
         }
+        else if (Input.GetKeyDown(cancelKey))
+        {
+            CancelRecording();
+        }
     }
 
     public bool CanSpeak(string userId)
     {
-        return (!isAnySpeaking && !isCurrentlySpeaking) || currentSpeakerId == userId;
+        return string.IsNullOrEmpty(currentSpeakerId) || currentSpeakerId == userId;
     }
 
     private void TryStartRecording()
@@ -72,16 +75,15 @@ public class PlayerTranslator : MonoBehaviourPunCallbacks
             return;
         }
 
+        TranslationManager.Instance.RequestSpeech();
         photonView.RPC("RPC_OnStartSpeaking", RpcTarget.All, userId);
-        StartRecording();
     }
 
     private void StartRecording()
     {
-        if (isAnySpeaking) return;
+        if (!string.IsNullOrEmpty(currentSpeakerId)) return;
 
         isRecording = true;
-        isAnySpeaking = true;
         recordingPosition = 0;
         
         string[] devices = Microphone.devices;
@@ -96,20 +98,23 @@ public class PlayerTranslator : MonoBehaviourPunCallbacks
 
     private void StopRecording()
     {
-        if (!isRecording) return;
-
         string userId = photonView.Owner.UserId;
-        photonView.RPC("RPC_OnStopSpeaking", RpcTarget.All, userId);
-        
-        Microphone.End(null);
-        isRecording = false;
-        isAnySpeaking = false;
+        if (currentSpeakerId != userId) return;
 
-        string audioData = ConvertAudioToBase64();
-        if (!string.IsNullOrEmpty(audioData))
+        if (isRecording)
         {
-            TranslationManager.Instance.SendAudioData(audioData);
+            Microphone.End(null);
+            isRecording = false;
+            
+            string audioData = ConvertAudioToBase64();
+            if (!string.IsNullOrEmpty(audioData))
+            {
+                TranslationManager.Instance.SendAudioData(audioData);
+                TranslationManager.Instance.DoneSpeech();
+            }
         }
+        
+        photonView.RPC("RPC_OnStopSpeaking", RpcTarget.All, userId);
     }
 
     private string ConvertAudioToBase64()
@@ -231,23 +236,18 @@ public class PlayerTranslator : MonoBehaviourPunCallbacks
     [PunRPC]
     private void RPC_OnStartSpeaking(string speakerId)
     {
-        if (isAnySpeaking && currentSpeakerId != speakerId)
+        if (!string.IsNullOrEmpty(currentSpeakerId) && currentSpeakerId != speakerId)
         {
             Debug.LogWarning("다른 사용자가 이미 말하고 있습니다.");
             return;
         }
 
-        isAnySpeaking = true;
-        isCurrentlySpeaking = true;
         currentSpeakerId = speakerId;
         
-        if (cantSpeakUI != null)
+        if (photonView.IsMine && speakerId == photonView.Owner.UserId)
         {
-            bool shouldShowUI = speakerId != photonView.Owner.UserId;
-            cantSpeakUI.SetActive(shouldShowUI);
+            StartRecording();
         }
-
-        Debug.Log($"발화 시작: {speakerId}");
     }
 
     [PunRPC]
@@ -255,12 +255,40 @@ public class PlayerTranslator : MonoBehaviourPunCallbacks
     {
         if (currentSpeakerId == speakerId)
         {
-            isAnySpeaking = false;
-            isCurrentlySpeaking = false;
             currentSpeakerId = "";
         }
-        
-        if (cantSpeakUI != null)
-            cantSpeakUI.SetActive(false);
+    }
+
+    private void CancelRecording()
+    {
+        string userId = photonView.Owner.UserId;
+        if (currentSpeakerId != userId) return;
+
+        if (isRecording)
+        {
+            Microphone.End(null);
+            isRecording = false;
+            TranslationManager.Instance.ClearAudioBuffer();
+        }
+
+        photonView.RPC("RPC_OnStopSpeaking", RpcTarget.All, userId);
+    }
+
+    private void OnDestroy()
+    {
+        if (photonView.IsMine && !string.IsNullOrEmpty(currentSpeakerId))
+        {
+            TranslationManager.Instance.ClearAudioBuffer();
+            TranslationManager.Instance.LeaveRoom();
+        }
+    }
+
+    public void OnSpeechApproved()
+    {
+        if (photonView.IsMine)
+        {
+            StartRecording();
+            // 필요한 경우 UI 업데이트 등 추가 처리
+        }
     }
 }
