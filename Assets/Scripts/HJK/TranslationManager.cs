@@ -206,11 +206,11 @@ public class TranslationManager : Singleton<TranslationManager>
                     break;
                     
                 case "conversation.audio.delta":
-                    OnPartialAudioReceived?.Invoke(data["audio"] as string);
+                    OnPartialAudioReceived?.Invoke(data["delta"] as string);
                     break;
                     
                 case "conversation.audio.done":
-                    OnCompleteAudioReceived?.Invoke(data["audio"] as string);
+                    OnCompleteAudioReceived?.Invoke(data["delta"] as string);
                     break;
                     
                 case "conversation.approved_speech":
