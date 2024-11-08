@@ -15,7 +15,7 @@ using System.Collections;
 public class TranslationManager : Singleton<TranslationManager>
 {
     private WebSocket ws;
-    private const string Endpoint = "ws://metaai2.iptime.org:64444/translation";
+    private const string Endpoint = "ws://ec2-3-36-111-173.ap-northeast-2.compute.amazonaws.com:6576/translation";
     // 1107 추가된 부분
     public string CurrentRoomID { get; private set; } = string.Empty;
 
@@ -38,6 +38,7 @@ public class TranslationManager : Singleton<TranslationManager>
 
     public void Connect()
     {
+        Debug.Log("[TranslationManager] Connect method called");
         if (ws != null && ws.IsAlive || isConnecting)
             return;
 
@@ -151,48 +152,70 @@ public class TranslationManager : Singleton<TranslationManager>
         }
     }
 
+    // 이벤트 정의
+    public event Action<string> OnRoomJoined;        // 방 입장 성공
+    public event Action OnRoomLeft;                  // 방 퇴장
+    public event Action<bool, List<Dictionary<string, object>>> OnRoomUpdated;  // 방 상태 업데이트
+    public event Action<string> OnPartialTextReceived;    // 부분 텍스트 수신
+    public event Action<string> OnCompleteTextReceived;   // 완성된 텍스트 수신
+    public event Action<string> OnPartialAudioReceived;   // 부분 오디오 수신
+    public event Action<string> OnCompleteAudioReceived;  // 완성된 오디오 수신
+    public event Action<string> OnSpeechApproved;         // 발언권 승인
+    public event Action<string> OnError;                  // 에러 발생
+
     private void OnMessageReceived(object sender, MessageEventArgs e)
     {
         var data = JsonConvert.DeserializeObject<Dictionary<string, object>>(e.Data);
-       
-        // 원본 데이터와 파싱된 데이터를 모두 출력
-        Debug.Log($"Raw message: {e.Data}");
-        Debug.Log($"Parsed data: {JsonConvert.SerializeObject(data, Formatting.Indented)}");
-
-        // 서버 에러 처리 추가
-        if (data["type"] as string == "server.error")
-        {
-            HandleServerError(Convert.ToInt32(data["code"]));
-            return;
-        }
-
+        
+        Debug.Log($"[TranslationManager] Received message: {e.Data}");
+        
         switch (data["type"] as string)
         {
-            // 방 생성 후 입장 성공 시 room.joined 이벤트 처리
+            case "server.error":
+                HandleServerError(Convert.ToInt32(data["code"]));
+                break;
+                
             case "room.joined":
                 CurrentRoomID = data["roomid"] as string;
-                OnJoinRoom?.Invoke();
+                OnRoomJoined?.Invoke(CurrentRoomID);
                 break;
-
+                
             case "room.bye":
                 CurrentRoomID = string.Empty;
+                OnRoomLeft?.Invoke();
                 break;
-
+                
             case "room.updated":
                 bool isReady = data["ready"] as bool? ?? false;
                 List<Dictionary<string, object>> users = JsonConvert.DeserializeObject<List<Dictionary<string, object>>>(data["users"].ToString());
                 
-                // 방 상태 업데이트 이벤트 처리
-                if (eventHandler != null)
-                {
-                    eventHandler.HandleRoomUpdate(isReady, users);
-                }
+                Debug.Log($"[TranslationManager] Invoking OnRoomUpdated - Ready: {isReady}, Users: {users.Count}");
+                OnRoomUpdated?.Invoke(isReady, users);  // 이벤트 발생
                 break;
-        }
-
-        if (eventHandler != null)
-        {
-            eventHandler.ProcessServerMessage(e.Data);
+                
+            case "conversation.text.delta":
+                OnPartialTextReceived?.Invoke(data["text"] as string);
+                break;
+                
+            case "conversation.text.done":
+                OnCompleteTextReceived?.Invoke(data["text"] as string);
+                break;
+                
+            case "conversation.audio.delta":
+                OnPartialAudioReceived?.Invoke(data["audio"] as string);
+                break;
+                
+            case "conversation.audio.done":
+                OnCompleteAudioReceived?.Invoke(data["audio"] as string);
+                break;
+                
+            case "conversation.approved_speech":
+                OnSpeechApproved?.Invoke(data["userid"] as string);
+                break;
+                
+            default:
+                Debug.LogWarning($"Unknown message type: {data["type"]}");
+                break;
         }
     }
 
@@ -254,15 +277,8 @@ public class TranslationManager : Singleton<TranslationManager>
 
     private void ShowErrorMessage(string message)
     {
-        // 에러 메시지 UI 표시 로직
-        // 예: ErrorPopup.Show(message);
-        Debug.LogError(message);  // 임시로 콘솔에 출력
-
-        // 필요한 경우 이벤트를 통해 다른 컴포넌트에 알림
-        if (eventHandler != null)
-        {
-            eventHandler.OnErrorOccurred(message);
-        }
+        Debug.LogError(message);
+        OnError?.Invoke(message);  // 직접 이벤트 발생
     }
 
     private void OnDestroy()

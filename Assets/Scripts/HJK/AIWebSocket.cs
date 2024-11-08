@@ -58,7 +58,7 @@ public class AIWebSocket : MonoBehaviour
     {
         // ConnectToWebsocket("ws://metaai2.iptime.org:44444", messageQueue);
         //ConnectToWebsocket("ws://ec2-13-125-234-38.ap-northeast-2.compute.amazonaws.com:44444", messageQueue); 
-        ConnectToWebsocket("ws://metaai2.iptime.org:64444", messageQueue);
+        ConnectToWebsocket("ws://ec2-3-36-111-173.ap-northeast-2.compute.amazonaws.com:6576/chat", messageQueue);
         await WaitForConnection();
         if (isConnected)
         {

@@ -24,57 +24,79 @@ public class TranslationEventHandler : Singleton<TranslationEventHandler>
     // 에러 발생 시 호출될 이벤트
     public event System.Action<string> OnError;
 
-    public void ProcessServerMessage(string message)
+    private void Start()
     {
-        var data = JsonConvert.DeserializeObject<Dictionary<string, object>>(message);
-
-        switch (data["type"] as string)
+        Debug.Log("[TranslationEventHandler] Start method called");
+        
+        var manager = TranslationManager.Instance;
+        if (manager == null)
         {
-            case "conversation.text.delta":
-                DistributePartialTranslatedText(data);
-                break;
-            case "conversation.audio.delta":
-                DistributePartialTranslatedAudio(data);
-                break;
-            case "conversation.text.done":
-                DistributeCompleteTranslatedText(data);
-                break;
-            case "conversation.audio.done":
-                DistributeCompleteTranslatedAudio(data);
-                break;
-            case "conversation.approved_speech":
-                HandleApprovedSpeech(data);
-                break;
-            default:
-                Debug.Log("Unknown message type: " + data["type"]);
-                break;
+            Debug.LogError("[TranslationEventHandler] TranslationManager instance is null!");
+            return;
+        }
+        
+        Debug.Log("[TranslationEventHandler] Subscribing to events");
+        manager.OnRoomUpdated += HandleRoomUpdate;
+        manager.OnPartialAudioReceived += DistributePartialTranslatedAudio;
+        manager.OnCompleteAudioReceived += DistributeCompleteTranslatedAudio;
+        manager.OnSpeechApproved += HandleApprovedSpeech;
+        manager.OnError += HandleError;
+        
+        Debug.Log("[TranslationEventHandler] Events subscribed successfully");
+    }
+
+    private void OnDestroy()
+    {
+        var manager = TranslationManager.Instance;
+        if (manager != null)
+        {
+            // 이벤트 구독 해제
+            manager.OnRoomUpdated -= HandleRoomUpdate;
+            manager.OnPartialAudioReceived -= DistributePartialTranslatedAudio;
+            manager.OnCompleteAudioReceived -= DistributeCompleteTranslatedAudio;
+            manager.OnSpeechApproved -= HandleApprovedSpeech;
+            manager.OnError -= HandleError;
         }
     }
 
-    private void DistributePartialTranslatedText(Dictionary<string, object> data)
+    private void HandleRoomUpdate(bool isReady, List<Dictionary<string, object>> users)
     {
-        // 텍스트 전달 로직
+        bool previousState = isRoomReady;
+        isRoomReady = isReady;
+        currentUsers = users;
+
+        // 디버깅을 위한 상세 로그 추가
+        Debug.Log($"[HandleRoomUpdate] Ready: {isReady}, Users Count: {users.Count}");
+        Debug.Log($"[HandleRoomUpdate] Current Users Detail:");
+        foreach (var user in users)
+        {
+            string userId = user["userid"] as string;
+            string lang = user["lang"] as string;
+            Debug.Log($"- User ID: {userId}, Language: {lang}");
+        }
+
+        // Ready 상태가 변경되었을 때만 이벤트 발생
+        if (previousState != isReady)
+        {
+            Debug.Log($"[HandleRoomUpdate] Ready state changed from {previousState} to {isReady}");
+            OnRoomReadyStateChanged?.Invoke(isReady);
+            UpdateUI(isReady);
+        }
+
+        // 사용자 수에 따른 추가 처리
+        HandleUserCountChange(users.Count);
     }
 
-    private void DistributePartialTranslatedAudio(Dictionary<string, object> data)
+    private void DistributePartialTranslatedAudio(string base64Audio)
     {
-        if (data.TryGetValue("audio", out object audioObj))
+        var translators = FindObjectsOfType<PlayerTranslator>();
+        foreach (var translator in translators)
         {
-            string base64Audio = audioObj as string;
-            var translators = FindObjectsOfType<PlayerTranslator>();
-            foreach (var translator in translators)
-            {
-                translator.ProcessAudioStream(base64Audio);
-            }
+            translator.ProcessAudioStream(base64Audio);
         }
     }
 
-    private void DistributeCompleteTranslatedText(Dictionary<string, object> data)
-    {
-        // 완성된 텍스트 전달 로직
-    }
-
-    private void DistributeCompleteTranslatedAudio(Dictionary<string, object> data)
+    private void DistributeCompleteTranslatedAudio(string base64Audio)
     {
         var translators = FindObjectsOfType<PlayerTranslator>();
         foreach (var translator in translators)
@@ -83,32 +105,31 @@ public class TranslationEventHandler : Singleton<TranslationEventHandler>
         }
     }
 
-    public void HandleRoomUpdate(bool isReady, List<Dictionary<string, object>> users)
+    private void HandleApprovedSpeech(string userId)
     {
-        bool previousState = isRoomReady;
-        isRoomReady = isReady;
-        currentUsers = users;
-
-        // 로그 출력
-        Debug.Log($"Room Update - Ready: {isReady}, Users: {users.Count}");
-        
-        // 필요한 경우 사용자 목록 처리
-        foreach (var user in users)
+        var translators = FindObjectsOfType<PlayerTranslator>();
+        foreach (var translator in translators)
         {
-            string userId = user["userid"] as string;
-            string lang = user["lang"] as string;
-            Debug.Log($"User: {userId}, Language: {lang}");
+            if (translator.photonView.Owner.UserId == userId)
+            {
+                translator.OnSpeechApproved();
+                break;
+            }
         }
+    }
 
-        // Ready 상태가 변경되었을 때만 이벤트 발생
-        if (previousState != isReady)
+    private void HandleError(string errorMessage)
+    {
+        OnError?.Invoke(errorMessage);
+
+        var translators = FindObjectsOfType<PlayerTranslator>();
+        foreach (var translator in translators)
         {
-            OnRoomReadyStateChanged?.Invoke(isReady);
-            UpdateUI(isReady);
+            if (translator.photonView.IsMine)
+            {
+                translator.HandleError(errorMessage);
+            }
         }
-
-        // 사용자 수에 따른 추가 처리
-        HandleUserCountChange(users.Count);
     }
 
     private void UpdateUI(bool isReady)
@@ -127,14 +148,16 @@ public class TranslationEventHandler : Singleton<TranslationEventHandler>
 
     private void HandleUserCountChange(int userCount)
     {
+        Debug.Log($"[HandleUserCountChange] Current user count: {userCount}");
+        
         // 사용자 수에 따른 처리
         if (userCount < 2)
         {
-            Debug.Log("통역을 시작하려면 다른 언어 사용자가 필요합니다.");
+            Debug.Log("[HandleUserCountChange] 통역을 시작하려면 다른 언어 사용자가 필요합니다.");
         }
         else
         {
-            Debug.Log("통역 준비가 완료되었습니다.");
+            Debug.Log("[HandleUserCountChange] 통역 준비가 완료되었습니다.");
         }
     }
 
@@ -167,21 +190,6 @@ public class TranslationEventHandler : Singleton<TranslationEventHandler>
             {
                 translator.OnSpeechApproved();
                 break;
-            }
-        }
-    }
-
-    public void OnErrorOccurred(string errorMessage)
-    {
-        OnError?.Invoke(errorMessage);
-
-        // 에러에 따른 UI 업데이트
-        var translators = FindObjectsOfType<PlayerTranslator>();
-        foreach (var translator in translators)
-        {
-            if (translator.photonView.IsMine)
-            {
-                translator.HandleError(errorMessage);
             }
         }
     }
