@@ -24,10 +24,12 @@ public class TranslationEventHandler : Singleton<TranslationEventHandler>
     // 에러 발생 시 호출될 이벤트
     public event System.Action<string> OnError;
 
+    public PlayerTranslator playerTranslator;
+
     private void Start()
     {
         Debug.Log("[TranslationEventHandler] Start method called");
-        
+        playerTranslator = FindObjectOfType<PlayerTranslator>();
         var manager = TranslationManager.Instance;
         if (manager == null)
         {
@@ -89,61 +91,66 @@ public class TranslationEventHandler : Singleton<TranslationEventHandler>
 
     private void DistributePartialTranslatedAudio(string base64Audio)
     {
-        var translators = FindObjectsOfType<PlayerTranslator>();
-        foreach (var translator in translators)
-        {
-            translator.ProcessAudioStream(base64Audio);
-        }
+        //var translators = FindObjectsOfType<PlayerTranslator>();
+        //foreach (var translator in translators)
+        //{
+        //    translator.ProcessAudioStream(base64Audio);
+        //}
+        playerTranslator.ProcessAudioStream(base64Audio);
     }
 
     private void DistributeCompleteTranslatedAudio(string base64Audio)
     {
-        var translators = FindObjectsOfType<PlayerTranslator>();
-        foreach (var translator in translators)
-        {
-            translator.FinalizeAudioPlayback();
-        }
+        //var translators = FindObjectsOfType<PlayerTranslator>();
+        //foreach (var translator in translators)
+        //{
+        //    translator.FinalizeAudioPlayback();
+        //}
+        playerTranslator.FinalizeAudioPlayback();
     }
 
     private void HandleApprovedSpeech(string userId)
     {
-        var translators = FindObjectsOfType<PlayerTranslator>();
-        foreach (var translator in translators)
-        {
-            if (translator.photonView.Owner.UserId == userId)
-            {
-                translator.OnSpeechApproved();
-                break;
-            }
-        }
+        //var translators = FindObjectsOfType<PlayerTranslator>();
+        //foreach (var translator in translators)
+        //{
+        //    if (translator.photonView.Owner.UserId == userId)
+        //    {
+        //        translator.OnSpeechApproved();
+        //        break;
+        //    }
+        //}
+        playerTranslator.OnSpeechApproved();
     }
 
     private void HandleError(string errorMessage)
     {
         OnError?.Invoke(errorMessage);
 
-        var translators = FindObjectsOfType<PlayerTranslator>();
-        foreach (var translator in translators)
-        {
-            if (translator.photonView.IsMine)
-            {
-                translator.HandleError(errorMessage);
-            }
-        }
+        //var translators = FindObjectsOfType<PlayerTranslator>();
+        //foreach (var translator in translators)
+        //{
+        //    if (translator.photonView.IsMine)
+        //    {
+        //        translator.HandleError(errorMessage);
+        //    }
+        //}
+        playerTranslator.HandleError(errorMessage);
     }
 
     private void UpdateUI(bool isReady)
     {
         // 발언 가능 상태 UI 업데이트
-        var translators = FindObjectsOfType<PlayerTranslator>();
-        foreach (var translator in translators)
-        {
-            if (translator.photonView.IsMine)
-            {
-                translator.UpdateSpeakUI(isReady);
-                break;
-            }
-        }
+        //var translators = FindObjectsOfType<PlayerTranslator>();
+        //foreach (var translator in translators)
+        //{
+        //    if (translator.photonView.IsMine)
+        //    {
+        //        translator.UpdateSpeakUI(isReady);
+        //        break;
+        //    }
+        //}
+        playerTranslator.UpdateSpeakUI(isReady);
     }
 
     private void HandleUserCountChange(int userCount)
@@ -184,13 +191,14 @@ public class TranslationEventHandler : Singleton<TranslationEventHandler>
     {
         string userId = data["userid"] as string;
         var translators = FindObjectsOfType<PlayerTranslator>();
-        foreach (var translator in translators)
-        {
-            if (translator.photonView.Owner.UserId == userId)
-            {
-                translator.OnSpeechApproved();
-                break;
-            }
-        }
+        //foreach (var translator in translators)
+        //{
+        //    if (translator.photonView.Owner.UserId == userId)
+        //    {
+        //        translator.OnSpeechApproved();
+        //        break;
+        //    }
+        //}
+        playerTranslator.OnSpeechApproved();
     }
 }
