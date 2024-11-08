@@ -23,9 +23,11 @@ public class TranslationManager : Singleton<TranslationManager>
 
     private TranslationEventHandler eventHandler;
 
+    public UnityMainThreadDispatcher dispatcher;
     private void Start()
     {
         eventHandler = TranslationEventHandler.Instance;
+        dispatcher = GameObject.FindObjectOfType(typeof(UnityMainThreadDispatcher))as UnityMainThreadDispatcher;
     }
 
     private void Update()
@@ -166,7 +168,7 @@ public class TranslationManager : Singleton<TranslationManager>
     private void OnMessageReceived(object sender, MessageEventArgs e)
     {
         // UnityMainThread에서 실행되도록 래핑
-        UnityMainThreadDispatcher.Instance.Enqueue(() => {
+        dispatcher.Enqueue(() => {
             var data = JsonConvert.DeserializeObject<Dictionary<string, object>>(e.Data);
             Debug.Log($"[TranslationManager] Received message: {e.Data}");
             
