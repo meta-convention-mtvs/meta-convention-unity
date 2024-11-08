@@ -15,7 +15,7 @@ using System.Collections;
 public class TranslationManager : Singleton<TranslationManager>
 {
     private WebSocket ws;
-    private const string Endpoint = "ws://metaai2.iptime.org:44444/translation";
+    private const string Endpoint = "ws://metaai2.iptime.org:64444/translation";
     // 1107 추가된 부분
     public string CurrentRoomID { get; private set; } = string.Empty;
 
@@ -63,7 +63,7 @@ public class TranslationManager : Singleton<TranslationManager>
 
     private void Ws_OnOpen(object sender, EventArgs e)
     {
-        print("connected");
+        Debug.Log("WebSocket - Translation 연결 성공");
         OnConnect?.Invoke();
         OnConnect = null;
     }
@@ -159,6 +159,13 @@ public class TranslationManager : Singleton<TranslationManager>
         Debug.Log($"Raw message: {e.Data}");
         Debug.Log($"Parsed data: {JsonConvert.SerializeObject(data, Formatting.Indented)}");
 
+        // 서버 에러 처리 추가
+        if (data["type"] as string == "server.error")
+        {
+            HandleServerError(Convert.ToInt32(data["code"]));
+            return;
+        }
+
         switch (data["type"] as string)
         {
             // 방 생성 후 입장 성공 시 room.joined 이벤트 처리
@@ -186,6 +193,75 @@ public class TranslationManager : Singleton<TranslationManager>
         if (eventHandler != null)
         {
             eventHandler.ProcessServerMessage(e.Data);
+        }
+    }
+
+    private void HandleServerError(int errorCode)
+    {
+        string errorMessage = "";
+        bool isCritical = false;
+
+        switch (errorCode)
+        {
+            case 1:
+                errorMessage = "치명적 오류, 연결이 중단되었습니다.";
+                isCritical = true;
+                break;
+            case 2:
+                errorMessage = "방 생성에 실패했습니다.";
+                break;
+            case 3:
+                errorMessage = "방 참여에 실패했습니다.";
+                break;
+            case 4:
+                errorMessage = "방 퇴장에 실패했습니다.";
+                break;
+            case 5:
+                errorMessage = "발언권 획득에 실패했습니다.";
+                break;
+            case 6:
+                errorMessage = "발언권이 없는 상태에서 음성 입력을 시도했습니다.";
+                break;
+            default:
+                errorMessage = $"알 수 없는 에러가 발생했습니다. (에러 코드: {errorCode})";
+                break;
+        }
+
+        Debug.LogError($"서버 에러: {errorMessage}");
+
+        // UI에 에러 메시지 표시 (예: 팝업)
+        ShowErrorMessage(errorMessage);
+
+        // 치명적 에러인 경우 추가 처리
+        if (isCritical)
+        {
+            HandleCriticalError();
+        }
+    }
+
+    private void HandleCriticalError()
+    {
+        // 웹소켓 연결 종료
+        if (ws != null)
+        {
+            ws.Close();
+            ws = null;
+        }
+
+        // 재연결 시도
+        StartCoroutine(ReconnectCoroutine());
+    }
+
+    private void ShowErrorMessage(string message)
+    {
+        // 에러 메시지 UI 표시 로직
+        // 예: ErrorPopup.Show(message);
+        Debug.LogError(message);  // 임시로 콘솔에 출력
+
+        // 필요한 경우 이벤트를 통해 다른 컴포넌트에 알림
+        if (eventHandler != null)
+        {
+            eventHandler.OnErrorOccurred(message);
         }
     }
 

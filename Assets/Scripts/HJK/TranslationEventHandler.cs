@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 using Newtonsoft.Json;
+using System.Linq;
 
 /// <summary>
 /// AI 통역 서버로부터 받은 메시지를 처리하는 싱글톤 핸들러 클래스
@@ -11,6 +12,18 @@ using Newtonsoft.Json;
 /// </summary>
 public class TranslationEventHandler : Singleton<TranslationEventHandler>
 {
+    private bool isRoomReady = false;
+    public bool IsRoomReady => isRoomReady;  // 읽기 전용 프로퍼티
+
+    // 현재 방의 사용자 정보를 저장
+    private List<Dictionary<string, object>> currentUsers = new List<Dictionary<string, object>>();
+    
+    // Ready 상태 변경 시 호출될 이벤트
+    public event System.Action<bool> OnRoomReadyStateChanged;
+
+    // 에러 발생 시 호출될 이벤트
+    public event System.Action<string> OnError;
+
     public void ProcessServerMessage(string message)
     {
         var data = JsonConvert.DeserializeObject<Dictionary<string, object>>(message);
@@ -72,7 +85,11 @@ public class TranslationEventHandler : Singleton<TranslationEventHandler>
 
     public void HandleRoomUpdate(bool isReady, List<Dictionary<string, object>> users)
     {
-        // 방 상태 업데이트 처리
+        bool previousState = isRoomReady;
+        isRoomReady = isReady;
+        currentUsers = users;
+
+        // 로그 출력
         Debug.Log($"Room Update - Ready: {isReady}, Users: {users.Count}");
         
         // 필요한 경우 사용자 목록 처리
@@ -83,6 +100,89 @@ public class TranslationEventHandler : Singleton<TranslationEventHandler>
             Debug.Log($"User: {userId}, Language: {lang}");
         }
 
-        // UI 업데이트나 다른 게임 로직에 필요한 처리를 여기에 추가
+        // Ready 상태가 변경되었을 때만 이벤트 발생
+        if (previousState != isReady)
+        {
+            OnRoomReadyStateChanged?.Invoke(isReady);
+            UpdateUI(isReady);
+        }
+
+        // 사용자 수에 따른 추가 처리
+        HandleUserCountChange(users.Count);
+    }
+
+    private void UpdateUI(bool isReady)
+    {
+        // 발언 가능 상태 UI 업데이트
+        var translators = FindObjectsOfType<PlayerTranslator>();
+        foreach (var translator in translators)
+        {
+            if (translator.photonView.IsMine)
+            {
+                translator.UpdateSpeakUI(isReady);
+                break;
+            }
+        }
+    }
+
+    private void HandleUserCountChange(int userCount)
+    {
+        // 사용자 수에 따른 처리
+        if (userCount < 2)
+        {
+            Debug.Log("통역을 시작하려면 다른 언어 사용자가 필요합니다.");
+        }
+        else
+        {
+            Debug.Log("통역 준비가 완료되었습니다.");
+        }
+    }
+
+    // 현재 방의 사용자 수 반환
+    public int GetCurrentUserCount()
+    {
+        return currentUsers.Count;
+    }
+
+    // 특정 언어를 사용하는 사용자가 있는지 확인
+    public bool HasUserWithLanguage(string language)
+    {
+        return currentUsers.Any(user => (user["lang"] as string) == language);
+    }
+
+    // 특정 사용자의 언어 가져오기
+    public string GetUserLanguage(string userId)
+    {
+        var user = currentUsers.FirstOrDefault(u => (u["userid"] as string) == userId);
+        return user?["lang"] as string;
+    }
+
+    private void HandleApprovedSpeech(Dictionary<string, object> data)
+    {
+        string userId = data["userid"] as string;
+        var translators = FindObjectsOfType<PlayerTranslator>();
+        foreach (var translator in translators)
+        {
+            if (translator.photonView.Owner.UserId == userId)
+            {
+                translator.OnSpeechApproved();
+                break;
+            }
+        }
+    }
+
+    public void OnErrorOccurred(string errorMessage)
+    {
+        OnError?.Invoke(errorMessage);
+
+        // 에러에 따른 UI 업데이트
+        var translators = FindObjectsOfType<PlayerTranslator>();
+        foreach (var translator in translators)
+        {
+            if (translator.photonView.IsMine)
+            {
+                translator.HandleError(errorMessage);
+            }
+        }
     }
 }
