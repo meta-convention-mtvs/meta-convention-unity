@@ -165,59 +165,61 @@ public class TranslationManager : Singleton<TranslationManager>
 
     private void OnMessageReceived(object sender, MessageEventArgs e)
     {
-        var data = JsonConvert.DeserializeObject<Dictionary<string, object>>(e.Data);
-        
-        Debug.Log($"[TranslationManager] Received message: {e.Data}");
-        
-        switch (data["type"] as string)
-        {
-            case "server.error":
-                HandleServerError(Convert.ToInt32(data["code"]));
-                break;
-                
-            case "room.joined":
-                print("OnMessageReceived: room.joined");
-                CurrentRoomID = data["roomid"] as string;
-                OnRoomJoined?.Invoke(CurrentRoomID);
-                break;
-                
-            case "room.bye":
-                CurrentRoomID = string.Empty;
-                OnRoomLeft?.Invoke();
-                break;
-                
-            case "room.updated":
-                bool isReady = data["ready"] as bool? ?? false;
-                List<Dictionary<string, object>> users = JsonConvert.DeserializeObject<List<Dictionary<string, object>>>(data["users"].ToString());
-                
-                Debug.Log($"[TranslationManager] Invoking OnRoomUpdated - Ready: {isReady}, Users: {users.Count}");
-                OnRoomUpdated?.Invoke(isReady, users);  // 이벤트 발생
-                break;
-                
-            case "conversation.text.delta":
-                OnPartialTextReceived?.Invoke(data["text"] as string);
-                break;
-                
-            case "conversation.text.done":
-                OnCompleteTextReceived?.Invoke(data["text"] as string);
-                break;
-                
-            case "conversation.audio.delta":
-                OnPartialAudioReceived?.Invoke(data["audio"] as string);
-                break;
-                
-            case "conversation.audio.done":
-                OnCompleteAudioReceived?.Invoke(data["audio"] as string);
-                break;
-                
-            case "conversation.approved_speech":
-                OnSpeechApproved?.Invoke(data["userid"] as string);
-                break;
-                
-            default:
-                Debug.LogWarning($"Unknown message type: {data["type"]}");
-                break;
-        }
+        // UnityMainThread에서 실행되도록 래핑
+        UnityMainThreadDispatcher.Instance().Enqueue(() => {
+            var data = JsonConvert.DeserializeObject<Dictionary<string, object>>(e.Data);
+            Debug.Log($"[TranslationManager] Received message: {e.Data}");
+            
+            switch (data["type"] as string)
+            {
+                case "server.error":
+                    HandleServerError(Convert.ToInt32(data["code"]));
+                    break;
+                    
+                case "room.joined":
+                    print("OnMessageReceived: room.joined");
+                    CurrentRoomID = data["roomid"] as string;
+                    OnRoomJoined?.Invoke(CurrentRoomID);
+                    break;
+                    
+                case "room.bye":
+                    CurrentRoomID = string.Empty;
+                    OnRoomLeft?.Invoke();
+                    break;
+                    
+                case "room.updated":
+                    bool isReady = data["ready"] as bool? ?? false;
+                    List<Dictionary<string, object>> users = JsonConvert.DeserializeObject<List<Dictionary<string, object>>>(data["users"].ToString());
+                    
+                    Debug.Log($"[TranslationManager] Invoking OnRoomUpdated - Ready: {isReady}, Users: {users.Count}");
+                    OnRoomUpdated?.Invoke(isReady, users);  // 이벤트 발생
+                    break;
+                    
+                case "conversation.text.delta":
+                    OnPartialTextReceived?.Invoke(data["text"] as string);
+                    break;
+                    
+                case "conversation.text.done":
+                    OnCompleteTextReceived?.Invoke(data["text"] as string);
+                    break;
+                    
+                case "conversation.audio.delta":
+                    OnPartialAudioReceived?.Invoke(data["audio"] as string);
+                    break;
+                    
+                case "conversation.audio.done":
+                    OnCompleteAudioReceived?.Invoke(data["audio"] as string);
+                    break;
+                    
+                case "conversation.approved_speech":
+                    OnSpeechApproved?.Invoke(data["userid"] as string);
+                    break;
+                    
+                default:
+                    Debug.LogWarning($"Unknown message type: {data["type"]}");
+                    break;
+            }
+        });
     }
 
     private void HandleServerError(int errorCode)
