@@ -33,24 +33,8 @@ public class TranslationEventHandler : Singleton<TranslationEventHandler>
         var manager = TranslationManager.Instance;
         if (manager == null)
         {
-            case "conversation.text.delta":
-                DistributePartialTranslatedText(data);
-                break;
-            case "conversation.audio.delta":
-                DistributePartialTranslatedAudio(data);
-                break;
-            case "conversation.text.done":
-                DistributeCompleteTranslatedText(data);
-                break;
-            case "conversation.audio.done":
-                DistributeCompleteTranslatedAudio(data);
-                break;
-            case "conversation.approved_speech":
-                //HandleApprovedSpeech(data);
-                break;
-            default:
-                Debug.Log("Unknown message type: " + data["type"]);
-                break;
+            Debug.LogError("[TranslationEventHandler] TranslationManager instance is null!");
+            return;
         }
         
         Debug.Log("[TranslationEventHandler] Subscribing to events");

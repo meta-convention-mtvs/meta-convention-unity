@@ -169,7 +169,6 @@ public class FireMgr : MonoBehaviour
     
     public void OnClickDownload()
     {
-        // fireStorage의 폴더/파일명
         string path = "ProfileImage/" + FireAuth.instance.auth.CurrentUser.UserId + ".png";
 
         FireStorage.instance.DownLoad(path, OnCompleteDownload);
@@ -180,7 +179,6 @@ public class FireMgr : MonoBehaviour
     {
         Texture2D texture = new Texture2D(2, 2);
         texture.LoadImage(data);
-        // 받아온 이미지를 이미지 
         profileImage.texture = texture;
     }
 
