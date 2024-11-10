@@ -162,7 +162,7 @@ public class TranslationManager : Singleton<TranslationManager>
     public event Action<string> OnCompleteTextReceived;   // 완성된 텍스트 수신
     public event Action<string> OnPartialAudioReceived;   // 부분 오디오 수신
     public event Action<string> OnCompleteAudioReceived;  // 완성된 오디오 수신
-    public event Action<string> OnSpeechApproved;         // 발언권 승인
+    public event Action<string> OnSpeechApproved;         // 발언권 승인 (userId 전달)
     public event Action<string> OnError;                  // 에러 발생
 
     private void OnMessageReceived(object sender, MessageEventArgs e)
@@ -214,7 +214,9 @@ public class TranslationManager : Singleton<TranslationManager>
                     break;
                     
                 case "conversation.approved_speech":
-                    OnSpeechApproved?.Invoke(data["userid"] as string);
+                    string approvedUserId = data["userid"] as string;
+                    Debug.Log($"[TranslationManager] Speech approved for user: {approvedUserId}");
+                    OnSpeechApproved?.Invoke(approvedUserId);  // userId 전달
                     break;
                     
                 default:

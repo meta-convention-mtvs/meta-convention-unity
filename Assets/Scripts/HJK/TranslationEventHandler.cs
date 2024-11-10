@@ -24,12 +24,18 @@ public class TranslationEventHandler : Singleton<TranslationEventHandler>
     // 에러 발생 시 호출될 이벤트
     public event System.Action<string> OnError;
 
-    public PlayerTranslator playerTranslator;
+    private PlayerTranslatorWithoutRPC playerTranslator;
+
+    private string currentSpeakerId = "";  // 현재 발언자 ID 추가
+    public string CurrentSpeakerId => currentSpeakerId;  // 읽기 전용 프로퍼티
+
+    // 발언자 변경 시 발생하는 이벤트
+    public event System.Action<string> OnSpeakerChanged;
 
     private void Start()
     {
         Debug.Log("[TranslationEventHandler] Start method called");
-        playerTranslator = FindObjectOfType<PlayerTranslator>();
+        playerTranslator = FindObjectOfType<PlayerTranslatorWithoutRPC>();
         var manager = TranslationManager.Instance;
         if (manager == null)
         {
@@ -43,6 +49,7 @@ public class TranslationEventHandler : Singleton<TranslationEventHandler>
         manager.OnCompleteAudioReceived += DistributeCompleteTranslatedAudio;
         manager.OnSpeechApproved += HandleApprovedSpeech;
         manager.OnError += HandleError;
+        manager.OnCompleteAudioReceived += HandleAudioDone;  // 오디오 완료 이벤트 구독 추가
         
         Debug.Log("[TranslationEventHandler] Events subscribed successfully");
     }
@@ -58,6 +65,7 @@ public class TranslationEventHandler : Singleton<TranslationEventHandler>
             manager.OnCompleteAudioReceived -= DistributeCompleteTranslatedAudio;
             manager.OnSpeechApproved -= HandleApprovedSpeech;
             manager.OnError -= HandleError;
+            manager.OnCompleteAudioReceived -= HandleAudioDone;  // 구독 해제 추가
         }
     }
 
@@ -91,66 +99,46 @@ public class TranslationEventHandler : Singleton<TranslationEventHandler>
 
     private void DistributePartialTranslatedAudio(string base64Audio)
     {
-        //var translators = FindObjectsOfType<PlayerTranslator>();
-        //foreach (var translator in translators)
-        //{
-        //    translator.ProcessAudioStream(base64Audio);
-        //}
-        playerTranslator.ProcessAudioStream(base64Audio);
+        if (playerTranslator != null)
+        {
+            playerTranslator.ProcessAudioStream(base64Audio);
+        }
     }
 
     private void DistributeCompleteTranslatedAudio(string base64Audio)
     {
-        //var translators = FindObjectsOfType<PlayerTranslator>();
-        //foreach (var translator in translators)
-        //{
-        //    translator.FinalizeAudioPlayback();
-        //}
-        playerTranslator.FinalizeAudioPlayback();
+        if (playerTranslator != null)
+        {
+            playerTranslator.FinalizeAudioPlayback();
+        }
     }
 
     private void HandleApprovedSpeech(string userId)
     {
-        //var translators = FindObjectsOfType<PlayerTranslator>();
-        //foreach (var translator in translators)
-        //{
-        //    if (translator.photonView.Owner.UserId == userId)
-        //    {
-        //        translator.OnSpeechApproved();
-        //        break;
-        //    }
-        //}
-        playerTranslator.OnSpeechApproved();
+        Debug.Log($"[TranslationEventHandler] Speech approved for user: {userId}");
+        currentSpeakerId = userId;
+        OnSpeakerChanged?.Invoke(userId);
+        if (playerTranslator != null)
+        {
+            playerTranslator.OnSpeechApproved(userId);
+        }
     }
 
     private void HandleError(string errorMessage)
     {
         OnError?.Invoke(errorMessage);
-
-        //var translators = FindObjectsOfType<PlayerTranslator>();
-        //foreach (var translator in translators)
-        //{
-        //    if (translator.photonView.IsMine)
-        //    {
-        //        translator.HandleError(errorMessage);
-        //    }
-        //}
-        playerTranslator.HandleError(errorMessage);
+        if (playerTranslator != null)
+        {
+            playerTranslator.HandleError(errorMessage);
+        }
     }
 
     private void UpdateUI(bool isReady)
     {
-        // 발언 가능 상태 UI 업데이트
-        //var translators = FindObjectsOfType<PlayerTranslator>();
-        //foreach (var translator in translators)
-        //{
-        //    if (translator.photonView.IsMine)
-        //    {
-        //        translator.UpdateSpeakUI(isReady);
-        //        break;
-        //    }
-        //}
-        playerTranslator.UpdateSpeakUI(isReady);
+        if (playerTranslator != null)
+        {
+            playerTranslator.UpdateSpeakUI(isReady);
+        }
     }
 
     private void HandleUserCountChange(int userCount)
@@ -187,18 +175,18 @@ public class TranslationEventHandler : Singleton<TranslationEventHandler>
         return user?["lang"] as string;
     }
 
-    private void HandleApprovedSpeech(Dictionary<string, object> data)
+    // 오디오 완료 처리 메서드 추가
+    private void HandleAudioDone(string _)
     {
-        string userId = data["userid"] as string;
-        //var translators = FindObjectsOfType<PlayerTranslator>();
-        //foreach (var translator in translators)
-        //{
-        //    if (translator.photonView.Owner.UserId == userId)
-        //    {
-        //        translator.OnSpeechApproved();
-        //        break;
-        //    }
-        //}
-        playerTranslator.OnSpeechApproved();
+        Debug.Log("[TranslationEventHandler] Audio playback completed");
+        currentSpeakerId = "";
+        OnSpeakerChanged?.Invoke("");
+    }
+
+    // 발언자 상태 초기화 메서드
+    public void ResetSpeaker()
+    {
+        currentSpeakerId = "";
+        OnSpeakerChanged?.Invoke("");
     }
 }
