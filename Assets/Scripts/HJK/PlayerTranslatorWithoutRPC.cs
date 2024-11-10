@@ -84,9 +84,6 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
     /// </summary>
     private void Update()
     {
-        // 자신의 플레이어가 아니면 입력 처리하지 않음
-        if (!photonView.IsMine) return;
-
         // 발언 키(M) 눌렀을 때
         if (Input.GetKeyDown(speakKey))
         {
@@ -129,7 +126,7 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
         }
 
         // 발언 가능한지 확인
-        if (!string.IsNullOrEmpty(TranslationEventHandler.Instance.CurrentSpeakerId))
+        if (!string.IsNullOrEmpty(TranslationEventHandler.Instance.CurrentSpeakerId) && TranslationEventHandler.Instance.CurrentSpeakerId != userId)
         {
             ShowWaitingUI("이미 상대방이 통역 중입니다");
             return;
