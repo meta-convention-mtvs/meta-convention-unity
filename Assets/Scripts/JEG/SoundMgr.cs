@@ -34,7 +34,8 @@ public class SoundMgr : Singleton<SoundMgr>
 
     public void StopAudio()
     {
-        audioSource.Stop();
+        if(audioSource != null)
+            audioSource.Stop();
     }
     public void PlayAudio(AudioClip[] clips, int idx)
     {

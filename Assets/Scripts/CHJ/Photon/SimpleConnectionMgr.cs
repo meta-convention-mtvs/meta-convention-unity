@@ -46,7 +46,7 @@ public class SimpleConnectionMgr : MonoBehaviourPunCallbacks
     public override void OnJoinedRoom()
     {
         print("Entered the Room");
-
+        PhotonNetwork.LoadLevel("MainScene_CHJ");
     }
 
 
