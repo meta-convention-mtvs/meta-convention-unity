@@ -99,6 +99,7 @@ public class CharacterCustomizeManager : MonoBehaviour
     {
         // image texture 를 읽어온다.
         // 읽어온 texture를 적용시킨다.
+        FileUploadManager.Instance.SetUpImageFileBrowser();
         FileUploadManager.Instance.ShowDialog(ImageFileLoad);
     }
 

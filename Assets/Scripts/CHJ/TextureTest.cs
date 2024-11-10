@@ -8,6 +8,7 @@ public class TextureTest : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        FileUploadManager.Instance.SetUpImageFileBrowser();
         FileUploadManager.Instance.ShowDialog(SetTexture);
     }
 

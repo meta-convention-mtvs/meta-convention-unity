@@ -1,5 +1,6 @@
 ﻿using Dummiesman;
 using Siccity.GLTFUtility;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -7,20 +8,18 @@ using UnityEngine;
 
 public class ObjectLoader : MonoBehaviour
 {
-    static GameObject loadedObject;
-
-    public static void ImportObj(string objPath)
+    public static GameObject ImportObj(string objPath)
     {
         if (!File.Exists(objPath))
         {
             print("File doesn't exist.");
+            return null;
         }
         else
         {
-            if (loadedObject != null)
-                Destroy(loadedObject);
-            loadedObject = new OBJLoader().Load(objPath);
+            GameObject loadedObject = new OBJLoader().Load(objPath);
             ChangeShaderToLit(loadedObject);
+            return loadedObject;
         }
     }
 
@@ -36,16 +35,9 @@ public class ObjectLoader : MonoBehaviour
         }
     }
 
-    public static void ImportGLTFAsync(string filepath)
+    public static void ImportGLTFAsync(string filepath, Action<GameObject, AnimationClip[]> OnLoadFinish)
     {
-        Importer.ImportGLTFAsync(filepath, new ImportSettings(), OnFinishAsync);
+        Importer.ImportGLTFAsync(filepath, new ImportSettings(), OnLoadFinish);
     }
 
-    static void OnFinishAsync(GameObject result, AnimationClip[] animations)
-    {
-        Debug.Log("Finished importing " + result.name);
-        if (loadedObject != null)
-            Destroy(loadedObject);
-        loadedObject = result;
-    }
 }

@@ -7,17 +7,27 @@ using System;
 
 public class FileUploadManager : Singleton<FileUploadManager>
 {
-    private void Awake()
-    {
-        SetUpFileBrowser();
-    }
 
-    void SetUpFileBrowser()
+    public void SetUpImageFileBrowser()
     {
         FileBrowser.SetFilters(true, new FileBrowser.Filter("Images", ".jpg", ".png"), new FileBrowser.Filter("Text Files", ".txt"), new FileBrowser.Filter("All Files", "*"));
+        //FileBrowser.SetDefaultFilter("Images");
         FileBrowser.AddQuickLink("Users", "C:\\Users", null);
     }
 
+    public void SetUpObjFileBrowser()
+    {
+        FileBrowser.SetFilters(true, new FileBrowser.Filter("ObjectFiles", ".obj", ".gltf"));
+        //FileBrowser.SetDefaultFilter("ObjectFiles"); 
+        FileBrowser.AddQuickLink("Users", "C:\\Users", null);
+    }
+
+    public void SetUpVideoFileBrowser()
+    {
+        FileBrowser.SetFilters(true, new FileBrowser.Filter("Videos", ".mp4", ".mov", ".webm", ".wmv"));
+        //FileBrowser.SetDefaultFilter("Videos");
+        FileBrowser.AddQuickLink("Users", "C:\\Users", null);
+    }
     public void ShowDialog(Action<string[]> onLoadSuccess)
     {
         StartCoroutine(ShowLoadDialogCoroutine(onLoadSuccess));

@@ -30,7 +30,7 @@ public class TranslationEventHandler : Singleton<TranslationEventHandler>
                 DistributeCompleteTranslatedAudio(data);
                 break;
             case "conversation.approved_speech":
-                HandleApprovedSpeech(data);
+                //HandleApprovedSpeech(data);
                 break;
             default:
                 Debug.Log("Unknown message type: " + data["type"]);

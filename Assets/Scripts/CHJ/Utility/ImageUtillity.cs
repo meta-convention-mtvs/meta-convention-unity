@@ -7,6 +7,8 @@ public class ImageUtility : MonoBehaviour
 {
     public static Texture2D LoadTexture(string filePath)
     {
+        if (!File.Exists(filePath))
+            return null;
         byte[] fileData = File.ReadAllBytes(filePath);
         Texture2D texture = new Texture2D(2, 2); // Temporary size, will resize
         if (texture.LoadImage(fileData))
