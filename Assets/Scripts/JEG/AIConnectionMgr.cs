@@ -9,7 +9,7 @@ using UnityEngine.Networking;
 using UnityEngine.UI;
 
 [System.Serializable]
-public class testUserInfo
+public class TestUserInfo
 {
     //public string uIDP { get; set; }
     public string[] industry_type { get; set; }
@@ -17,11 +17,18 @@ public class testUserInfo
     public string situation_description { get; set; }
     public string language{ get; set; }
 
+    public TestUserInfo(string[] ind_type, string[] selected_interests, string situ_desc, string lang)
+    {
+        this.industry_type = ind_type;
+        this.selected_interests = selected_interests;
+        this.situation_description = situ_desc;
+        this.language = lang;
+    }
    
 }
 
 [System.Serializable]
-public class testRecommendedCompany
+public class TestRecommendedCompany
 {
     public string company_mission { get; set; }
     public string company_name { get; set; }
@@ -38,10 +45,71 @@ public class AIConnectionMgr : MonoBehaviour
 
     public Text companyName;
 
+    public InputField industry_input;
+    public InputField interest_input;
+    public InputField situ_input;
+    public InputField lang_input;
+
+    public string[] industryTypes = new string[1];
+    public string[] interests = new string[1];
+    public string situDescription;
+    public string lang;
+
+    public static string[] fields = new string[49] {"3D Printing",
+ "5G Technologies",
+ "AR/VR/XR",
+ "Accessibility",
+ "Accessories",
+ "AgTech",
+ "Artificial Intelligence",
+ "Audio",
+ "Cloud Computing",
+ "Construction Tech",
+ "Content and EntertaInment",
+ "Cybersecurity",
+ "Defense",
+ "Digital Health",
+ "Drones",
+ "Education Tech",
+ "Energy Transition",
+ "Energy/Power",
+ "Enterprise",
+ "Fashion Tech",
+ "Fintech",
+ "Fitness",
+ "Food Tech",
+ "Gaming and Esports",
+ "Home Entertainment and Office Hardware",
+ "Imaging",
+ "Innovation",
+ "Investing",
+ "IoT/Sensors",
+ "Lifestyle",
+ "Marketing and Advertising",
+ "Metaverse",
+ "NFT",
+ "Retail/E-Commerce",
+ "Robotics",
+ "Smart Cities",
+ "Smart Home and Appliances",
+ "Sourcing and Manufacturing",
+ "Space Tech",
+ "Sports",
+ "Startups",
+ "Streaming",
+ "Style",
+ "Supply and Logistics",
+ "Sustainability",
+ "Technology",
+ "Travel and Tourism",
+ "Vehicle Tech and Advanced Mobility",
+ "Video"};
+
+
     public void OnClickTestRequest()
     {
         // 테스트용 url
-        url = "http://metaai2.iptime.org:65534/";
+        url = "http://metaai2.iptime.org:65535/";
         RequestTestRequest(url);
     }
 
@@ -72,7 +140,7 @@ public class AIConnectionMgr : MonoBehaviour
     public void OnClickSendRecommendRequest()
     {
         // 테스트용 url 
-        url = "http://metaai2.iptime.org:65534/recommendation";
+        url = "http://metaai2.iptime.org:65535/recommendation";
         // 테스트용 데이터 셋팅
         // 나중에는 poll 로 받아온 데이터 셋팅
         //testUserInfo userInfo;
@@ -89,7 +157,18 @@ public class AIConnectionMgr : MonoBehaviour
     {
         // TODO: 받아온 유저의 관심분야 데이터를 jsonData로 변환해서 보내야 함..
         //string jsonData = JsonUtility.ToJson(userInfo);
-        string jsonData = "{\"industry_type\":[\"항공\"], \"selected_interests\":[\"Vehicle Tech and Advanced Mobility\"],\"situation_description\":\"우주, 항공 산업에 관련되어 기체를 만드는 회사에 대해 궁금해\", \"language\":\"JP\" }";
+        
+        industryTypes[0] = industry_input.text;
+        interests[0] = interest_input.text;
+        situDescription = situ_input.text;
+        lang = lang_input.text;
+
+        TestUserInfo userInfo = new TestUserInfo(industryTypes, interests, situDescription, lang);
+
+        string jsonData = JsonConvert.SerializeObject(userInfo, Formatting.None);
+       
+
+        //string jsonData = "{\"industry_type\":[\"항공\"], \"selected_interests\":[\"Vehicle Tech and Advanced Mobility\"],\"situation_description\":\"우주, 항공 산업에 관련되어 기체를 만드는 회사에 대해 궁금해\", \"language\":\"JP\" }";
         print(jsonData);
         using (UnityWebRequest www = UnityWebRequest.PostWwwForm(url, ""))
         {
@@ -110,7 +189,7 @@ public class AIConnectionMgr : MonoBehaviour
 
 
 
-                List<testRecommendedCompany> recommendedCompany = JsonConvert.DeserializeObject<List<testRecommendedCompany>>(receiveJsonData);
+                List<TestRecommendedCompany> recommendedCompany = JsonConvert.DeserializeObject<List<TestRecommendedCompany>>(receiveJsonData);
 
                 for (int i = 0; i < recommendedCompany.Count(); i++)
                 {
