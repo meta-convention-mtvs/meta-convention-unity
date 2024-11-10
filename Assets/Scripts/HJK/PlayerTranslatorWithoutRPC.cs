@@ -166,13 +166,15 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
     private void StopRecording()
     {
         if (!isRecording) return;
-
+        print("StopRecording(녹음 중지됨)");
+        
         // 마이크 녹음 중지
         Microphone.End(null);
         isRecording = false;
         
         // 녹음된 오디오를 base64 문자열로 변환하여 전송
         string audioData = ConvertAudioToBase64();
+        print("오디오 변환 성공 -> audioData: " + audioData);
         if (!string.IsNullOrEmpty(audioData))
         {
             // 오디오 데이터 전송
@@ -411,6 +413,7 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
     /// </summary>
     public void HandleError(string errorMessage)
     {
+        print("HandleError(에러 발생됨)");
         // 현재 녹음 중이면 녹음 중지
         if (isRecording)
         {
