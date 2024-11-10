@@ -15,7 +15,7 @@ using System.Collections;
 public class TranslationManager : Singleton<TranslationManager>
 {
     private WebSocket ws;
-    private const string Endpoint = "ws://metaai2.iptime.org:44444/translation";
+    private const string Endpoint = "ws://ec2-3-36-111-173.ap-northeast-2.compute.amazonaws.com:6576/translation";
     // 1107 추가된 부분
     public string CurrentRoomID { get; private set; } = string.Empty;
 
@@ -23,9 +23,11 @@ public class TranslationManager : Singleton<TranslationManager>
 
     private TranslationEventHandler eventHandler;
 
+    public UnityMainThreadDispatcher dispatcher;
     private void Start()
     {
         eventHandler = TranslationEventHandler.Instance;
+        dispatcher = GameObject.FindObjectOfType(typeof(UnityMainThreadDispatcher))as UnityMainThreadDispatcher;
     }
 
     private void Update()
@@ -38,6 +40,7 @@ public class TranslationManager : Singleton<TranslationManager>
 
     public void Connect()
     {
+        Debug.Log("[TranslationManager] Connect method called");
         if (ws != null && ws.IsAlive || isConnecting)
             return;
 
@@ -63,7 +66,7 @@ public class TranslationManager : Singleton<TranslationManager>
 
     private void Ws_OnOpen(object sender, EventArgs e)
     {
-        print("connected");
+        Debug.Log("WebSocket - Translation 연결 성공");
         OnConnect?.Invoke();
         OnConnect = null;
     }
@@ -151,42 +154,138 @@ public class TranslationManager : Singleton<TranslationManager>
         }
     }
 
+    // 이벤트 정의
+    public event Action<string> OnRoomJoined;        // 방 입장 성공
+    public event Action OnRoomLeft;                  // 방 퇴장
+    public event Action<bool, List<Dictionary<string, object>>> OnRoomUpdated;  // 방 상태 업데이트
+    public event Action<string> OnPartialTextReceived;    // 부분 텍스트 수신
+    public event Action<string> OnCompleteTextReceived;   // 완성된 텍스트 수신
+    public event Action<string> OnPartialAudioReceived;   // 부분 오디오 수신
+    public event Action<string> OnCompleteAudioReceived;  // 완성된 오디오 수신
+    public event Action<string> OnSpeechApproved;         // 발언권 승인 (userId 전달)
+    public event Action<string> OnError;                  // 에러 발생
+
     private void OnMessageReceived(object sender, MessageEventArgs e)
     {
-        var data = JsonConvert.DeserializeObject<Dictionary<string, object>>(e.Data);
-       
-        // 원본 데이터와 파싱된 데이터를 모두 출력
-        Debug.Log($"Raw message: {e.Data}");
-        Debug.Log($"Parsed data: {JsonConvert.SerializeObject(data, Formatting.Indented)}");
+        // UnityMainThread에서 실행되도록 래핑
+        dispatcher.Enqueue(() => {
+            var data = JsonConvert.DeserializeObject<Dictionary<string, object>>(e.Data);
+            Debug.Log($"[TranslationManager] Received message: {e.Data}");
+            
+            switch (data["type"] as string)
+            {
+                case "server.error":
+                    HandleServerError(Convert.ToInt32(data["code"]));
+                    break;
+                    
+                case "room.joined":
+                    print("OnMessageReceived: room.joined");
+                    CurrentRoomID = data["roomid"] as string;
+                    OnRoomJoined?.Invoke(CurrentRoomID);
+                    break;
+                    
+                case "room.bye":
+                    CurrentRoomID = string.Empty;
+                    OnRoomLeft?.Invoke();
+                    break;
+                    
+                case "room.updated":
+                    bool isReady = data["ready"] as bool? ?? false;
+                    List<Dictionary<string, object>> users = JsonConvert.DeserializeObject<List<Dictionary<string, object>>>(data["users"].ToString());
+                    
+                    Debug.Log($"[TranslationManager] Invoking OnRoomUpdated - Ready: {isReady}, Users: {users.Count}");
+                    OnRoomUpdated?.Invoke(isReady, users);  // 이벤트 발생
+                    break;
+                    
+                case "conversation.text.delta":
+                    OnPartialTextReceived?.Invoke(data["text"] as string);
+                    break;
+                    
+                case "conversation.text.done":
+                    OnCompleteTextReceived?.Invoke(data["text"] as string);
+                    break;
+                    
+                case "conversation.audio.delta":
+                    OnPartialAudioReceived?.Invoke(data["delta"] as string);
+                    break;
+                    
+                case "conversation.audio.done":
+                    OnCompleteAudioReceived?.Invoke(data["delta"] as string);
+                    break;
+                    
+                case "conversation.approved_speech":
+                    string approvedUserId = data["userid"] as string;
+                    Debug.Log($"[TranslationManager] Speech approved for user: {approvedUserId}");
+                    OnSpeechApproved?.Invoke(approvedUserId);  // userId 전달
+                    break;
+                    
+                default:
+                    Debug.LogWarning($"Unknown message type: {data["type"]}");
+                    break;
+            }
+        });
+    }
 
-        switch (data["type"] as string)
+    private void HandleServerError(int errorCode)
+    {
+        string errorMessage = "";
+        bool isCritical = false;
+
+        switch (errorCode)
         {
-            // 방 생성 후 입장 성공 시 room.joined 이벤트 처리
-            case "room.joined":
-                CurrentRoomID = data["roomid"] as string;
-                OnJoinRoom?.Invoke();
+            case 1:
+                errorMessage = "치명적 오류, 연결이 중단되었습니다.";
+                isCritical = true;
                 break;
-
-            case "room.bye":
-                CurrentRoomID = string.Empty;
+            case 2:
+                errorMessage = "방 생성에 실패했습니다.";
                 break;
-
-            case "room.updated":
-                bool isReady = data["ready"] as bool? ?? false;
-                List<Dictionary<string, object>> users = JsonConvert.DeserializeObject<List<Dictionary<string, object>>>(data["users"].ToString());
-                
-                // 방 상태 업데이트 이벤트 처리
-                if (eventHandler != null)
-                {
-                    eventHandler.HandleRoomUpdate(isReady, users);
-                }
+            case 3:
+                errorMessage = "방 참여에 실패했습니다.";
+                break;
+            case 4:
+                errorMessage = "방 퇴장에 실패했습니다.";
+                break;
+            case 5:
+                errorMessage = "발언권 획득에 실패했습니다.";
+                break;
+            case 6:
+                errorMessage = "발언권이 없는 상태에서 음성 입력을 시도했습니다.";
+                break;
+            default:
+                errorMessage = $"알 수 없는 에러가 발생했습니다. (에러 코드: {errorCode})";
                 break;
         }
 
-        if (eventHandler != null)
+        Debug.LogError($"서버 에러: {errorMessage}");
+
+        // UI에 에러 메시지 표시 (예: 팝업)
+        ShowErrorMessage(errorMessage);
+
+        // 치명적 에러인 경우 추가 처리
+        if (isCritical)
         {
-            eventHandler.ProcessServerMessage(e.Data);
+            HandleCriticalError();
         }
+    }
+
+    private void HandleCriticalError()
+    {
+        // 웹소켓 연결 종료
+        if (ws != null)
+        {
+            ws.Close();
+            ws = null;
+        }
+
+        // 재연결 시도
+        StartCoroutine(ReconnectCoroutine());
+    }
+
+    private void ShowErrorMessage(string message)
+    {
+        Debug.LogError(message);
+        OnError?.Invoke(message);  // 직접 이벤트 발생
     }
 
     private void OnDestroy()

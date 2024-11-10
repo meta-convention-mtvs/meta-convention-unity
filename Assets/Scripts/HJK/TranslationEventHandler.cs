@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 using Newtonsoft.Json;
+using System.Linq;
 
 /// <summary>
 /// AI 통역 서버로부터 받은 메시지를 처리하는 싱글톤 핸들러 클래스
@@ -11,78 +12,181 @@ using Newtonsoft.Json;
 /// </summary>
 public class TranslationEventHandler : Singleton<TranslationEventHandler>
 {
-    public void ProcessServerMessage(string message)
-    {
-        var data = JsonConvert.DeserializeObject<Dictionary<string, object>>(message);
+    private bool isRoomReady = false;
+    public bool IsRoomReady => isRoomReady;  // 읽기 전용 프로퍼티
 
-        switch (data["type"] as string)
+    // 현재 방의 사용자 정보를 저장
+    private List<Dictionary<string, object>> currentUsers = new List<Dictionary<string, object>>();
+    
+    // Ready 상태 변경 시 호출될 이벤트
+    public event System.Action<bool> OnRoomReadyStateChanged;
+
+    // 에러 발생 시 호출될 이벤트
+    public event System.Action<string> OnError;
+
+    private PlayerTranslatorWithoutRPC playerTranslator;
+
+    private string currentSpeakerId = "";  // 현재 발언자 ID 추가
+    public string CurrentSpeakerId => currentSpeakerId;  // 읽기 전용 프로퍼티
+
+    // 발언자 변경 시 발생하는 이벤트
+    public event System.Action<string> OnSpeakerChanged;
+
+    private void Start()
+    {
+        Debug.Log("[TranslationEventHandler] Start method called");
+        playerTranslator = FindObjectOfType<PlayerTranslatorWithoutRPC>();
+        var manager = TranslationManager.Instance;
+        if (manager == null)
         {
-            case "conversation.text.delta":
-                DistributePartialTranslatedText(data);
-                break;
-            case "conversation.audio.delta":
-                DistributePartialTranslatedAudio(data);
-                break;
-            case "conversation.text.done":
-                DistributeCompleteTranslatedText(data);
-                break;
-            case "conversation.audio.done":
-                DistributeCompleteTranslatedAudio(data);
-                break;
-            case "conversation.approved_speech":
-                //HandleApprovedSpeech(data);
-                break;
-            default:
-                Debug.Log("Unknown message type: " + data["type"]);
-                break;
+            Debug.LogError("[TranslationEventHandler] TranslationManager instance is null!");
+            return;
         }
-    }
-
-    private void DistributePartialTranslatedText(Dictionary<string, object> data)
-    {
-        // 텍스트 전달 로직
-    }
-
-    private void DistributePartialTranslatedAudio(Dictionary<string, object> data)
-    {
-        if (data.TryGetValue("audio", out object audioObj))
-        {
-            string base64Audio = audioObj as string;
-            var translators = FindObjectsOfType<PlayerTranslator>();
-            foreach (var translator in translators)
-            {
-                translator.ProcessAudioStream(base64Audio);
-            }
-        }
-    }
-
-    private void DistributeCompleteTranslatedText(Dictionary<string, object> data)
-    {
-        // 완성된 텍스트 전달 로직
-    }
-
-    private void DistributeCompleteTranslatedAudio(Dictionary<string, object> data)
-    {
-        var translators = FindObjectsOfType<PlayerTranslator>();
-        foreach (var translator in translators)
-        {
-            translator.FinalizeAudioPlayback();
-        }
-    }
-
-    public void HandleRoomUpdate(bool isReady, List<Dictionary<string, object>> users)
-    {
-        // 방 상태 업데이트 처리
-        Debug.Log($"Room Update - Ready: {isReady}, Users: {users.Count}");
         
-        // 필요한 경우 사용자 목록 처리
+        Debug.Log("[TranslationEventHandler] Subscribing to events");
+        manager.OnRoomUpdated += HandleRoomUpdate;
+        manager.OnPartialAudioReceived += DistributePartialTranslatedAudio;
+        manager.OnCompleteAudioReceived += DistributeCompleteTranslatedAudio;
+        manager.OnSpeechApproved += HandleApprovedSpeech;
+        manager.OnError += HandleError;
+        manager.OnCompleteAudioReceived += HandleAudioDone;  // 오디오 완료 이벤트 구독 추가
+        
+        Debug.Log("[TranslationEventHandler] Events subscribed successfully");
+    }
+
+    private void OnDestroy()
+    {
+        var manager = TranslationManager.Instance;
+        if (manager != null)
+        {
+            // 이벤트 구독 해제
+            manager.OnRoomUpdated -= HandleRoomUpdate;
+            manager.OnPartialAudioReceived -= DistributePartialTranslatedAudio;
+            manager.OnCompleteAudioReceived -= DistributeCompleteTranslatedAudio;
+            manager.OnSpeechApproved -= HandleApprovedSpeech;
+            manager.OnError -= HandleError;
+            manager.OnCompleteAudioReceived -= HandleAudioDone;  // 구독 해제 추가
+        }
+    }
+
+    private void HandleRoomUpdate(bool isReady, List<Dictionary<string, object>> users)
+    {
+        bool previousState = isRoomReady;
+        isRoomReady = isReady;
+        currentUsers = users;
+
+        // 디버깅을 위한 상세 로그 추가
+        Debug.Log($"[HandleRoomUpdate] Ready: {isReady}, Users Count: {users.Count}");
+        Debug.Log($"[HandleRoomUpdate] Current Users Detail:");
         foreach (var user in users)
         {
             string userId = user["userid"] as string;
             string lang = user["lang"] as string;
-            Debug.Log($"User: {userId}, Language: {lang}");
+            Debug.Log($"- User ID: {userId}, Language: {lang}");
         }
 
-        // UI 업데이트나 다른 게임 로직에 필요한 처리를 여기에 추가
+        // Ready 상태가 변경되었을 때만 이벤트 발생
+        if (previousState != isReady)
+        {
+            Debug.Log($"[HandleRoomUpdate] Ready state changed from {previousState} to {isReady}");
+            OnRoomReadyStateChanged?.Invoke(isReady);
+            UpdateUI(isReady);
+        }
+
+        // 사용자 수에 따른 추가 처리
+        HandleUserCountChange(users.Count);
+    }
+
+    private void DistributePartialTranslatedAudio(string base64Audio)
+    {
+        if (playerTranslator != null)
+        {
+            playerTranslator.ProcessAudioStream(base64Audio);
+        }
+    }
+
+    private void DistributeCompleteTranslatedAudio(string base64Audio)
+    {
+        if (playerTranslator != null)
+        {
+            playerTranslator.FinalizeAudioPlayback();
+        }
+    }
+
+    private void HandleApprovedSpeech(string userId)
+    {
+        Debug.Log($"[TranslationEventHandler] Speech approved for user: {userId}");
+        currentSpeakerId = userId;
+        OnSpeakerChanged?.Invoke(userId);
+        if (playerTranslator != null)
+        {
+            playerTranslator.OnSpeechApproved(userId);
+        }
+    }
+
+    private void HandleError(string errorMessage)
+    {
+        OnError?.Invoke(errorMessage);
+        if (playerTranslator != null)
+        {
+            playerTranslator.HandleError(errorMessage);
+        }
+    }
+
+    private void UpdateUI(bool isReady)
+    {
+        if (playerTranslator != null)
+        {
+            playerTranslator.UpdateSpeakUI(isReady);
+        }
+    }
+
+    private void HandleUserCountChange(int userCount)
+    {
+        Debug.Log($"[HandleUserCountChange] Current user count: {userCount}");
+        
+        // 사용자 수에 따른 처리
+        if (userCount < 2)
+        {
+            Debug.Log("[HandleUserCountChange] 통역을 시작하려면 다른 언어 사용자가 필요합니다.");
+        }
+        else
+        {
+            Debug.Log("[HandleUserCountChange] 통역 준비가 완료되었습니다.");
+        }
+    }
+
+    // 현재 방의 사용자 수 반환
+    public int GetCurrentUserCount()
+    {
+        return currentUsers.Count;
+    }
+
+    // 특정 언어를 사용하는 사용자가 있는지 확인
+    public bool HasUserWithLanguage(string language)
+    {
+        return currentUsers.Any(user => (user["lang"] as string) == language);
+    }
+
+    // 특정 사용자의 언어 가져오기
+    public string GetUserLanguage(string userId)
+    {
+        var user = currentUsers.FirstOrDefault(u => (u["userid"] as string) == userId);
+        return user?["lang"] as string;
+    }
+
+    // 오디오 완료 처리 메서드 추가
+    private void HandleAudioDone(string _)
+    {
+        Debug.Log("[TranslationEventHandler] Audio playback completed");
+        currentSpeakerId = "";
+        OnSpeakerChanged?.Invoke("");
+    }
+
+    // 발언자 상태 초기화 메서드
+    public void ResetSpeaker()
+    {
+        currentSpeakerId = "";
+        OnSpeakerChanged?.Invoke("");
     }
 }
