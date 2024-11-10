@@ -161,7 +161,7 @@ public class TranslationManager : Singleton<TranslationManager>
     public event Action<string> OnPartialTextReceived;    // 부분 텍스트 수신
     public event Action<string> OnCompleteTextReceived;   // 완성된 텍스트 수신
     public event Action<string> OnPartialAudioReceived;   // 부분 오디오 수신
-    public event Action<string> OnCompleteAudioReceived;  // 완성된 오디오 수신
+    public event Action OnCompleteAudioReceived;  // 완성된 오디오 수신
     public event Action<string> OnSpeechApproved;         // 발언권 승인 (userId 전달)
     public event Action<string> OnError;                  // 에러 발생
 
