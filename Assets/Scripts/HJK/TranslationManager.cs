@@ -210,7 +210,7 @@ public class TranslationManager : Singleton<TranslationManager>
                     break;
                     
                 case "conversation.audio.done":
-                    OnCompleteAudioReceived?.Invoke(data["delta"] as string);
+                    OnCompleteAudioReceived?.Invoke();
                     break;
                     
                 case "conversation.approved_speech":

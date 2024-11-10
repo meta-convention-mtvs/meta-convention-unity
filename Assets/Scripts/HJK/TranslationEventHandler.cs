@@ -103,7 +103,7 @@ public class TranslationEventHandler : Singleton<TranslationEventHandler>
         }
     }
 
-    private void DistributeCompleteTranslatedAudio(string base64Audio)
+    private void DistributeCompleteTranslatedAudio()
     {
         if (playerTranslator != null)
         {
