@@ -135,10 +135,17 @@ public class TranslationEventHandler : Singleton<TranslationEventHandler>
 
     private void UpdateUI(bool isReady)
     {
-        if (playerTranslator != null)
-        {
-            playerTranslator.UpdateSpeakUI(isReady);
-        }
+        // 발언 가능 상태 UI 업데이트
+        //var translators = FindObjectsOfType<PlayerTranslator>();
+        //foreach (var translator in translators)
+        //{
+        //    if (translator.photonView.IsMine)
+        //    {
+        //        translator.UpdateSpeakUI(isReady);
+        //        break;
+        //    }
+        //}
+        playerTranslator.UpdateSpeakUI(isReady);
     }
 
     private void HandleUserCountChange(int userCount)

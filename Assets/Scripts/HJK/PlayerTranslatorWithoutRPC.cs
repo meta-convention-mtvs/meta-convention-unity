@@ -143,7 +143,8 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
     {
         print("StartRecording(녹음 시작됨)");
         // currentSpeakerId 참조를 TranslationEventHandler로 변경
-        if (!string.IsNullOrEmpty(TranslationEventHandler.Instance.CurrentSpeakerId)) return;
+        print("CurrentSpeakerId: " + TranslationEventHandler.Instance.CurrentSpeakerId);
+        // if (!string.IsNullOrEmpty(TranslationEventHandler.Instance.CurrentSpeakerId)) return;
 
         isRecording = true;
         recordingPosition = 0;
@@ -165,6 +166,7 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
     /// </summary>
     private void StopRecording()
     {
+        print("StopRecording(일단 실행됨)");
         if (!isRecording) return;
         print("StopRecording(녹음 중지됨)");
         
