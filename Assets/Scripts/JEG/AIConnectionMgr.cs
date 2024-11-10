@@ -109,7 +109,7 @@ public class AIConnectionMgr : MonoBehaviour
     public void OnClickTestRequest()
     {
         // 테스트용 url
-        url = "http://metaai2.iptime.org:65535/";
+        url = "http://ec2-3-36-111-173.ap-northeast-2.compute.amazonaws.com:6576/";
         RequestTestRequest(url);
     }
 
@@ -140,7 +140,7 @@ public class AIConnectionMgr : MonoBehaviour
     public void OnClickSendRecommendRequest()
     {
         // 테스트용 url 
-        url = "http://metaai2.iptime.org:65535/recommendation";
+        url = "http://ec2-3-36-111-173.ap-northeast-2.compute.amazonaws.com:6576/recommendation";
         // 테스트용 데이터 셋팅
         // 나중에는 poll 로 받아온 데이터 셋팅
         //testUserInfo userInfo;
