@@ -141,6 +141,7 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
     /// </summary>
     private void StartRecording()
     {
+        print("StartRecording(녹음 시작됨)");
         // currentSpeakerId 참조를 TranslationEventHandler로 변경
         if (!string.IsNullOrEmpty(TranslationEventHandler.Instance.CurrentSpeakerId)) return;
 
@@ -396,8 +397,10 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
     /// </summary>
     public void OnSpeechApproved(string approvedUserId)
     {
+        print("OnSpeechApproved(발언권 승인됨)");
         if (FireAuthManager.Instance.GetCurrentUser().UserId == approvedUserId)
         {
+            print("if문 통과함");
             ShowCanSpeakUI();
             StartRecording();
         }
