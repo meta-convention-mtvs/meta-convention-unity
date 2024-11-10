@@ -210,13 +210,13 @@ public class TranslationManager : Singleton<TranslationManager>
                     break;
                     
                 case "conversation.audio.done":
-                    OnCompleteAudioReceived?.Invoke(data["delta"] as string);
+                    OnCompleteAudioReceived?.Invoke();
                     break;
                     
                 case "conversation.approved_speech":
                     string approvedUserId = data["userid"] as string;
                     Debug.Log($"[TranslationManager] Speech approved for user: {approvedUserId}");
-                    OnSpeechApproved?.Invoke(approvedUserId);  // userId 전달
+                    OnSpeechApproved?.Invoke(approvedUserId);  // 올바른 이벤트 사용
                     break;
                     
                 default:
