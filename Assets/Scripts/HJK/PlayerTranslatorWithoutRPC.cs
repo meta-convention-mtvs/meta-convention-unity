@@ -3,6 +3,7 @@ using Photon.Pun;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.UI;  // Text 컴포넌트 사용을 위해 추가
 
 /// <summary>
 /// 개별 플레이어의 AI 통역 관련 기능을 처리하는 컴포넌트
@@ -23,7 +24,6 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
 
     // 설정값들
     [SerializeField] private KeyCode speakKey = KeyCode.M;      // 발언 시작/종료 키
-    [SerializeField] private GameObject cantSpeakUI;            // 발언 불가 시 표시할 UI
     [SerializeField] private float maxRecordingTime = 60f;      // 최대 녹음 시간(초)
     [SerializeField] private KeyCode cancelKey = KeyCode.Escape; // 발언 취소 키
 
@@ -39,9 +39,10 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
     private bool isAudioCancelled = false;                    // 오디오 재생 취소 여부
 
     // UI 요소들
-    [SerializeField] private GameObject speakButton;           // 발언 가능 상태 표시 UI
-    [SerializeField] private GameObject waitingText;           // 대기 상태 표시 UI
-    [SerializeField] private TMPro.TextMeshProUGUI errorMessageUI; // 에러 메시지 UI
+    [SerializeField] private GameObject cantSpeakUI;            // 발언 불가 시 표시할 UI
+    [SerializeField] private GameObject speakButton;            // 발언 가능 상태 표시 UI
+    [SerializeField] private GameObject waitingText;            // 대기 상태 표시 UI
+    [SerializeField] private Text errorMessageUI;               // 에러 메시지 UI (TMP -> Text)
 
     // 에러 메시지 관련
     private float errorMessageDisplayTime = 3f;                // 에러 메시지 표시 시간
@@ -120,7 +121,7 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
     /// </summary>
     private void TryStartRecording()
     {
-        string userId = photonView.Owner.UserId;
+        string userId = FireAuthManager.Instance.GetCurrentUser().UserId;
         if (!TranslationEventHandler.Instance.IsRoomReady)
         {
             ShowWaitingUI("통역을 시작하려면 다른 언어 사용자가 필요합니다");
@@ -361,7 +362,7 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
     /// </summary>
     private void CancelRecording()
     {
-        string userId = photonView.Owner.UserId;
+        string userId = FireAuthManager.Instance.GetCurrentUser().UserId;
         if (TranslationEventHandler.Instance.CurrentSpeakerId != userId) return;
 
         if (isRecording)
@@ -398,7 +399,7 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
     /// </summary>
     public void OnSpeechApproved(string approvedUserId)
     {
-        if (photonView.Owner.UserId == approvedUserId)
+        if (FireAuthManager.Instance.GetCurrentUser().UserId == approvedUserId)
         {
             ShowCanSpeakUI();
             StartRecording();
@@ -456,9 +457,9 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
 
     private void ShowWaitingUI(string message)
     {
-        if (waitingText != null && waitingText.GetComponent<TMPro.TextMeshProUGUI>() != null)
+        if (waitingText != null && waitingText.GetComponent<Text>() != null)
         {
-            waitingText.GetComponent<TMPro.TextMeshProUGUI>().text = message;
+            waitingText.GetComponent<Text>().text = message;
             waitingText.SetActive(true);
         }
     }
