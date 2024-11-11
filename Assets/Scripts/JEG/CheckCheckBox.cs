@@ -5,47 +5,10 @@ using UnityEngine.UI;
 
 public class CheckCheckBox : MonoBehaviour
 {
-    //public GameObject checkPanel;
-    //public Toggle checkBoxPrefabs;
-    
-
-    //public List<int> fieldIdx;
-
-    //// Start is called before the first frame update
-    //void Start()
-    //{
-
-    //}
-
-    //// Update is called once per frame
-    //void Update()
-    //{
-
-    //}
-
-    //public void ShowList()
-    //{
-    //    string[] fieldList = instance.fields;
-    //    for (int i =0; i < instance.fields.Length; i++)
-    //    {
-    //        Toggle checkboxes = Instantiate(checkBoxPrefabs,checkPanel.transform);
-    //        Text labelText = checkboxes.GetComponent<Text>();          
-    //        labelText.text = fieldList[i];
-
-
-    //    }
-
-    //}
-
-    //public void ConfilmInterField()
-    //{
-
-    //}
-
     public GameObject togglePrefab;  // 체크박스 프리팹
     public Transform panel;  // 체크박스가 추가될 부모 오브젝트
     private List<Toggle> toggles = new List<Toggle>();  // 생성된 체크박스 저장 리스트
-    private List<int> selectedIndices = new List<int>();  // 체크된 체크박스의 인덱스 저장 리스트
+    public List<int> selectedIndices = new List<int>();  // 체크된 체크박스의 인덱스 저장 리스트
     private const int maxSelections = 5;  // 최대 선택 가능한 체크박스 개수
 
     void Start()
