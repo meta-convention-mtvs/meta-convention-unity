@@ -258,25 +258,40 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
 
         try
         {
-            // base64 문자열을 byte 배열로 변환
+            // base64 디코딩 과정 로깅
+            Debug.Log($"[Audio] Received base64 length: {base64AudioData.Length}");
+            
             byte[] audioData = Convert.FromBase64String(base64AudioData);
+            Debug.Log($"[Audio] Converted to bytes length: {audioData.Length}");
+            
             short[] shortArray = new short[audioData.Length / 2];
             Buffer.BlockCopy(audioData, 0, shortArray, 0, audioData.Length);
+            Debug.Log($"[Audio] Converted to shorts length: {shortArray.Length}");
             
-            // short 배열을 float 배열로 변환
             float[] samples = new float[shortArray.Length];
             for (int i = 0; i < shortArray.Length; i++)
             {
                 samples[i] = shortArray[i] / 32768f;
             }
+            Debug.Log($"[Audio] Final samples length: {samples.Length}");
 
-            // 오디오 버퍼에 추가하고 재생 시작
-            audioBuffer.AddRange(samples);
-            StartAudioBuffer();
+            // 유효한 오디오 데이터 체크
+            bool hasValidAudio = samples.Any(s => Mathf.Abs(s) > 0.0001f);
+            Debug.Log($"[Audio] Contains valid audio data: {hasValidAudio}");
+
+            if (hasValidAudio)
+            {
+                audioBuffer.AddRange(samples);
+                StartAudioBuffer();
+            }
+            else
+            {
+                Debug.LogWarning("[Audio] Skipping empty or invalid audio data");
+            }
         }
         catch (Exception e)
         {
-            Debug.LogError($"오디오 스트림 처리 중 오류: {e.Message}");
+            Debug.LogError($"[Audio] Processing error: {e.GetType().Name} - {e.Message}\nStack: {e.StackTrace}");
         }
     }
 
@@ -285,15 +300,17 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
     /// </summary>
     private void StartAudioBuffer()
     {
-        // 버퍼에 충분한 데이터가 있고 현재 재생 중이 아닐 때
+        Debug.Log($"[Audio] Buffer status - Size: {audioBuffer.Count}, IsPlaying: {isPlaying}");
+        
         if (audioBuffer.Count >= BUFFER_THRESHOLD && !isPlaying)
         {
-            // 이전 재생 코루틴이 있다면 중지
             if (playCoroutine != null)
             {
+                Debug.Log("[Audio] Stopping previous coroutine");
                 StopCoroutine(playCoroutine);
             }
-            // 새로운 재생 코루틴 시작
+            
+            Debug.Log("[Audio] Starting new playback coroutine");
             playCoroutine = StartCoroutine(PlayBufferedAudio());
         }
     }
