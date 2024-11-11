@@ -3,7 +3,8 @@ using Photon.Pun;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine.UI;  // Text 컴포넌트 사용을 위해 추가
+using UnityEngine.UI;
+using System.Linq;  // Text 컴포넌트 사용을 위해 추가
 
 /// <summary>
 /// 개별 플레이어의 AI 통역 관련 기능을 처리하는 컴포넌트
@@ -302,7 +303,10 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
     {
         Debug.Log($"[Audio] Buffer status - Size: {audioBuffer.Count}, IsPlaying: {isPlaying}");
         
-        if (audioBuffer.Count >= BUFFER_THRESHOLD && !isPlaying)
+        // BUFFER_THRESHOLD 값을 더 작게 조정
+        const int MIN_BUFFER_SIZE = 4800;  // 0.2초 분량
+        
+        if (audioBuffer.Count >= MIN_BUFFER_SIZE && !isPlaying)
         {
             if (playCoroutine != null)
             {
@@ -321,11 +325,14 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
     private IEnumerator PlayBufferedAudio()
     {
         isPlaying = true;
+        Debug.Log("[Audio] Starting audio playback");
 
         while (audioBuffer.Count > 0 && !isAudioCancelled)
         {
-            // 버퍼에서 일정량의 샘플 추출
-            int sampleCount = Mathf.Min(audioBuffer.Count, BUFFER_THRESHOLD);
+            // 버퍼 크기를 더 작게 조정
+            int sampleCount = Mathf.Min(audioBuffer.Count, 4800);  // 0.2초 분량
+            Debug.Log($"[Audio] Playing chunk of {sampleCount} samples");
+            
             float[] playbackSamples = audioBuffer.GetRange(0, sampleCount).ToArray();
             audioBuffer.RemoveRange(0, sampleCount);
 
@@ -334,15 +341,23 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
                 sampleCount, 1, RECORDING_FREQUENCY, false);
             clip.SetData(playbackSamples, 0);
 
-            // 오디오 재생
-            translatedAudioSource.clip = clip;
-            translatedAudioSource.Play();
-
-            // 클립 길이만큼 대기
-            yield return new WaitForSeconds(clip.length);
+            if (translatedAudioSource != null)
+            {
+                translatedAudioSource.clip = clip;
+                translatedAudioSource.Play();
+                Debug.Log($"[Audio] Playing clip of length: {clip.length}s");
+                
+                // 클립이 실제로 재생될 때까지 짧게 대기
+                yield return new WaitForSeconds(clip.length + 0.05f);
+            }
+            else
+            {
+                Debug.LogError("[Audio] AudioSource is null!");
+                break;
+            }
         }
 
-        // 재생 상태 초기화
+        Debug.Log("[Audio] Playback completed");
         isPlaying = false;
         playCoroutine = null;
     }
