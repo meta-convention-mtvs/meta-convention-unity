@@ -174,16 +174,21 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
         int position = Microphone.GetPosition(null);
         Debug.Log($"[Debug] 녹음 중지 전 position: {position}");
         
-        // 마이크 녹음 중지
-        Microphone.End(null);
-        isRecording = false;
-        
         // position이 유효한 경우에만 처리
         if (position > 0)
         {
-            // 녹음된 오디오를 base64 문자열로 변환하여 전송
-            string audioData = ConvertAudioToBase64();
+            // 녹음된 데이터를 임시 배열에 저장
+            float[] samples = new float[position];
+            recordingClip.GetData(samples, 0);
+            
+            // 마이크 녹음 중지
+            Microphone.End(null);
+            isRecording = false;
+            
+            // 저장된 샘플을 base64로 변환
+            string audioData = ConvertAudioToBase64(samples);
             print("오디오 변환 성공 -> audioData: " + audioData);
+            
             if (!string.IsNullOrEmpty(audioData))
             {
                 // 오디오 데이터 전송
@@ -191,13 +196,11 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
                 // 발언 종료 신호 전송
                 TranslationManager.Instance.DoneSpeech();
             }
-            else
-            {
-                Debug.LogWarning("녹음된 오디오 데이터가 없거나 변환에 실패했습니다.");
-            }
         }
         else
         {
+            Microphone.End(null);
+            isRecording = false;
             Debug.LogWarning("녹음된 데이터가 없습니다.");
         }
 
@@ -208,24 +211,16 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
     /// <summary>
     /// 녹음된 오디오 데이터를 base64 문자열로 변환
     /// </summary>
-    private string ConvertAudioToBase64()
+    private string ConvertAudioToBase64(float[] samples)
     {
-        int position = Microphone.GetPosition(null);
-        Debug.Log($"[Debug] 초기 position 값: {position}");
-        if (position <= 0) {
-            Debug.LogWarning("[Debug] position이 0 이하입니다.");
+        if (samples == null || samples.Length == 0)
+        {
+            Debug.LogWarning("[Debug] 샘플 데이터가 비어있습니다.");
             return string.Empty;
         }
         
-        Debug.Log($"[Debug] 녹음 클립 길이: {recordingClip.length}초");
-        Debug.Log($"[Debug] 녹음 클립 샘플 수: {recordingClip.samples}");
-        
-        float[] samples = new float[position];
-        recordingClip.GetData(samples, 0);
-        
         Debug.Log($"[Debug] 샘플 배열 크기: {samples.Length}");
-        Debug.Log($"[Debug] 첫 번째 샘플 값: {(samples.Length > 0 ? samples[0].ToString() : "없음")}");
-
+        
         // float[] to byte[] 변환
         short[] intData = new short[samples.Length];
         byte[] bytesData = new byte[samples.Length * 2];
