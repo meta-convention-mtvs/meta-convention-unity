@@ -199,26 +199,32 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
     private string ConvertAudioToBase64()
     {
         int position = Microphone.GetPosition(null);
-        if (position <= 0) return string.Empty;  // 녹음된 데이터가 없으면 빈 문자열 반환
+        Debug.Log($"[Debug] 초기 position 값: {position}");
+        if (position <= 0) {
+            Debug.LogWarning("[Debug] position이 0 이하입니다.");
+            return string.Empty;
+        }
         
-        Debug.Log($"실제 녹음 위치: {position}");
-        Debug.Log($"예상 시간(초): {position / (float)RECORDING_FREQUENCY}");
+        Debug.Log($"[Debug] 녹음 클립 길이: {recordingClip.length}초");
+        Debug.Log($"[Debug] 녹음 클립 샘플 수: {recordingClip.samples}");
         
         float[] samples = new float[position];
         recordingClip.GetData(samples, 0);
+        
+        Debug.Log($"[Debug] 샘플 배열 크기: {samples.Length}");
+        Debug.Log($"[Debug] 첫 번째 샘플 값: {(samples.Length > 0 ? samples[0].ToString() : "없음")}");
 
         // float[] to byte[] 변환
         short[] intData = new short[samples.Length];
         byte[] bytesData = new byte[samples.Length * 2];
-        float rescaleFactor = 32767f;  // float를 16비트 정수로 변환하기 위한 스케일 팩터
+        float rescaleFactor = 32767f;
 
-        // 각 샘플을 16비트 정수로 변환
+        int nonZeroSamples = 0;
         for (int i = 0; i < samples.Length; i++)
         {
             float sample = samples[i];
-            // 노이즈 제거
-            if (Mathf.Abs(sample) < 0.001f)
-                sample = 0f;
+            if (Mathf.Abs(sample) >= 0.001f)
+                nonZeroSamples++;
             
             // 클리핑 방지
             if (sample > 1f) sample = 1f;
@@ -226,11 +232,14 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
             
             intData[i] = (short)(sample * rescaleFactor);
         }
+        
+        Debug.Log($"[Debug] 0이 아닌 샘플 수: {nonZeroSamples}");
 
-        // short 배열을 byte 배열로 변환
         Buffer.BlockCopy(intData, 0, bytesData, 0, bytesData.Length);
-        // byte 배열을 base64 문자열로 변환
-        return Convert.ToBase64String(bytesData);
+        string result = Convert.ToBase64String(bytesData);
+        Debug.Log($"[Debug] 최종 base64 문자열 길이: {result.Length}");
+        
+        return result;
     }
 
     /// <summary>
