@@ -50,8 +50,12 @@ public class AIConnectionMgr : MonoBehaviour
     public InputField situ_input;
     public InputField lang_input;
 
-    public string[] industryTypes = new string[1];
-    public string[] interests = new string[1];
+    public GameObject sendCanvas;
+    public GameObject ccbCanvas;
+    private CheckCheckBox ccb;
+
+    public string[] industryTypes;
+    public string[] interests;
     public string situDescription;
     public string lang;
 
@@ -105,38 +109,52 @@ public class AIConnectionMgr : MonoBehaviour
  "Vehicle Tech and Advanced Mobility",
  "Video"};
 
+    #region 서머리 테스트 함수(사용 안함)
+    // 테스트용
+    //public void OnClickTestRequest()
+    //{
+    //    // 테스트용 url
+    //    url = "http://ec2-3-36-111-173.ap-northeast-2.compute.amazonaws.com:6576/summary";
+    //    RequestTestRequest(url);
+    //}
 
-    public void OnClickTestRequest()
-    {
-        // 테스트용 url
-        url = "http://ec2-3-36-111-173.ap-northeast-2.compute.amazonaws.com:6576/";
-        RequestTestRequest(url);
-    }
+    //public void RequestTestRequest(string url)
+    //{
+    //    StartCoroutine(IRequestTestRecommendation(url));
+    //}
 
-    public void RequestTestRequest(string url)
-    {
-        StartCoroutine(IRequestTestRecommendation(url));
-    }
+    //IEnumerator IRequestTestRecommendation(string url)
+    //{
 
-    IEnumerator IRequestTestRecommendation(string url)
-    {
-        using(UnityWebRequest www = UnityWebRequest.Get(url))
-        {
-            yield return www.SendWebRequest();
+    //    string jsonData = "{\"user_id\":\"none\", \"org_id\":\"abcd\",\"lang\":\"ko\"}";
+    //    using (UnityWebRequest www = UnityWebRequest.PostWwwForm(url,""))
+    //    {
+    //        www.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(jsonData));
+    //        www.downloadHandler = new DownloadHandlerBuffer();
+    //        www.SetRequestHeader("Content-Type", "application/json");
+    //        yield return www.SendWebRequest();
 
-            if (www.result == UnityWebRequest.Result.Success)
-            {
-                Debug.LogError(www.downloadHandler.text);
-                companyName.text = www.downloadHandler.text;
+    //        if (www.result == UnityWebRequest.Result.Success)
+    //        {
+    //            JObject jsonObject = JObject.Parse(www.downloadHandler.text);
+
+    //            string receiveJsonData = jsonObject["result"].ToString();
+    //            print("Received Json : " + receiveJsonData);
+
+    //            Debug.LogError(www.downloadHandler.text);
+    //            companyName.text = www.downloadHandler.text;
 
 
-            }
-            else
-            {
-                Debug.LogError(www.error);
-            }
-        }
-    }
+    //        }
+    //        else
+    //        {
+    //            Debug.LogError(www.error);
+    //        }
+    //    }
+    //}
+    #endregion
+
+
     public void OnClickSendRecommendRequest()
     {
         // 테스트용 url 
@@ -156,10 +174,21 @@ public class AIConnectionMgr : MonoBehaviour
     IEnumerator IRequestRecommend(string url)
     {
         // TODO: 받아온 유저의 관심분야 데이터를 jsonData로 변환해서 보내야 함..
+        // checkcheckbox에서 List 받아와서 interests 에 항목 넣어서 셋팅
         //string jsonData = JsonUtility.ToJson(userInfo);
         
+        industryTypes = new string[1];
         industryTypes[0] = industry_input.text;
-        interests[0] = interest_input.text;
+        ccb = ccbCanvas.GetComponent<CheckCheckBox>();
+    
+        interests = new string[ccb.selectedIndices.Count];
+        
+        for(int i = 0; i < ccb.selectedIndices.Count; i++)
+        {
+            print(ccb.selectedIndices[i]);
+            interests[i] = (string)fields[ccb.selectedIndices[i]];
+        }
+        // interests[0] = interest_input.text;
         situDescription = situ_input.text;
         lang = lang_input.text;
 
@@ -205,6 +234,12 @@ public class AIConnectionMgr : MonoBehaviour
                 Debug.LogError(www.error);
             }
         }
+    }
+
+    public void OnClickSubmit()
+    {
+        ccbCanvas.SetActive(false);
+        sendCanvas.SetActive(true);
     }
 }
 
