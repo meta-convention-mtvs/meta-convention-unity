@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Security.Policy;
@@ -22,15 +23,19 @@ public class SummaryMgr : MonoBehaviour
     {
         // 테스트용 url
         url = "http://ec2-3-36-111-173.ap-northeast-2.compute.amazonaws.com:6576/summary";
-        RequestSummary(url);
+        RequestSummary(url,ttttt );
     }
 
-    public void RequestSummary(string url)
+    public void ttttt(string t)
     {
-        StartCoroutine(IRequestSummary(url));
+
+    }
+    public void RequestSummary(string url, Action<string> OnReceived)
+    {
+        StartCoroutine(IRequestSummary(url, OnReceived));
     }
 
-    IEnumerator IRequestSummary(string url)
+    IEnumerator IRequestSummary(string url, Action<string> OnReceived)
     {
 
         string jsonData = "{\"user_id\":\"none\", \"org_id\":\"abcd\",\"lang\":\"ko\"}";
@@ -48,7 +53,7 @@ public class SummaryMgr : MonoBehaviour
 
                 TakeSummary takeSummary = JsonConvert.DeserializeObject<TakeSummary>(receiveJsonData);
 
-                summaryText.text = takeSummary.summary;
+                OnReceived?.Invoke(takeSummary.summary);
 
                 Debug.LogError(takeSummary);
 

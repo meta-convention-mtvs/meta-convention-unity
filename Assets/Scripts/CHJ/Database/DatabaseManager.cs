@@ -4,14 +4,20 @@ using UnityEngine;
 using System;
 using Firebase.Firestore;
 using System.Threading.Tasks;
+using Firebase.Storage;
+using System.IO;
+using Firebase.Extensions;
+using UnityEngine.Networking;
 
 public class DatabaseManager : Singleton<DatabaseManager>
 {
     FirebaseFirestore store;
+    FirebaseStorage storage;
 
-    private void Start()
+    private void Awake()
     {
         store = FirebaseFirestore.DefaultInstance;
+        storage = FirebaseStorage.DefaultInstance;
     }
 
     public void SaveData<T>(T info) where T : class
@@ -39,11 +45,11 @@ public class DatabaseManager : Singleton<DatabaseManager>
 
 
 
-    public void GetData<T>(Action<T> OnComplete)  where T :class
+    public void GetData<T>(Action<T> OnComplete) where T : class
     {
-        StartCoroutine(CoLoadUserInfo<T>( OnComplete));
+        StartCoroutine(CoLoadUserInfo<T>(OnComplete));
     }
-    IEnumerator CoLoadUserInfo<T>(Action<T> onComplete) where T: class
+    IEnumerator CoLoadUserInfo<T>(Action<T> onComplete) where T : class
     {
         // 저장 경로 USER/ID/내 정보
         string path = "USER/" + FireAuthManager.Instance.GetCurrentUser().UserId + "/" + "Data/" + typeof(T).ToString();
@@ -85,4 +91,159 @@ public class DatabaseManager : Singleton<DatabaseManager>
         return default(T);
     }
 
+
+
+    public void UploadImage(string localFilePath)
+    {
+        // Storage 참조 설정
+        var storageRef = storage.GetReferenceFromUrl("gs://metaconvention.appspot.com");
+        var fileRef = storageRef.Child("images/" + FireAuthManager.Instance.GetCurrentUser().UserId + "/" + Path.GetFileName(localFilePath));
+
+        // 파일 업로드
+        fileRef.PutFileAsync(localFilePath).ContinueWithOnMainThread(task =>
+        {
+            if (task.IsCompleted)
+            {
+                Debug.Log("이미지 업로드 성공");
+                fileRef.GetDownloadUrlAsync().ContinueWithOnMainThread(urlTask =>
+                {
+                    if (!urlTask.IsFaulted && !urlTask.IsCanceled)
+                    {
+                        string downloadUrl = urlTask.Result.ToString();
+                        Debug.Log("다운로드 URL: " + downloadUrl);
+                    }
+                });
+            }
+            else
+            {
+                Debug.LogError("이미지 업로드 실패: " + task.Exception);
+            }
+        });
+    }
+
+    public void DownloadImage(string imageFileName, Action<Texture2D> OnTextureLoad)
+    {
+        var storageRef = storage.GetReferenceFromUrl("gs://metaconvention.appspot.com");
+        var fileRef = storageRef.Child("images/" + FireAuthManager.Instance.GetCurrentUser().UserId + "/" + imageFileName);
+
+        fileRef.GetDownloadUrlAsync().ContinueWithOnMainThread(task =>
+        {
+            if (task.IsCompleted)
+            {
+                string downloadUrl = task.Result.ToString();
+                Debug.Log("이미지 다운로드 URL: " + downloadUrl);
+
+                // URL을 통해 비디오 재생
+                StartCoroutine(CoDownloadImage(downloadUrl, OnTextureLoad));
+            }
+            else
+            {
+                Debug.LogError("이미지 URL 가져오기 실패: " + task.Exception);
+            }
+        });
+    }
+
+    private IEnumerator CoDownloadImage(string url, Action<Texture2D> OnTextureLoad)
+    {
+        using (UnityWebRequest www = UnityWebRequestTexture.GetTexture(url))
+        {
+            yield return www.SendWebRequest();
+
+            if (www.result != UnityWebRequest.Result.Success)
+            {
+                Debug.LogError("이미지 다운로드 실패: " + www.error);
+            }
+            else
+            {
+                // 다운로드한 텍스처를 RawImage에 적용
+                Texture2D texture = ((DownloadHandlerTexture)www.downloadHandler).texture;
+                OnTextureLoad?.Invoke(texture);
+                Debug.Log("이미지 다운로드 성공");
+            }
+        }
+    }
+
+    public void UploadVideo(string localFilePath)
+    {
+        // Storage 참조 설정
+        var storageRef = storage.GetReferenceFromUrl("gs://metaconvention.appspot.com");
+        var fileRef = storageRef.Child("videos/" + FireAuthManager.Instance.GetCurrentUser().UserId + "/" + Path.GetFileName(localFilePath));
+
+        // 파일 업로드
+        fileRef.PutFileAsync(localFilePath).ContinueWithOnMainThread(task =>
+        {
+            if (task.IsCompleted)
+            {
+                Debug.Log("비디오 업로드 성공");
+                fileRef.GetDownloadUrlAsync().ContinueWithOnMainThread(urlTask =>
+                {
+                    if (!urlTask.IsFaulted && !urlTask.IsCanceled)
+                    {
+                        string downloadUrl = urlTask.Result.ToString();
+                        Debug.Log("다운로드 URL: " + downloadUrl);
+                    }
+                });
+            }
+            else
+            {
+                Debug.LogError("비디오 업로드 실패: " + task.Exception);
+            }
+        });
+    }
+
+    public void DownLoadVideo(string videoFileName, Action<string> OnVideoLoad)
+    {
+        // Storage 참조 설정
+        var storageRef = storage.GetReferenceFromUrl("gs://metaconvention.appspot.com");
+        var fileRef = storageRef.Child("videos/" + FireAuthManager.Instance.GetCurrentUser().UserId + "/" + videoFileName);
+
+
+        fileRef.GetDownloadUrlAsync().ContinueWithOnMainThread(task =>
+        {
+            if (task.IsCompleted)
+            {
+                string downloadUrl = task.Result.ToString();
+                Debug.Log("비디오 다운로드 URL: " + downloadUrl);
+                OnVideoLoad?.Invoke(downloadUrl);
+       
+            }
+            else
+            {
+                Debug.LogError("비디오 URL 가져오기 실패: " + task.Exception);
+            }
+        });
+    }
+
+    public void UploadObject(string localFilePath)
+    {
+        // Storage 참조 설정
+        var storageRef = storage.GetReferenceFromUrl("gs://metaconvention.appspot.com");
+        var fileRef = storageRef.Child("objects/" + FireAuthManager.Instance.GetCurrentUser().UserId + "/" + Path.GetFileName(localFilePath));
+
+        // 파일 업로드
+        fileRef.PutFileAsync(localFilePath).ContinueWithOnMainThread(task =>
+        {
+            if (task.IsCompleted)
+            {
+                Debug.Log("오브젝트 업로드 성공");
+                fileRef.GetDownloadUrlAsync().ContinueWithOnMainThread(urlTask =>
+                {
+                    if (!urlTask.IsFaulted && !urlTask.IsCanceled)
+                    {
+                        string downloadUrl = urlTask.Result.ToString();
+                        Debug.Log("다운로드 URL: " + downloadUrl);
+                    }
+                });
+            }
+            else
+            {
+                Debug.LogError("오브젝트 업로드 실패: " + task.Exception);
+            }
+        });
+    }
+
+    public void DownloadObject(string obejctFileName, Action<string> OnObjectLoad)
+    {
+
+    }
 }

@@ -12,9 +12,11 @@ public class LoadDataFromServer : MonoBehaviour
     // 로그인 정보를 바탕으로 데이터베이스에서 데이터를 불러온다.
     Card userCardData;
     CharacterCustomizeData userCharacterCustomizeData;
+    UserTypeData userTypeData;
 
     bool cardDataLoadedComplete;
     bool customizeDataLoadedComplete;
+    bool userTypeDataLoadedComplete;
 
     bool isSceneLoading = false;
 
@@ -27,10 +29,10 @@ public class LoadDataFromServer : MonoBehaviour
 
     private void Update()
     {
-        if(cardDataLoadedComplete && customizeDataLoadedComplete && !isSceneLoading)
+        if(cardDataLoadedComplete && customizeDataLoadedComplete && userTypeDataLoadedComplete && !isSceneLoading)
         {
             // 카드 만드는 씬으로 넘어간다.
-            if(userCardData == null || userCharacterCustomizeData == null)
+            if(userCardData == null || userCharacterCustomizeData == null || userTypeData == null)
             {
                 cardTransition.PerformTransition();
             }
@@ -49,6 +51,7 @@ public class LoadDataFromServer : MonoBehaviour
     {
         DatabaseManager.Instance.GetData<Card>((data) => { userCardData = data; cardDataLoadedComplete = true; });
         DatabaseManager.Instance.GetData<CharacterCustomizeData>((data) => { userCharacterCustomizeData = data; customizeDataLoadedComplete = true; });
+        DatabaseManager.Instance.GetData<UserTypeData>((data) => { userTypeData = data; userTypeDataLoadedComplete = true; });
 
     }
 

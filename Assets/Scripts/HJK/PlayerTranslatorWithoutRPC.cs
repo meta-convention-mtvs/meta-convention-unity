@@ -3,6 +3,7 @@ using Photon.Pun;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.UI;  // Text 컴포넌트 사용을 위해 추가
 
 /// <summary>
 /// 개별 플레이어의 AI 통역 관련 기능을 처리하는 컴포넌트
@@ -23,7 +24,6 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
 
     // 설정값들
     [SerializeField] private KeyCode speakKey = KeyCode.M;      // 발언 시작/종료 키
-    [SerializeField] private GameObject cantSpeakUI;            // 발언 불가 시 표시할 UI
     [SerializeField] private float maxRecordingTime = 60f;      // 최대 녹음 시간(초)
     [SerializeField] private KeyCode cancelKey = KeyCode.Escape; // 발언 취소 키
 
@@ -39,9 +39,10 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
     private bool isAudioCancelled = false;                    // 오디오 재생 취소 여부
 
     // UI 요소들
-    [SerializeField] private GameObject speakButton;           // 발언 가능 상태 표시 UI
-    [SerializeField] private GameObject waitingText;           // 대기 상태 표시 UI
-    [SerializeField] private TMPro.TextMeshProUGUI errorMessageUI; // 에러 메시지 UI
+    [SerializeField] private GameObject cantSpeakUI;            // 발언 불가 시 표시할 UI
+    [SerializeField] private GameObject speakButton;            // 발언 가능 상태 표시 UI
+    [SerializeField] private GameObject waitingText;            // 대기 상태 표시 UI
+    [SerializeField] private Text errorMessageUI;               // 에러 메시지 UI (TMP -> Text)
 
     // 에러 메시지 관련
     private float errorMessageDisplayTime = 3f;                // 에러 메시지 표시 시간
@@ -83,9 +84,6 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
     /// </summary>
     private void Update()
     {
-        // 자신의 플레이어가 아니면 입력 처리하지 않음
-        if (!photonView.IsMine) return;
-
         // 발언 키(M) 눌렀을 때
         if (Input.GetKeyDown(speakKey))
         {
@@ -120,7 +118,7 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
     /// </summary>
     private void TryStartRecording()
     {
-        string userId = photonView.Owner.UserId;
+        string userId = FireAuthManager.Instance.GetCurrentUser().UserId;
         if (!TranslationEventHandler.Instance.IsRoomReady)
         {
             ShowWaitingUI("통역을 시작하려면 다른 언어 사용자가 필요합니다");
@@ -128,7 +126,7 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
         }
 
         // 발언 가능한지 확인
-        if (!string.IsNullOrEmpty(TranslationEventHandler.Instance.CurrentSpeakerId))
+        if (!string.IsNullOrEmpty(TranslationEventHandler.Instance.CurrentSpeakerId) && TranslationEventHandler.Instance.CurrentSpeakerId != userId)
         {
             ShowWaitingUI("이미 상대방이 통역 중입니다");
             return;
@@ -143,8 +141,10 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
     /// </summary>
     private void StartRecording()
     {
+        print("StartRecording(녹음 시작됨)");
         // currentSpeakerId 참조를 TranslationEventHandler로 변경
-        if (!string.IsNullOrEmpty(TranslationEventHandler.Instance.CurrentSpeakerId)) return;
+        print("CurrentSpeakerId: " + TranslationEventHandler.Instance.CurrentSpeakerId);
+        // if (!string.IsNullOrEmpty(TranslationEventHandler.Instance.CurrentSpeakerId)) return;
 
         isRecording = true;
         recordingPosition = 0;
@@ -166,14 +166,17 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
     /// </summary>
     private void StopRecording()
     {
+        print("StopRecording(일단 실행됨)");
         if (!isRecording) return;
-
+        print("StopRecording(녹음 중지됨)");
+        
         // 마이크 녹음 중지
         Microphone.End(null);
         isRecording = false;
         
         // 녹음된 오디오를 base64 문자열로 변환하여 전송
         string audioData = ConvertAudioToBase64();
+        print("오디오 변환 성공 -> audioData: " + audioData);
         if (!string.IsNullOrEmpty(audioData))
         {
             // 오디오 데이터 전송
@@ -361,7 +364,7 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
     /// </summary>
     private void CancelRecording()
     {
-        string userId = photonView.Owner.UserId;
+        string userId = FireAuthManager.Instance.GetCurrentUser().UserId;
         if (TranslationEventHandler.Instance.CurrentSpeakerId != userId) return;
 
         if (isRecording)
@@ -398,8 +401,10 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
     /// </summary>
     public void OnSpeechApproved(string approvedUserId)
     {
-        if (photonView.Owner.UserId == approvedUserId)
+        print("OnSpeechApproved(발언권 승인됨)");
+        if (FireAuthManager.Instance.GetCurrentUser().UserId == approvedUserId)
         {
+            print("if문 통과함");
             ShowCanSpeakUI();
             StartRecording();
         }
@@ -410,6 +415,7 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
     /// </summary>
     public void HandleError(string errorMessage)
     {
+        print("HandleError(에러 발생됨)");
         // 현재 녹음 중이면 녹음 중지
         if (isRecording)
         {
@@ -456,9 +462,9 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
 
     private void ShowWaitingUI(string message)
     {
-        if (waitingText != null && waitingText.GetComponent<TMPro.TextMeshProUGUI>() != null)
+        if (waitingText != null && waitingText.GetComponent<Text>() != null)
         {
-            waitingText.GetComponent<TMPro.TextMeshProUGUI>().text = message;
+            waitingText.GetComponent<Text>().text = message;
             waitingText.SetActive(true);
         }
     }

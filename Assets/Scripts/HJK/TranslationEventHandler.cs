@@ -49,7 +49,6 @@ public class TranslationEventHandler : Singleton<TranslationEventHandler>
         manager.OnCompleteAudioReceived += DistributeCompleteTranslatedAudio;
         manager.OnSpeechApproved += HandleApprovedSpeech;
         manager.OnError += HandleError;
-        manager.OnCompleteAudioReceived += HandleAudioDone;  // 오디오 완료 이벤트 구독 추가
         
         Debug.Log("[TranslationEventHandler] Events subscribed successfully");
     }
@@ -65,7 +64,6 @@ public class TranslationEventHandler : Singleton<TranslationEventHandler>
             manager.OnCompleteAudioReceived -= DistributeCompleteTranslatedAudio;
             manager.OnSpeechApproved -= HandleApprovedSpeech;
             manager.OnError -= HandleError;
-            manager.OnCompleteAudioReceived -= HandleAudioDone;  // 구독 해제 추가
         }
     }
 
@@ -105,12 +103,17 @@ public class TranslationEventHandler : Singleton<TranslationEventHandler>
         }
     }
 
-    private void DistributeCompleteTranslatedAudio(string base64Audio)
+    private void DistributeCompleteTranslatedAudio()
     {
         if (playerTranslator != null)
         {
             playerTranslator.FinalizeAudioPlayback();
         }
+        
+        // HandleAudioDone의 로직을 여기로 통합
+        Debug.Log("[TranslationEventHandler] Audio playback completed");
+        currentSpeakerId = "";
+        OnSpeakerChanged?.Invoke("");
     }
 
     private void HandleApprovedSpeech(string userId)
@@ -135,10 +138,17 @@ public class TranslationEventHandler : Singleton<TranslationEventHandler>
 
     private void UpdateUI(bool isReady)
     {
-        if (playerTranslator != null)
-        {
-            playerTranslator.UpdateSpeakUI(isReady);
-        }
+        // 발언 가능 상태 UI 업데이트
+        //var translators = FindObjectsOfType<PlayerTranslator>();
+        //foreach (var translator in translators)
+        //{
+        //    if (translator.photonView.IsMine)
+        //    {
+        //        translator.UpdateSpeakUI(isReady);
+        //        break;
+        //    }
+        //}
+        playerTranslator.UpdateSpeakUI(isReady);
     }
 
     private void HandleUserCountChange(int userCount)
@@ -173,14 +183,6 @@ public class TranslationEventHandler : Singleton<TranslationEventHandler>
     {
         var user = currentUsers.FirstOrDefault(u => (u["userid"] as string) == userId);
         return user?["lang"] as string;
-    }
-
-    // 오디오 완료 처리 메서드 추가
-    private void HandleAudioDone(string _)
-    {
-        Debug.Log("[TranslationEventHandler] Audio playback completed");
-        currentSpeakerId = "";
-        OnSpeakerChanged?.Invoke("");
     }
 
     // 발언자 상태 초기화 메서드
