@@ -26,6 +26,8 @@ public class BoothCustomizingManager : MonoBehaviour
     private void Start()
     {
         boothCustomizeData = new BoothCustomizeData();
+        // 1로 초기화시킨다.
+        boothCustomizeData.modelingScale = 1;
         LoadGamePrefab(boothPrefabs);
     }
 
@@ -45,6 +47,7 @@ public class BoothCustomizingManager : MonoBehaviour
     {
         display.OnObjectButtonClick += ShowModelingFileUploder;
         display.OnVideoButtonClick += ShowVideoFileUploder;
+        display.OnObjectSliderChanged += SetModelingScale;
     }
     private void Update()
     {
@@ -124,12 +127,23 @@ public class BoothCustomizingManager : MonoBehaviour
         FileUploadManager.Instance.ShowDialog(SetModeling);
     }
 
+    void ShowBoothFileUploader()
+    {
+        FileUploadManager.Instance.SetUpObjFileBrowser();
+        FileUploadManager.Instance.ShowDialog(SetBoothObject);
+    }
+
     void ShowVideoFileUploder()
     {
         FileUploadManager.Instance.SetUpVideoFileBrowser();
         FileUploadManager.Instance.ShowDialog(SetVideoClip);
     }
 
+    void SetModelingScale(float size)
+    {
+        boothCustomizeData.modelingScale = size;
+        boothDataChanged = true;
+    }
     void SetColor(Vector3 HSV)
     {
         boothCustomizeData.color = Color.HSVToRGB(HSV.x, HSV.y, HSV.z);
@@ -142,6 +156,12 @@ public class BoothCustomizingManager : MonoBehaviour
         boothObjectModelingChanged = true;
     }
 
+    void SetBoothObject(string[] paths)
+    {
+        string path = paths[0];
+        boothCustomizeData.boothObjectPath = path;
+
+    }
     void SetLogoImage(string[] paths)
     {
         string path = paths[0];
@@ -173,6 +193,18 @@ public class BoothCustomizingManager : MonoBehaviour
     {
         DatabaseManager.Instance.SaveData<BoothCustomizeData>(boothCustomizeData);
     }
+
+    public bool CanSaveData()
+    {
+        if (boothCustomizeData.companyName != null)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
 }
 
 // Firebase에 저장해 놓을 데이터
@@ -181,6 +213,8 @@ public class BoothCustomizeData
 {
     [FirestoreProperty]
     public BoothCategory category { get; set; }
+    [FirestoreProperty]
+    public string boothObjectPath { get; set; }
     [FirestoreProperty]
     public string companyName { get; set; }
     [FirestoreProperty]

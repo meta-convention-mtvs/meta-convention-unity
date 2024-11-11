@@ -13,45 +13,45 @@ public class CheckCheckBox : MonoBehaviour
 
     void Start()
     {
-        GenerateToggles(AIConnectionMgr.fields.Length);  // 10개의 체크박스를 생성 (원하는 수로 변경 가능)
+        //GenerateToggles(AIConnectionMgr.fields.Length);  // 10개의 체크박스를 생성 (원하는 수로 변경 가능)
     }
 
-    void GenerateToggles(int count)
-    {
-        // 원래 있던 토글들은 제거하고 생성해줘 (스크롤 바는 제거하지 않음)
-        foreach (Transform child in panel)
-        {
-            if (child.GetComponent<Toggle>() != null)
-            {
-                Destroy(child.gameObject);
-            }
-        }
-        toggles.Clear();
+    //void GenerateToggles(int count)
+    //{
+    //    // 원래 있던 토글들은 제거하고 생성해줘 (스크롤 바는 제거하지 않음)
+    //    foreach (Transform child in panel)
+    //    {
+    //        if (child.GetComponent<Toggle>() != null)
+    //        {
+    //            Destroy(child.gameObject);
+    //        }
+    //    }
+    //    toggles.Clear();
 
-        for (int i = 0; i < count; i++)
-        {
-            // 프리팹 인스턴스화
-            GameObject toggleInstance = Instantiate(togglePrefab, panel);
-            Toggle toggle = toggleInstance.GetComponent<Toggle>();
+    //    for (int i = 0; i < count; i++)
+    //    {
+    //        // 프리팹 인스턴스화
+    //        GameObject toggleInstance = Instantiate(togglePrefab, panel);
+    //        Toggle toggle = toggleInstance.GetComponent<Toggle>();
 
-            if (toggle != null)
-            {
-                // 인덱스 부여
-                int index = i;
-                toggles.Add(toggle);
+    //        if (toggle != null)
+    //        {
+    //            // 인덱스 부여
+    //            int index = i;
+    //            toggles.Add(toggle);
 
-                // 인덱스에 따라 라벨 텍스트 설정
-                Text label = toggle.GetComponentInChildren<Text>();
-                if (label != null)
-                {
-                    label.text = AIConnectionMgr.fields[i];
-                }
+    //            // 인덱스에 따라 라벨 텍스트 설정
+    //            Text label = toggle.GetComponentInChildren<Text>();
+    //            if (label != null)
+    //            {
+    //                //label.text = AIConnectionMgr.fields[i];
+    //            }
 
-                // 이벤트 리스너 설정
-                toggle.onValueChanged.AddListener((isOn) => OnToggleValueChanged(index, isOn));
-            }
-        }
-    }
+    //            // 이벤트 리스너 설정
+    //            toggle.onValueChanged.AddListener((isOn) => OnToggleValueChanged(index, isOn));
+    //        }
+    //    }
+    //}
 
     void OnToggleValueChanged(int index, bool isOn)
     {

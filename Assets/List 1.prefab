@@ -458,19 +458,7 @@ MonoBehaviour:
   m_Value: 0
   m_OnValueChanged:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 6787271492221918437}
-        m_TargetAssemblyTypeName: SetText, Assembly-CSharp
-        m_MethodName: SetTextInComponent
-        m_Mode: 5
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!1 &6153204131093601926
 GameObject:
   m_ObjectHideFlags: 0
@@ -979,6 +967,7 @@ MonoBehaviour:
   - {fileID: 8559430657863740689}
   - {fileID: 6736779944420538577}
   bannerButton: {fileID: 6959568718325217732}
+  objectSizeSlider: {fileID: 750224521799978356}
 --- !u!1 &8468304123328816921
 GameObject:
   m_ObjectHideFlags: 0
@@ -1102,7 +1091,7 @@ PrefabInstance:
     - target: {fileID: 1098255898888365363, guid: 9392a7e58d4c142e4ba373a8efc05e26,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -100
+      value: -200
       objectReference: {fileID: 0}
     - target: {fileID: 1098255898888365363, guid: 9392a7e58d4c142e4ba373a8efc05e26,
         type: 3}
@@ -1132,7 +1121,7 @@ PrefabInstance:
     - target: {fileID: 4924146267939021966, guid: 9392a7e58d4c142e4ba373a8efc05e26,
         type: 3}
       propertyPath: m_Text
-      value: "\uD06C\uAE30\n\n"
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4924146267939021966, guid: 9392a7e58d4c142e4ba373a8efc05e26,
         type: 3}
@@ -1152,7 +1141,7 @@ PrefabInstance:
     - target: {fileID: 4924146267939021966, guid: 9392a7e58d4c142e4ba373a8efc05e26,
         type: 3}
       propertyPath: m_FontData.m_Alignment
-      value: 3
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 4924146267939021966, guid: 9392a7e58d4c142e4ba373a8efc05e26,
         type: 3}
@@ -1216,6 +1205,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 14dab9f44f2fd8f4784d2bf26caa9e95, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  slider: {fileID: 750224521799978356}
 --- !u!1001 &177784702426600167
 PrefabInstance:
   m_ObjectHideFlags: 0

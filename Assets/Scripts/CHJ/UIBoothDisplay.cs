@@ -10,9 +10,11 @@ public class UIBoothDisplay : MonoBehaviour
     public Button videoButton;
     public Button[] furnitureButtons;
     public Button bannerButton;
+    public Slider objectSizeSlider;
 
     public Action OnObjectButtonClick, OnVideoButtonClick, OnBannerButtonClick;
     public Action[] OnFurnitureButtonClick;
+    public Action<float> OnObjectSliderChanged;
 
     private void Awake()
     {
@@ -35,6 +37,7 @@ public class UIBoothDisplay : MonoBehaviour
             furnitureButtons[i].onClick.AddListener(() => _OnFurnitureButtonClick(j));
         }
         bannerButton.onClick.AddListener(_OnBannerButtonClick);
+        objectSizeSlider.onValueChanged.AddListener(_OnObjectSliderChanged);
     }
 
     void _OnObjectButtonClick()
@@ -55,5 +58,10 @@ public class UIBoothDisplay : MonoBehaviour
     void _OnBannerButtonClick()
     {
         OnBannerButtonClick?.Invoke();
+    }
+
+    void _OnObjectSliderChanged(float f)
+    {
+        OnObjectSliderChanged?.Invoke(f);
     }
 }

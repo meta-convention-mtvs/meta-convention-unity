@@ -68,13 +68,17 @@ public class ColorPicker : MonoBehaviour, IPointerClickHandler, IBeginDragHandle
 
     void MousePositionColorPicker(PointerEventData eventData)
     {
-        Vector2 colorUV = GetNormalizedPointIn(eventData, rectTransform);
-        s = colorUV.x;
-        v = colorUV.y;
+        // Check if the pointer is within the rectTransform bounds
+        if (RectTransformUtility.RectangleContainsScreenPoint(rectTransform, eventData.position))
+        {
+            Vector2 colorUV = GetNormalizedPointIn(eventData, rectTransform);
+            s = colorUV.x;
+            v = colorUV.y;
 
-        SetColor(currentColorImage, h, s, v);
-        blackDot.gameObject.SetActive(true);
-        blackDotRt.transform.position = eventData.position;
+            SetColor(currentColorImage, h, s, v);
+            blackDot.gameObject.SetActive(true);
+            blackDotRt.transform.position = eventData.position;
+        }
     }
 
     Vector2 GetNormalizedPointIn(PointerEventData eventData, RectTransform rectTransform)

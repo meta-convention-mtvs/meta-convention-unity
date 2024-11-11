@@ -33,6 +33,10 @@ public class RenderBoothData : MonoBehaviour
         SetLogo(extraData.logoImage);
         SetColor(extraData.color);
         SetVideo(extraData.videoURL);
+        if (currentInstantiatedObject != null)
+        {
+            currentInstantiatedObject.transform.localScale = new Vector3(extraData.modelingScale, extraData.modelingScale, extraData.modelingScale);
+        }
     }
 
     public void RenderBoothModeling(BoothExtraData extraData)
@@ -42,6 +46,7 @@ public class RenderBoothData : MonoBehaviour
             Destroy(currentInstantiatedObject);
         }
         currentInstantiatedObject = ObjectLoader.ImportObj(extraData.modelingPath);
+        currentInstantiatedObject.transform.localScale = new Vector3(extraData.modelingScale, extraData.modelingScale, extraData.modelingScale);
     }
     void SetLogo(Texture2D images)
     {

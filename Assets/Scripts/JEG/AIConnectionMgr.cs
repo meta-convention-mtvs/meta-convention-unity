@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -43,71 +44,61 @@ public class AIConnectionMgr : MonoBehaviour
 {
     public string url;
 
-    public Text companyName;
-
-    public InputField industry_input;
-    public InputField interest_input;
     public InputField situ_input;
-    public InputField lang_input;
 
     public GameObject sendCanvas;
     public GameObject ccbCanvas;
-    private CheckCheckBox ccb;
 
-    public string[] industryTypes;
-    public string[] interests;
-    public string situDescription;
-    public string lang;
-
-    public static string[] fields = new string[49] {"3D Printing",
- "5G Technologies",
- "AR/VR/XR",
- "Accessibility",
- "Accessories",
- "AgTech",
- "Artificial Intelligence",
- "Audio",
- "Cloud Computing",
- "Construction Tech",
- "Content and EntertaInment",
- "Cybersecurity",
- "Defense",
- "Digital Health",
- "Drones",
- "Education Tech",
- "Energy Transition",
- "Energy/Power",
- "Enterprise",
- "Fashion Tech",
- "Fintech",
- "Fitness",
- "Food Tech",
- "Gaming and Esports",
- "Home Entertainment and Office Hardware",
- "Imaging",
- "Innovation",
- "Investing",
- "IoT/Sensors",
- "Lifestyle",
- "Marketing and Advertising",
- "Metaverse",
- "NFT",
- "Retail/E-Commerce",
- "Robotics",
- "Smart Cities",
- "Smart Home and Appliances",
- "Sourcing and Manufacturing",
- "Space Tech",
- "Sports",
- "Startups",
- "Streaming",
- "Style",
- "Supply and Logistics",
- "Sustainability",
- "Technology",
- "Travel and Tourism",
- "Vehicle Tech and Advanced Mobility",
- "Video"};
+    public Action<TestRecommendedCompany> OnReceivedRecommend; 
+ //   public static string[] fields = new string[49] {"3D Printing",
+ //"5G Technologies",
+ //"AR/VR/XR",
+ //"Accessibility",
+ //"Accessories",
+ //"AgTech",
+ //"Artificial Intelligence",
+ //"Audio",
+ //"Cloud Computing",
+ //"Construction Tech",
+ //"Content and EntertaInment",
+ //"Cybersecurity",
+ //"Defense",
+ //"Digital Health",
+ //"Drones",
+ //"Education Tech",
+ //"Energy Transition",
+ //"Energy/Power",
+ //"Enterprise",
+ //"Fashion Tech",
+ //"Fintech",
+ //"Fitness",
+ //"Food Tech",
+ //"Gaming and Esports",
+ //"Home Entertainment and Office Hardware",
+ //"Imaging",
+ //"Innovation",
+ //"Investing",
+ //"IoT/Sensors",
+ //"Lifestyle",
+ //"Marketing and Advertising",
+ //"Metaverse",
+ //"NFT",
+ //"Retail/E-Commerce",
+ //"Robotics",
+ //"Smart Cities",
+ //"Smart Home and Appliances",
+ //"Sourcing and Manufacturing",
+ //"Space Tech",
+ //"Sports",
+ //"Startups",
+ //"Streaming",
+ //"Style",
+ //"Supply and Logistics",
+ //"Sustainability",
+ //"Technology",
+ //"Travel and Tourism",
+ //"Vehicle Tech and Advanced Mobility",
+ //"Video"};
 
     #region 서머리 테스트 함수(사용 안함)
     // 테스트용
@@ -177,26 +168,8 @@ public class AIConnectionMgr : MonoBehaviour
         // checkcheckbox에서 List 받아와서 interests 에 항목 넣어서 셋팅
         //string jsonData = JsonUtility.ToJson(userInfo);
         
-        industryTypes = new string[1];
-        industryTypes[0] = industry_input.text;
-        ccb = ccbCanvas.GetComponent<CheckCheckBox>();
-    
-        interests = new string[ccb.selectedIndices.Count];
-        
-        for(int i = 0; i < ccb.selectedIndices.Count; i++)
-        {
-            print(ccb.selectedIndices[i]);
-            interests[i] = (string)fields[ccb.selectedIndices[i]];
-        }
-        // interests[0] = interest_input.text;
-        situDescription = situ_input.text;
-        lang = lang_input.text;
-
-        TestUserInfo userInfo = new TestUserInfo(industryTypes, interests, situDescription, lang);
-
-        string jsonData = JsonConvert.SerializeObject(userInfo, Formatting.None);
+        string jsonData = JsonConvert.SerializeObject(GetTestUserInfo(situ_input.text, "ko"), Formatting.None);
        
-
         //string jsonData = "{\"industry_type\":[\"항공\"], \"selected_interests\":[\"Vehicle Tech and Advanced Mobility\"],\"situation_description\":\"우주, 항공 산업에 관련되어 기체를 만드는 회사에 대해 궁금해\", \"language\":\"JP\" }";
         print(jsonData);
         using (UnityWebRequest www = UnityWebRequest.PostWwwForm(url, ""))
@@ -222,10 +195,10 @@ public class AIConnectionMgr : MonoBehaviour
 
                 for (int i = 0; i < recommendedCompany.Count(); i++)
                 {
-                Debug.Log("Company Name: " + recommendedCompany[i].company_name);
-
+                    Debug.Log("Company Name: " + recommendedCompany[i].company_name);
+                    OnReceivedRecommend?.Invoke(recommendedCompany[i]);
                 }
-                companyName.text = recommendedCompany[0].company_name;
+                //companyName.text = recommendedCompany[0].company_name;
 
                 // TODO: 받아온 데이터 UI 만들기..
                 // 어떻게 보이게 할 건지, 플로우 확인 되면 작업 
@@ -236,10 +209,24 @@ public class AIConnectionMgr : MonoBehaviour
         }
     }
 
+
+    TestUserInfo GetTestUserInfo(string situDescription, string lang)
+    {
+        TestUserInfo userInfo = new TestUserInfo(new string[]{ "-" }, new string[] { "-" }, situDescription, lang);
+        return userInfo;
+    }
+
     public void OnClickSubmit()
     {
         ccbCanvas.SetActive(false);
         sendCanvas.SetActive(true);
     }
+}
+
+[Firebase.Firestore.FirestoreData]
+public class Language
+{
+    [Firebase.Firestore.FirestoreProperty]
+    public string lang { get; set; }
 }
 

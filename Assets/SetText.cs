@@ -5,15 +5,17 @@ using UnityEngine.UI;
 
 public class SetText : MonoBehaviour
 {
+    public Slider slider;
     Text text;
 
     private void Start()
     {
         text = GetComponent<Text>();
+        slider.onValueChanged.AddListener(SetTextInComponent);
     }
 
-    public void SetTextInComponent(string s)
+    public void SetTextInComponent(float f)
     {
-        text.text = s;
+        text.text = f.ToString();
     }
 }
