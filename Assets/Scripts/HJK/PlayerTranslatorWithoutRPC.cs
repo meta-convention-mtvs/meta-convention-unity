@@ -170,23 +170,35 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
         if (!isRecording) return;
         print("StopRecording(녹음 중지됨)");
         
+        // 현재 position 저장
+        int position = Microphone.GetPosition(null);
+        Debug.Log($"[Debug] 녹음 중지 전 position: {position}");
+        
         // 마이크 녹음 중지
         Microphone.End(null);
         isRecording = false;
         
-        // 녹음된 오디오를 base64 문자열로 변환하여 전송
-        string audioData = ConvertAudioToBase64();
-        print("오디오 변환 성공 -> audioData: " + audioData);
-        if (!string.IsNullOrEmpty(audioData))
+        // position이 유효한 경우에만 처리
+        if (position > 0)
         {
-            // 오디오 데이터 전송
-            TranslationManager.Instance.SendAudioData(audioData);
-            // 발언 종료 신호 전송
-            TranslationManager.Instance.DoneSpeech();
+            // 녹음된 오디오를 base64 문자열로 변환하여 전송
+            string audioData = ConvertAudioToBase64();
+            print("오디오 변환 성공 -> audioData: " + audioData);
+            if (!string.IsNullOrEmpty(audioData))
+            {
+                // 오디오 데이터 전송
+                TranslationManager.Instance.SendAudioData(audioData);
+                // 발언 종료 신호 전송
+                TranslationManager.Instance.DoneSpeech();
+            }
+            else
+            {
+                Debug.LogWarning("녹음된 오디오 데이터가 없거나 변환에 실패했습니다.");
+            }
         }
         else
         {
-            Debug.LogWarning("녹음된 오디오 데이터가 없거나 변환에 실패했습니다.");
+            Debug.LogWarning("녹음된 데이터가 없습니다.");
         }
 
         // 발언자 상태 초기화
