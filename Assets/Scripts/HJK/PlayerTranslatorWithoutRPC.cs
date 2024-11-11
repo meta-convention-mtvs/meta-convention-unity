@@ -199,7 +199,7 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
     private string ConvertAudioToBase64()
     {
         int position = Microphone.GetPosition(null);
-        if (position <= 0) position = recordingClip.samples;
+        if (position <= 0) return string.Empty;  // 녹음된 데이터가 없으면 빈 문자열 반환
         
         Debug.Log($"실제 녹음 위치: {position}");
         Debug.Log($"예상 시간(초): {position / (float)RECORDING_FREQUENCY}");
