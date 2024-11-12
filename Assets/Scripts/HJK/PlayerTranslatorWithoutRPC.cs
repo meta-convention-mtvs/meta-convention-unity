@@ -3,7 +3,8 @@ using Photon.Pun;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine.UI;  // Text 컴포넌트 사용을 위해 추가
+using UnityEngine.UI;
+using System.Linq;  // Text 컴포넌트 사용을 위해 추가
 
 /// <summary>
 /// 개별 플레이어의 AI 통역 관련 기능을 처리하는 컴포넌트
@@ -170,23 +171,38 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
         if (!isRecording) return;
         print("StopRecording(녹음 중지됨)");
         
-        // 마이크 녹음 중지
-        Microphone.End(null);
-        isRecording = false;
+        // 현재 position 저장
+        int position = Microphone.GetPosition(null);
+        Debug.Log($"[Debug] 녹음 중지 전 position: {position}");
         
-        // 녹음된 오디오를 base64 문자열로 변환하여 전송
-        string audioData = ConvertAudioToBase64();
-        print("오디오 변환 성공 -> audioData: " + audioData);
-        if (!string.IsNullOrEmpty(audioData))
+        // position이 유효한 경우에만 처리
+        if (position > 0)
         {
-            // 오디오 데이터 전송
-            TranslationManager.Instance.SendAudioData(audioData);
-            // 발언 종료 신호 전송
-            TranslationManager.Instance.DoneSpeech();
+            // 녹음된 데이터를 임시 배열에 저장
+            float[] samples = new float[position];
+            recordingClip.GetData(samples, 0);
+            
+            // 마이크 녹음 중지
+            Microphone.End(null);
+            isRecording = false;
+            
+            // 저장된 샘플을 base64로 변환
+            string audioData = ConvertAudioToBase64(samples);
+            print("오디오 변환 성공 -> audioData: " + audioData);
+            
+            if (!string.IsNullOrEmpty(audioData))
+            {
+                // 오디오 데이터 전송
+                TranslationManager.Instance.SendAudioData(audioData);
+                // 발언 종료 신호 전송
+                TranslationManager.Instance.DoneSpeech();
+            }
         }
         else
         {
-            Debug.LogWarning("녹음된 오디오 데이터가 없거나 변환에 실패했습니다.");
+            Microphone.End(null);
+            isRecording = false;
+            Debug.LogWarning("녹음된 데이터가 없습니다.");
         }
 
         // 발언자 상태 초기화
@@ -196,28 +212,27 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
     /// <summary>
     /// 녹음된 오디오 데이터를 base64 문자열로 변환
     /// </summary>
-    private string ConvertAudioToBase64()
+    private string ConvertAudioToBase64(float[] samples)
     {
-        // 현재 녹음 위치 가져오기
-        int position = Microphone.GetPosition(null);
-        if (position <= 0) position = recordingClip.samples;
-
-        // 오디오 데이터 가져오기
-        float[] samples = new float[position];
-        recordingClip.GetData(samples, 0);
-
+        if (samples == null || samples.Length == 0)
+        {
+            Debug.LogWarning("[Debug] 샘플 데이터가 비어있습니다.");
+            return string.Empty;
+        }
+        
+        Debug.Log($"[Debug] 샘플 배열 크기: {samples.Length}");
+        
         // float[] to byte[] 변환
         short[] intData = new short[samples.Length];
         byte[] bytesData = new byte[samples.Length * 2];
-        float rescaleFactor = 32767f;  // float를 16비트 정수로 변환하기 위한 스케일 팩터
+        float rescaleFactor = 32767f;
 
-        // 각 샘플을 16비트 정수로 변환
+        int nonZeroSamples = 0;
         for (int i = 0; i < samples.Length; i++)
         {
             float sample = samples[i];
-            // 노이즈 제거
-            if (Mathf.Abs(sample) < 0.001f)
-                sample = 0f;
+            if (Mathf.Abs(sample) >= 0.001f)
+                nonZeroSamples++;
             
             // 클리핑 방지
             if (sample > 1f) sample = 1f;
@@ -225,11 +240,14 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
             
             intData[i] = (short)(sample * rescaleFactor);
         }
+        
+        Debug.Log($"[Debug] 0이 아닌 샘플 수: {nonZeroSamples}");
 
-        // short 배열을 byte 배열로 변환
         Buffer.BlockCopy(intData, 0, bytesData, 0, bytesData.Length);
-        // byte 배열을 base64 문자열로 변환
-        return Convert.ToBase64String(bytesData);
+        string result = Convert.ToBase64String(bytesData);
+        Debug.Log($"[Debug] 최종 base64 문자열 길이: {result.Length}");
+        
+        return result;
     }
 
     /// <summary>
@@ -241,25 +259,47 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
 
         try
         {
-            // base64 문자열을 byte 배열로 변환
+            // base64 디코딩 과정 로깅
+            Debug.Log($"[Audio] Received base64 length: {base64AudioData.Length}");
+            
             byte[] audioData = Convert.FromBase64String(base64AudioData);
+            Debug.Log($"[Audio] Converted to bytes length: {audioData.Length}");
+            
             short[] shortArray = new short[audioData.Length / 2];
             Buffer.BlockCopy(audioData, 0, shortArray, 0, audioData.Length);
+            Debug.Log($"[Audio] Converted to shorts length: {shortArray.Length}");
             
-            // short 배열을 float 배열로 변환
             float[] samples = new float[shortArray.Length];
             for (int i = 0; i < shortArray.Length; i++)
             {
                 samples[i] = shortArray[i] / 32768f;
             }
+            Debug.Log($"[Audio] Final samples length: {samples.Length}");
 
-            // 오디오 버퍼에 추가하고 재생 시작
-            audioBuffer.AddRange(samples);
-            StartAudioBuffer();
+            // 현재 청크의 길이를 초 단위로 계산
+            float currentChunkSeconds = (float)samples.Length / RECORDING_FREQUENCY;
+            Debug.Log($"[Audio] 현재 청크 duration: {currentChunkSeconds:F2} seconds");
+
+            // 유효한 오디오 데이터 체크
+            bool hasValidAudio = samples.Any(s => Mathf.Abs(s) > 0.0001f);
+            Debug.Log($"[Audio] Contains valid audio data: {hasValidAudio}");
+
+            if (hasValidAudio)
+            {
+                audioBuffer.AddRange(samples);
+                // 전체 버퍼의 길이를 초 단위로 계산
+                float totalBufferSeconds = (float)audioBuffer.Count / RECORDING_FREQUENCY;
+                Debug.Log($"[Audio] 전체 버퍼 duration: {totalBufferSeconds:F2} seconds");
+                StartAudioBuffer();
+            }
+            else
+            {
+                Debug.LogWarning("[Audio] Skipping empty or invalid audio data");
+            }
         }
         catch (Exception e)
         {
-            Debug.LogError($"오디오 스트림 처리 중 오류: {e.Message}");
+            Debug.LogError($"[Audio] Processing error: {e.GetType().Name} - {e.Message}\nStack: {e.StackTrace}");
         }
     }
 
@@ -268,15 +308,22 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
     /// </summary>
     private void StartAudioBuffer()
     {
-        // 버퍼에 충분한 데이터가 있고 현재 재생 중이 아닐 때
-        if (audioBuffer.Count >= BUFFER_THRESHOLD && !isPlaying)
+        Debug.Log($"[Audio] Buffer status - Size: {audioBuffer.Count}, IsPlaying: {isPlaying}");
+        float bufferDuration = (float)audioBuffer.Count / RECORDING_FREQUENCY;
+        Debug.Log($"[Audio] Buffer duration: {bufferDuration:F2} seconds");
+        
+        // 최소 버퍼 크기를 0.1초로 설정 (2400 샘플)
+        const int MIN_BUFFER_SIZE = RECORDING_FREQUENCY / 10;  // 2400 = 0.1초
+        
+        if ((audioBuffer.Count >= MIN_BUFFER_SIZE || bufferDuration >= 0.1f) && !isPlaying)
         {
-            // 이전 재생 코루틴이 있다면 중지
             if (playCoroutine != null)
             {
+                Debug.Log("[Audio] Stopping previous coroutine");
                 StopCoroutine(playCoroutine);
             }
-            // 새로운 재생 코루틴 시작
+            
+            Debug.Log("[Audio] Starting new playback coroutine");
             playCoroutine = StartCoroutine(PlayBufferedAudio());
         }
     }
@@ -287,28 +334,43 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
     private IEnumerator PlayBufferedAudio()
     {
         isPlaying = true;
+        Debug.Log("[Audio] Starting audio playback");
 
         while (audioBuffer.Count > 0 && !isAudioCancelled)
         {
-            // 버퍼에서 일정량의 샘플 추출
-            int sampleCount = Mathf.Min(audioBuffer.Count, BUFFER_THRESHOLD);
-            float[] playbackSamples = audioBuffer.GetRange(0, sampleCount).ToArray();
-            audioBuffer.RemoveRange(0, sampleCount);
+            // 현재 버퍼의 전체 길이를 초 단위로 계산
+            float bufferDuration = (float)audioBuffer.Count / RECORDING_FREQUENCY;
+            Debug.Log($"[Audio] Current buffer duration: {bufferDuration:F2} seconds");
+            
+            // 버퍼의 모든 데이터를 한 번에 재생
+            int sampleCount = audioBuffer.Count;
+            Debug.Log($"[Audio] Playing buffer of {sampleCount} samples");
+            
+            float[] playbackSamples = audioBuffer.ToArray();
+            audioBuffer.Clear();
 
-            // 재생할 AudioClip 생성
             AudioClip clip = AudioClip.Create("TranslatedAudio", 
                 sampleCount, 1, RECORDING_FREQUENCY, false);
             clip.SetData(playbackSamples, 0);
 
-            // 오디오 재생
-            translatedAudioSource.clip = clip;
-            translatedAudioSource.Play();
-
-            // 클립 길이만큼 대기
-            yield return new WaitForSeconds(clip.length);
+            if (translatedAudioSource != null)
+            {
+                translatedAudioSource.clip = clip;
+                translatedAudioSource.Play();
+                float duration = (float)sampleCount / RECORDING_FREQUENCY;
+                Debug.Log($"[Audio] Playing clip of length: {duration:F2} seconds");
+                
+                // 클립이 완전히 재생될 때까지 대기
+                yield return new WaitForSeconds(duration);
+            }
+            else
+            {
+                Debug.LogError("[Audio] AudioSource is null!");
+                break;
+            }
         }
 
-        // 재생 상태 초기화
+        Debug.Log("[Audio] Playback completed");
         isPlaying = false;
         playCoroutine = null;
     }
