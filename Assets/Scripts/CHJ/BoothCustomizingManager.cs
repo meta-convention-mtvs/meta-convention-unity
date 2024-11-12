@@ -127,6 +127,7 @@ public class BoothCustomizingManager : MonoBehaviour
         FileUploadManager.Instance.ShowDialog(SetModeling);
     }
 
+    // to do: booth도 올릴 수 있어야 한다.
     void ShowBoothFileUploader()
     {
         FileUploadManager.Instance.SetUpObjFileBrowser();
