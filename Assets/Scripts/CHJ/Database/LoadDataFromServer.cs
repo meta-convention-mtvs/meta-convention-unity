@@ -11,7 +11,7 @@ public class LoadDataFromServer : MonoBehaviour
 
     // 로그인 정보를 바탕으로 데이터베이스에서 데이터를 불러온다.
     Card userCardData;
-    CharacterCustomizeData userCharacterCustomizeData;
+    CharacterTopBottomCustomizeData userCharacterCustomizeData;
     UserTypeData userTypeData;
 
     bool cardDataLoadedComplete;
@@ -23,7 +23,7 @@ public class LoadDataFromServer : MonoBehaviour
     private void Start()
     {
         userCardData = new Card();
-        userCharacterCustomizeData = new CharacterCustomizeData();
+        userCharacterCustomizeData = new CharacterTopBottomCustomizeData();
         FireAuthManager.Instance.OnLogin += LoadUserDataFromServer;
     }
 
@@ -50,7 +50,7 @@ public class LoadDataFromServer : MonoBehaviour
     public void LoadUserDataFromServer()
     {
         DatabaseManager.Instance.GetData<Card>((data) => { userCardData = data; cardDataLoadedComplete = true; });
-        DatabaseManager.Instance.GetData<CharacterCustomizeData>((data) => { userCharacterCustomizeData = data; customizeDataLoadedComplete = true; });
+        DatabaseManager.Instance.GetData<CharacterTopBottomCustomizeData>((data) => { userCharacterCustomizeData = data; customizeDataLoadedComplete = true; });
         DatabaseManager.Instance.GetData<UserTypeData>((data) => { userTypeData = data; userTypeDataLoadedComplete = true; });
 
     }

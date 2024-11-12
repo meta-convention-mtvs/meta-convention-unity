@@ -1,4 +1,5 @@
 ﻿using Firebase.Firestore;
+using System.IO;
 using System.Linq;
 using UnityEngine;
 
@@ -20,8 +21,11 @@ public class CharacterCustomizeManager : MonoBehaviour
     private int bottomClothesIndex;
     private bool isMan = true;
     private bool isIndexChange;
+    // Top Clothes의 마지막 번호는 커스텀 티를 위한 것이다.
     private int totalTopClothes;
     private int totalBottomClothes;
+    private bool isImageUploaded;
+    private string imageFilePath;
 
     private void Awake()
     {
@@ -92,6 +96,10 @@ public class CharacterCustomizeManager : MonoBehaviour
         if (currentShowObject != null)
             currentShowObject.SetActive(false);
         currentShowObject = GetCharacterInIndex(topClothesIndex, bottomClothesIndex, isMan);
+        if(topClothesIndex == totalTopClothes - 1)
+        {
+            ChangeClothes(currentShowObject, customTShirts);
+        }
         currentShowObject.SetActive(true);
     }
 
@@ -105,42 +113,52 @@ public class CharacterCustomizeManager : MonoBehaviour
 
     void ImageFileLoad(string[] paths)
     {
+        //image 파일이 올라감
         string path = paths[0];
+        imageFilePath = path;
 
+        // texture 불러옴
         Texture2D texture = ImageUtility.LoadTexture(path);
-        customTShirts.materials[1].mainTexture = texture;
+        texture.wrapMode = TextureWrapMode.Clamp;
+        customTShirts.materials[0].mainTexture = texture;
 
-        if (isMan)
-        {
-            var topGameObjects = instantiatedMaleCharacter[topClothesIndex, bottomClothesIndex].GetComponentsInChildren<SkinnedMeshRenderer>().Where(go => go != null && go.gameObject.name.Contains("top"));
+        // 이미지 파일 올라갔다.
+        isImageUploaded = true;
 
-            foreach(var go in topGameObjects)
-            {
-                ChangeClothes(instantiatedMaleCharacter[topClothesIndex, bottomClothesIndex], go, customTShirts);
-            }
-        }
-        
+        // 렌더링을 다시 해주기
+        isIndexChange = true;
+        topClothesIndex = totalTopClothes - 1;
+
     }
-    void ChangeClothes(GameObject player, SkinnedMeshRenderer originalClothes, SkinnedMeshRenderer newClothes)
+
+    void ChangeClothes(GameObject player, SkinnedMeshRenderer newClothes)
     {
+        var originalClothes = player.GetComponentsInChildren<SkinnedMeshRenderer>().Where(go => go != null && go.gameObject.name.Contains("top"));
+
         GameObject go = new GameObject();
         go.transform.SetParent(player.transform);
-
         SkinnedMeshRenderer mesh = go.AddComponent<SkinnedMeshRenderer>();
-        mesh.rootBone = originalClothes.rootBone;
-        mesh.bones = originalClothes.bones;
-        mesh.localBounds = originalClothes.localBounds;
-        mesh.sharedMesh = newClothes.sharedMesh;
-        mesh.sharedMaterials = newClothes.sharedMaterials;
 
-        originalClothes.gameObject.SetActive(false);
+        foreach (SkinnedMeshRenderer clothes in originalClothes)
+        {
+            mesh.rootBone = clothes.rootBone;
+            mesh.bones = clothes.bones;
+            mesh.localBounds = clothes.localBounds;
+            mesh.sharedMesh = newClothes.sharedMesh;
+            mesh.sharedMaterials = newClothes.sharedMaterials;
+
+            clothes.gameObject.SetActive(false);
+        }
     }
 
     #region 상하의 인덱스 조절 함수
     void IncTopIndex()
     {
         topClothesIndex++;
-        topClothesIndex %= totalTopClothes;
+        if (isImageUploaded)
+            topClothesIndex %= totalTopClothes;
+        else
+            topClothesIndex %= totalTopClothes - 1;
         isIndexChange = true;
         cameraMove.SetTopCamera();
     }
@@ -148,8 +166,12 @@ public class CharacterCustomizeManager : MonoBehaviour
     void DecTopIndex()
     {
         topClothesIndex--;
-        if(topClothesIndex < 0)
-            topClothesIndex = (totalTopClothes - 1);
+        if (topClothesIndex < 0) {
+            if (isImageUploaded)
+                topClothesIndex = (totalTopClothes - 1);
+            else
+                topClothesIndex = (totalTopClothes - 2);
+        }
         isIndexChange = true;
         cameraMove.SetTopCamera();
     }
@@ -182,8 +204,11 @@ public class CharacterCustomizeManager : MonoBehaviour
         data.isMan = isMan;
         data.topIndex = topClothesIndex;
         data.bottomIndex = bottomClothesIndex;
-
+        data.isCustomTop = topClothesIndex == totalTopClothes - 1 ? true : false;
+        data.customImageFileName = Path.GetFileName(imageFilePath);
         DatabaseManager.Instance.SaveData<CharacterTopBottomCustomizeData>(data);
+        if(data.isCustomTop)
+            DatabaseManager.Instance.UploadImage(imageFilePath);
     }
 }
 
@@ -196,16 +221,9 @@ public class CharacterTopBottomCustomizeData
     public int topIndex { get; set; }
     [FirestoreProperty]
     public int bottomIndex { get; set; }
+    [FirestoreProperty]
+    public bool isCustomTop { get; set; }
+    [FirestoreProperty]
+    public string customImageFileName { get; set; }
 
-    public CharacterTopBottomCustomizeData()
-    {
-
-    }
-
-    public CharacterTopBottomCustomizeData(bool isMan, int topIndex, int bottomIndex)
-    {
-        this.isMan = isMan;
-        this.topIndex = topIndex;
-        this.bottomIndex = bottomIndex;
-    }
 }

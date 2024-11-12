@@ -36,10 +36,12 @@ public class CreatePlayer : MonoBehaviour
         // player 객체를 카메라에 등록시킨다.
         OnPlayerCreate?.Invoke(player);
     }
+
     private void onCardLoad(Card myCard)
     {
         SaveCardInProperties(player.GetPhotonView().Owner, myCard);
     }
+
     public GameObject Create(RoomType roomType)
     {
         // 플레이어 prefab 생성
@@ -71,8 +73,7 @@ public class CreatePlayer : MonoBehaviour
             {"MeetingList",emptyMeetingList },
             {"MeetingListIndex", 0 }
         };
-
-        
+      
         player.SetCustomProperties(myInformation);
     }
 

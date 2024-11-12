@@ -1,6 +1,7 @@
 ﻿using Firebase.Firestore;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using UnityEngine.Video;
 
@@ -21,13 +22,13 @@ public class BoothCustomizingManager : MonoBehaviour
 
     // Obj파일을 불러오면 바로 인스턴스화됩니다. 새로운 obj 파일을 불러오면 이전에 불러왔던 파일을 없애주고 불러와야 합니다.
     private GameObject currentInstantiatedObject;
-    private string prevObjPath;
 
     private void Start()
     {
         boothCustomizeData = new BoothCustomizeData();
         // 1로 초기화시킨다.
         boothCustomizeData.modelingScale = 1;
+        boothCustomizeData.color = new FireStoreColor(0, 0, 0);
         LoadGamePrefab(boothPrefabs);
     }
 
@@ -37,6 +38,7 @@ public class BoothCustomizingManager : MonoBehaviour
         defaultSetting.OnBoothButtonClick[0] += () => SetBoothType(0);
         defaultSetting.OnBoothButtonClick[1] += () => SetBoothType((BoothType)1);
         defaultSetting.OnBoothButtonClick[2] += () => SetBoothType((BoothType)2);
+        defaultSetting.OnImportBoothModelingClick += ShowBoothFileUploader;
         defaultSetting.OnCompanyNameChanged += SetCompanyName;
         defaultSetting.OnLogoButtonClick += ShowImageFileUploader;
         defaultSetting.OnHomepageNameChanged += SetHomepageLink;
@@ -58,9 +60,22 @@ public class BoothCustomizingManager : MonoBehaviour
             {
                 instantiatedObject[0].SetActive(false);
                 instantiatedObject[1].SetActive(false);
+                if (File.Exists(boothCustomizeData.boothObjectPath))
+                {
+                    if (currentInstantiatedObject != null)
+                    {
+                        Destroy(currentInstantiatedObject);
+                    }
+                    currentInstantiatedObject = ObjectLoader.ImportObj(boothCustomizeData.boothObjectPath);
+                }
+
             }
             else
             {
+                if (currentInstantiatedObject != null)
+                {
+                    Destroy(currentInstantiatedObject);
+                }
                 instantiatedObject[currentIndex].SetActive(true);
                 instantiatedObject[1 - currentIndex].SetActive(false);
                 instantiatedObject[currentIndex].GetComponent<RenderBoothData>().RenderBoothDataWith(GetBoothExtraData(boothCustomizeData));
@@ -69,13 +84,15 @@ public class BoothCustomizingManager : MonoBehaviour
         }
         if (boothDataChanged)
         {
-            instantiatedObject[currentIndex].GetComponent<RenderBoothData>().RenderBoothDataWith(GetBoothExtraData(boothCustomizeData));
+            if(currentIndex > -1)
+                instantiatedObject[currentIndex].GetComponent<RenderBoothData>().RenderBoothDataWith(GetBoothExtraData(boothCustomizeData));
             boothDataChanged = false;
         }
 
         if(boothObjectModelingChanged)
         {
-            instantiatedObject[currentIndex].GetComponent<RenderBoothData>().RenderBoothModeling(GetBoothExtraData(boothCustomizeData));
+            if (currentIndex > -1)
+                instantiatedObject[currentIndex].GetComponent<RenderBoothData>().RenderBoothModeling(GetBoothExtraData(boothCustomizeData));
             boothObjectModelingChanged = false;
         }
     }
@@ -127,6 +144,7 @@ public class BoothCustomizingManager : MonoBehaviour
         FileUploadManager.Instance.ShowDialog(SetModeling);
     }
 
+    // to do: booth도 올릴 수 있어야 한다.
     void ShowBoothFileUploader()
     {
         FileUploadManager.Instance.SetUpObjFileBrowser();
@@ -146,7 +164,7 @@ public class BoothCustomizingManager : MonoBehaviour
     }
     void SetColor(Vector3 HSV)
     {
-        boothCustomizeData.color = Color.HSVToRGB(HSV.x, HSV.y, HSV.z);
+        boothCustomizeData.color = new FireStoreColor(HSV.x, HSV.y, HSV.z);
         boothDataChanged = true;
     }
     void SetModeling(string[] paths)
@@ -160,7 +178,7 @@ public class BoothCustomizingManager : MonoBehaviour
     {
         string path = paths[0];
         boothCustomizeData.boothObjectPath = path;
-
+        boothTypeChanged = true;
     }
     void SetLogoImage(string[] paths)
     {
@@ -180,10 +198,9 @@ public class BoothCustomizingManager : MonoBehaviour
     {
         BoothExtraData extraData = new BoothExtraData();
         extraData.boothType = data.boothType;
-        extraData.color = data.color;
+        extraData.color = data.color.GetColor();
         extraData.logoImage = ImageUtility.LoadTexture(data.logoImagePath);
         extraData.modelingScale = data.modelingScale;
-        // todo: obj 파일을 어떻게 렌더할 것인가
         extraData.modelingPath = data.modelingPath;
         extraData.videoURL = data.videoURL;
         return extraData;
@@ -191,19 +208,58 @@ public class BoothCustomizingManager : MonoBehaviour
 
     public void SaveBoothData()
     {
+        if(boothCustomizeData.boothType == BoothType.Blank && boothCustomizeData.boothObjectPath != null)
+        {
+            DatabaseManager.Instance.UploadObject(boothCustomizeData.boothObjectPath);
+        }
+
+        if(boothCustomizeData.logoImagePath != null)
+        {
+            DatabaseManager.Instance.UploadImage(boothCustomizeData.logoImagePath);
+        }
+
+        if(boothCustomizeData.modelingPath != null)
+        {
+            DatabaseManager.Instance.UploadObject(boothCustomizeData.modelingPath);
+        }
+
+        if(boothCustomizeData.videoURL != null)
+        {
+            DatabaseManager.Instance.UploadVideo(boothCustomizeData.videoURL.Substring("file://".Length));
+        }
+
+        boothCustomizeData.boothObjectPath = Path.GetFileName(boothCustomizeData.boothObjectPath);
+        boothCustomizeData.logoImagePath = Path.GetFileName(boothCustomizeData.logoImagePath);
+        boothCustomizeData.modelingPath = Path.GetFileName(boothCustomizeData.modelingPath);
+        if (boothCustomizeData.videoURL != null && boothCustomizeData.videoURL.StartsWith("file://"))
+        {
+            boothCustomizeData.videoURL = Path.GetFileName(boothCustomizeData.videoURL.Substring("file://".Length));
+        }
         DatabaseManager.Instance.SaveData<BoothCustomizeData>(boothCustomizeData);
+
     }
 
-    public bool CanSaveData()
+    public enum BoothCustomzieDataSaveError
     {
-        if (boothCustomizeData.companyName != null)
+        EmptyCompanyName,
+        EmptyBoothObject
+    }
+    public bool CanSaveData(ref BoothCustomzieDataSaveError error)
+    {
+        if (string.IsNullOrEmpty(boothCustomizeData.companyName))
         {
-            return true;
-        }
-        else
-        {
+            // error code 1
+            error = BoothCustomzieDataSaveError.EmptyCompanyName;
             return false;
         }
+        
+        if(boothCustomizeData.boothType == BoothType.Blank && boothCustomizeData.boothObjectPath == null)
+        {
+            error = BoothCustomzieDataSaveError.EmptyBoothObject;
+            return false;
+        }
+
+        return true;
     }
 }
 
@@ -222,7 +278,7 @@ public class BoothCustomizeData
     [FirestoreProperty]
     public BoothType boothType { get; set; }
     [FirestoreProperty]
-    public Color color { get; set; }
+    public FireStoreColor color { get; set; }
     [FirestoreProperty]
     public string logoImagePath { get; set; }
     [FirestoreProperty]
@@ -258,4 +314,32 @@ public enum BoothType
     Blank,
     Cubic,
     Round
+}
+
+[FirestoreData]
+public class FireStoreColor
+{
+    [FirestoreProperty]
+    public float r { get; set; }
+    [FirestoreProperty]
+    public float g { get; set; }
+    [FirestoreProperty]
+    public float b { get; set; }
+
+    public FireStoreColor()
+    {
+
+    }
+
+    public FireStoreColor(float r, float g, float b)
+    {
+        this.r = r;
+        this.g = g;
+        this.b = b;
+    }
+
+    public Color GetColor()
+    {
+        return new Color(r, g, b);
+    }
 }

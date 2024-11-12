@@ -9,6 +9,7 @@ public class UIBoothDefaultSetting : MonoBehaviour
 {
     public TMP_Dropdown dropdown;
     public Button[] boothTypeButton;
+    public Button importBoothModelingButton;
     public TMP_InputField companyName;
     public Button logoButton;
     public TMP_InputField homepageLink;
@@ -16,6 +17,7 @@ public class UIBoothDefaultSetting : MonoBehaviour
 
     public Action<int> OnDropdownChanged;
     public Action[] OnBoothButtonClick;
+    public Action OnImportBoothModelingClick;
     public Action<string> OnCompanyNameChanged;
     public Action OnLogoButtonClick;
     public Action<string> OnHomepageNameChanged;
@@ -40,6 +42,7 @@ public class UIBoothDefaultSetting : MonoBehaviour
             int j = i;
             boothTypeButton[i].onClick.AddListener(() => _OnBoothButtonClick(j));
         }
+        importBoothModelingButton.onClick.AddListener(_OnImportBoothModelingClick);
         companyName.onEndEdit.AddListener(_OnCompanyNameChanged);
         logoButton.onClick.AddListener(_OnLogoButtonClick);
         homepageLink.onEndEdit.AddListener(_OnHomepageNameChanged);
@@ -53,8 +56,12 @@ public class UIBoothDefaultSetting : MonoBehaviour
 
     void _OnBoothButtonClick(int index)
     {
-        print(index);
         OnBoothButtonClick[index]?.Invoke();
+    }
+
+    void _OnImportBoothModelingClick()
+    {
+        OnImportBoothModelingClick?.Invoke();
     }
 
     void _OnCompanyNameChanged(string s)

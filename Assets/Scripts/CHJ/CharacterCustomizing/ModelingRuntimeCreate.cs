@@ -4,16 +4,19 @@ using Hashtable = ExitGames.Client.Photon.Hashtable;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 public class ModelingRuntimeCreate : MonoBehaviourPun
 {
-    public CustomizeTemplet maleCharacterPrefabs;
-    public CustomizeTemplet femaleCharacterPrefabs;
+    public CharacterTemplet characterTemplet;
 
     public Avatar maleAvatar;
     public Avatar femaleAvatar;
 
+    public SkinnedMeshRenderer customTShirts;
+    
     Animator anim;
+
 
     private void Awake()
     {
@@ -21,13 +24,13 @@ public class ModelingRuntimeCreate : MonoBehaviourPun
         if (photonView.IsMine)
         {
             // data를 읽어온다.
-            DatabaseManager.Instance.GetData<CharacterCustomizeData>(CreateAvatar);
+            DatabaseManager.Instance.GetData<CharacterTopBottomCustomizeData>(CreateAvatar);
             
         }
     }
 
 
-    void CreateAvatar(CharacterCustomizeData customzieData)
+    void CreateAvatar(CharacterTopBottomCustomizeData customzieData)
     {
 
         // data에 적혀있는 gender, idx 에 따라 prefab을 생성후 플레이어의 prefab의 자식으로 만든다.
@@ -35,21 +38,63 @@ public class ModelingRuntimeCreate : MonoBehaviourPun
 
         if (customzieData != null)
         {
-            photonView.RPC(nameof(RpcCreateAvatar), RpcTarget.AllBuffered, customzieData.isMan, customzieData.customizingIdx);
+            photonView.RPC(nameof(RpcCreateAvatar), RpcTarget.AllBuffered, customzieData.isMan, customzieData.topIndex, customzieData.bottomIndex, customzieData.isCustomTop, customzieData.customImageFileName);
         }
     }
 
     
     [PunRPC]
-    void RpcCreateAvatar(bool isMan, int customizingIdx)
+    void RpcCreateAvatar(bool isMan, int topIndex, int bottomIndex, bool isCustomTop, string customImageFileName)
     {
-        CustomizeTemplet templet = isMan ? maleCharacterPrefabs : femaleCharacterPrefabs;
+        GameObject character;
+        if (isMan)
+        {
+            character = characterTemplet.maleCharacterPrefabs[topIndex].column[bottomIndex];
+        }
+        else
+        {
+            character = characterTemplet.femaleCharacterPrefabs[topIndex].column[bottomIndex];
+        }
 
-        Instantiate(templet.gamePrefabs[customizingIdx], gameObject.transform);
+        Instantiate(character, gameObject.transform);
+        if (isCustomTop)
+        {
+            DatabaseManager.Instance.DownloadImage(customImageFileName, OnLoadTexture);
+        }
         anim.avatar = isMan ? maleAvatar : femaleAvatar;
 
         anim.Rebind();
     }
 
+    void OnLoadTexture(Texture2D texture)
+    {
+        // texture 불러옴
+        texture.wrapMode = TextureWrapMode.Clamp;
+
+        SkinnedMeshRenderer skinned = Instantiate(customTShirts);
+        skinned.materials[0].mainTexture = texture;
+
+        ChangeClothes(this.gameObject, skinned);
+    }
+
+    void ChangeClothes(GameObject player, SkinnedMeshRenderer newClothes)
+    {
+        var originalClothes = player.GetComponentsInChildren<SkinnedMeshRenderer>().Where(go => go != null && go.gameObject.name.Contains("top"));
+
+        GameObject go = new GameObject();
+        go.transform.SetParent(player.transform);
+        SkinnedMeshRenderer mesh = go.AddComponent<SkinnedMeshRenderer>();
+
+        foreach (SkinnedMeshRenderer clothes in originalClothes)
+        {
+            mesh.rootBone = clothes.rootBone;
+            mesh.bones = clothes.bones;
+            mesh.localBounds = clothes.localBounds;
+            mesh.sharedMesh = newClothes.sharedMesh;
+            mesh.sharedMaterials = newClothes.sharedMaterials;
+
+            clothes.gameObject.SetActive(false);
+        }
+    }
 
 }
