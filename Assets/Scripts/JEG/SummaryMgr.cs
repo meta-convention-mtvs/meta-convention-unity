@@ -10,7 +10,13 @@ using UnityEngine.UI;
 
 public class SummaryMgr : MonoBehaviour
 {
-    string url;
+    public string url;
+
+    public InputField visitorId;
+    public InputField companyId;
+    
+
+
 
     public Text summaryText;
     public class TakeSummary
@@ -19,16 +25,30 @@ public class SummaryMgr : MonoBehaviour
         public string full_script { get; set; }
     }
 
+    public void OnClickTakeUserID()
+    {
+        GetRequestJson(visitorId.text, companyId.text);
+    }
+
+    // MeetingInfo 함수에 user UID, company UID 넣으면 됨
+    public string GetRequestJson(string userId, string companyId)
+    {
+        string meetingJson = "{\"user_id\":\"" + userId + "\", \"org_id\":\"" + companyId + "\",\"lang\":\"ko\"}";
+        return meetingJson;
+    }
+
     public void OnClickToTakeSummary()
     {
         // 테스트용 url
         url = "http://ec2-3-36-111-173.ap-northeast-2.compute.amazonaws.com:6576/summary";
-        RequestSummary(url,ttttt );
+        RequestSummary(url,OnDataLoaded );
     }
 
-    public void ttttt(string t)
+    //콜백함수: 데이터가 로딩되면 실행됨
+    public void OnDataLoaded(string t)
     {
-
+        // string t가 받아온 데이터
+        // 데이터를 띄우는 로직
     }
     public void RequestSummary(string url, Action<string> OnReceived)
     {
@@ -37,8 +57,8 @@ public class SummaryMgr : MonoBehaviour
 
     IEnumerator IRequestSummary(string url, Action<string> OnReceived)
     {
-
-        string jsonData = "{\"user_id\":\"none\", \"org_id\":\"abcd\",\"lang\":\"ko\"}";
+        // todo: id 읽어오는 거 로직 필요
+        string jsonData = GetRequestJson(visitorId.text, companyId.text);
         using (UnityWebRequest www = UnityWebRequest.PostWwwForm(url, ""))
         {
             www.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(jsonData));
