@@ -20,6 +20,41 @@ public class DatabaseManager : Singleton<DatabaseManager>
         storage = FirebaseStorage.DefaultInstance;
     }
 
+    public void GetPublicData<T>(Action<T> OnComplete) where T : class
+    {
+        StartCoroutine(CoLoadPublicData<T>(OnComplete));
+    }
+
+    IEnumerator CoLoadPublicData<T>(Action<T> onComplete) where T : class
+    {
+        // 저장 경로 USER/ID/내 정보
+        string path = "PUBLIC/" +  typeof(T).ToString();
+        // 정보 조회 요청
+        Task<DocumentSnapshot> task = FirebaseFirestore.DefaultInstance.Document(path).GetSnapshotAsync();
+        // 통신이 완료 될 때 까지 기다린다.
+        yield return new WaitUntil(() => task.IsCompleted);
+        // 만약 예외가 없다면
+        if (task.Exception == null)
+        {
+            print("정보 불러오기 성공!");
+            // 불러온 정보를 UserInfo 변수에 저장
+            T loadInfo = task.Result.ConvertTo<T>();
+            // 불러온 정보를 전달
+            if (onComplete != null)
+            {
+                onComplete(loadInfo);
+            }
+            else
+            {
+                onComplete(null);
+            }
+        }
+        else
+        {
+            print("정보 불러오기 실패 : " + task.Exception);
+        }
+    }
+
     public void SaveData<T>(T info) where T : class
     {
         StartCoroutine(CoSaveUserInfo<T>(info));
@@ -78,20 +113,6 @@ public class DatabaseManager : Singleton<DatabaseManager>
             print("유저 정보 불러오기 실패 : " + task.Exception);
         }
     }
-
-    public T GetData<T>(string key)
-    {
-        if (PlayerPrefs.HasKey(key))
-        {
-            string data = PlayerPrefs.GetString(key);
-            print(key + " : " + data);
-            return (T)JsonUtility.FromJson<T>(data);
-        }
-
-        return default(T);
-    }
-
-
 
     public void UploadImage(string localFilePath)
     {

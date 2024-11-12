@@ -177,7 +177,7 @@ GameObject:
   - component: {fileID: 2245248626367142422}
   - component: {fileID: 4049822186640541649}
   - component: {fileID: 2206109854182225242}
-  - component: {fileID: 6221779505487528295}
+  - component: {fileID: 5131770038305237421}
   m_Layer: 5
   m_Name: MypageCanvas_BoothRecommendation_Element
   m_TagString: Untagged
@@ -203,10 +203,10 @@ RectTransform:
   - {fileID: 757060647824934714}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 1065, y: 232.2}
+  m_SizeDelta: {x: 1065, y: 232.20001}
   m_Pivot: {x: 0, y: 1}
 --- !u!222 &4049822186640541649
 CanvasRenderer:
@@ -246,7 +246,7 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &6221779505487528295
+--- !u!114 &5131770038305237421
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -255,14 +255,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 2200709689256871806}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 614f31a4bb2d3564dab6ba2ba630997b, type: 3}
+  m_Script: {fileID: 11500000, guid: 36af1a90a0e9dcb4f9c8ecc134ee6de2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  nameText: {fileID: 0}
-  instituteText: {fileID: 0}
-  majorText: {fileID: 0}
-  emailText: {fileID: 0}
-  phoneText: {fileID: 0}
+  companyName: {fileID: 4640927625832972594}
+  companyMission: {fileID: 0}
+  companyItem: {fileID: 0}
+  companyLink: {fileID: 0}
+  companyReason: {fileID: 5799442485493844095}
 --- !u!1 &5622872975283160701
 GameObject:
   m_ObjectHideFlags: 0

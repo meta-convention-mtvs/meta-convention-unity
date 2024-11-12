@@ -13,10 +13,15 @@ public class CompanyRecommendItem : MonoBehaviour
 
     public void SetItemText(TestRecommendedCompany companyInfo)
     {
-        companyName.text = companyInfo.company_name;
-        companyMission.text = companyInfo.company_mission;
-        companyItem.text = companyInfo.items;
-        companyLink.text = companyInfo.link;
-        companyReason.text = companyInfo.reason;
+        if(companyName != null)
+            companyName.text = companyInfo.company_name;
+        if(companyMission != null)
+            companyMission.text = companyInfo.company_mission;
+        if(companyItem != null)
+            companyItem.text = companyInfo.items;
+        if(companyLink != null)
+            companyLink.text = companyInfo.link;
+        if(companyReason != null)
+            companyReason.text = companyInfo.reason;
     }
 }

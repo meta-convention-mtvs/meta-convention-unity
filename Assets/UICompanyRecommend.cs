@@ -7,9 +7,19 @@ public class UICompanyRecommend : MonoBehaviour
 {
     public GameObject companyItemsFactory;
     public RectTransform Content;
-    void SetRecommendField(TestRecommendedCompany companyInfo)
+
+    public void GetRecommendDataFromDatabase()
     {
-        GameObject go =Instantiate(companyItemsFactory, Content);
-        go.GetComponent<CompanyRecommendItem>().SetItemText(companyInfo);
+        DatabaseManager.Instance.GetData<RecommendedCompanyListData>(SetRecommendField);
+    }
+
+    public void SetRecommendField(RecommendedCompanyListData companyInfos)
+    {
+        foreach(TestRecommendedCompany companyInfo in companyInfos.recommendedCompanyList)
+        {
+            GameObject go =Instantiate(companyItemsFactory, Content);
+            go.GetComponent<CompanyRecommendItem>().SetItemText(companyInfo);
+
+        }
     }
 }

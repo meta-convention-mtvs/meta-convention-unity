@@ -13,12 +13,25 @@ public class UIBoothPosition : MonoBehaviour
     private RectTransform rectTransform;
     private int currentIndex = -1;
     private SelectableParentObject selectedObject;
+    private ChargedBoothPosition position;
 
     void Start()
     {
         rectTransform = rawImage.GetComponent<RectTransform>();
+        DatabaseManager.Instance.GetPublicData<ChargedBoothPosition>(SetChargedBoothPosition);
     }
 
+    void SetChargedBoothPosition(ChargedBoothPosition position)
+    {
+        this.position = position;
+        for(int i = 0; i < position.BoothPositionList.Count; i++)
+        {
+            if(i < boothPosition.Count)
+            {
+                boothPosition[i].GetComponentInParent<SelectableParentObject>().isInteractable = !position.BoothPositionList[i];
+            }
+        }
+    }
     void Update()
     {
 
@@ -70,6 +83,16 @@ public class UIBoothPosition : MonoBehaviour
             DatabaseManager.Instance.SaveData<BoothPosition>(myPosition);
         }
     }
+
+    public bool CanSaveData()
+    {
+        if (currentIndex == -1)
+            return false;
+        if (position != null && position.BoothPositionList[currentIndex] == true)
+            return false;
+        return true;
+    }
+
     Vector2 GetViewportPointInRecttTransform(RectTransform rectTransform, Vector3 mousePosition)
     {
         // 마우스 좌표를 Screen Point로 변환
@@ -100,4 +123,11 @@ public class BoothPosition
 {
     [FirestoreProperty]
     public int boothPositionIndex { get; set; }
+}
+
+[FirestoreData]
+public class ChargedBoothPosition
+{
+    [FirestoreProperty]
+    public List<bool> BoothPositionList { get; set; }
 }

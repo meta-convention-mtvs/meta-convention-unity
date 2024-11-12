@@ -3,6 +3,7 @@
 public class SelectableParentObject : MonoBehaviour
 {
     public Color selectedColor = Color.blue; // 선택 시 사용할 파란색
+    public bool isInteractable = true;
     private Color[] originalColors;          // 각 자식의 원래 색상 저장
     private Material[] materials;            // 각 자식의 메터리얼 저장
 
@@ -22,19 +23,25 @@ public class SelectableParentObject : MonoBehaviour
 
     public void Select()
     {
-        // 선택 시 모든 자식의 색상을 파란색으로 변경
-        for (int i = 0; i < materials.Length; i++)
+        if (isInteractable)
         {
-            materials[i].color = selectedColor;
+            // 선택 시 모든 자식의 색상을 파란색으로 변경
+            for (int i = 0; i < materials.Length; i++)
+            {
+                materials[i].color = selectedColor;
+            }
         }
     }
 
     public void Deselect()
     {
-        // 선택 해제 시 모든 자식의 색상을 원래 색상으로 복원
-        for (int i = 0; i < materials.Length; i++)
+        if (isInteractable)
         {
-            materials[i].color = originalColors[i];
+            // 선택 해제 시 모든 자식의 색상을 원래 색상으로 복원
+            for (int i = 0; i < materials.Length; i++)
+            {
+                materials[i].color = originalColors[i];
+            }
         }
     }
 }

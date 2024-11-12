@@ -1,10 +1,12 @@
-﻿using Newtonsoft.Json;
+﻿using Firebase.Firestore;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
@@ -28,78 +30,82 @@ public class TestUserInfo
    
 }
 
-[System.Serializable]
+[FirestoreData]
 public class TestRecommendedCompany
 {
+    [FirestoreProperty]
     public string company_mission { get; set; }
+    [FirestoreProperty]
     public string company_name { get; set; }
+    [FirestoreProperty]
     public string items { get; set; }
+    [FirestoreProperty]
     public string link { get; set; }
+    [FirestoreProperty]
     public string logo_file_name { get; set; }
+    [FirestoreProperty]
     public string reason { get; set; }
 
 }
 
 public class AIConnectionMgr : MonoBehaviour
 {
-    public string url;
+    public string url = "http://ec2-3-36-111-173.ap-northeast-2.compute.amazonaws.com:6576/recommendation";
 
-    public InputField situ_input;
+    public TMP_InputField situ_input;
 
-    public GameObject sendCanvas;
-    public GameObject ccbCanvas;
-
-    public Action<TestRecommendedCompany> OnReceivedRecommend; 
- //   public static string[] fields = new string[49] {"3D Printing",
- //"5G Technologies",
- //"AR/VR/XR",
- //"Accessibility",
- //"Accessories",
- //"AgTech",
- //"Artificial Intelligence",
- //"Audio",
- //"Cloud Computing",
- //"Construction Tech",
- //"Content and EntertaInment",
- //"Cybersecurity",
- //"Defense",
- //"Digital Health",
- //"Drones",
- //"Education Tech",
- //"Energy Transition",
- //"Energy/Power",
- //"Enterprise",
- //"Fashion Tech",
- //"Fintech",
- //"Fitness",
- //"Food Tech",
- //"Gaming and Esports",
- //"Home Entertainment and Office Hardware",
- //"Imaging",
- //"Innovation",
- //"Investing",
- //"IoT/Sensors",
- //"Lifestyle",
- //"Marketing and Advertising",
- //"Metaverse",
- //"NFT",
- //"Retail/E-Commerce",
- //"Robotics",
- //"Smart Cities",
- //"Smart Home and Appliances",
- //"Sourcing and Manufacturing",
- //"Space Tech",
- //"Sports",
- //"Startups",
- //"Streaming",
- //"Style",
- //"Supply and Logistics",
- //"Sustainability",
- //"Technology",
- //"Travel and Tourism",
- //"Vehicle Tech and Advanced Mobility",
- //"Video"};
-
+    public UICompanyRecommend ui_cr;
+    #region 현재 안씀
+    //   public static string[] fields = new string[49] {"3D Printing",
+    //"5G Technologies",
+    //"AR/VR/XR",
+    //"Accessibility",
+    //"Accessories",
+    //"AgTech",
+    //"Artificial Intelligence",
+    //"Audio",
+    //"Cloud Computing",
+    //"Construction Tech",
+    //"Content and EntertaInment",
+    //"Cybersecurity",
+    //"Defense",
+    //"Digital Health",
+    //"Drones",
+    //"Education Tech",
+    //"Energy Transition",
+    //"Energy/Power",
+    //"Enterprise",
+    //"Fashion Tech",
+    //"Fintech",
+    //"Fitness",
+    //"Food Tech",
+    //"Gaming and Esports",
+    //"Home Entertainment and Office Hardware",
+    //"Imaging",
+    //"Innovation",
+    //"Investing",
+    //"IoT/Sensors",
+    //"Lifestyle",
+    //"Marketing and Advertising",
+    //"Metaverse",
+    //"NFT",
+    //"Retail/E-Commerce",
+    //"Robotics",
+    //"Smart Cities",
+    //"Smart Home and Appliances",
+    //"Sourcing and Manufacturing",
+    //"Space Tech",
+    //"Sports",
+    //"Startups",
+    //"Streaming",
+    //"Style",
+    //"Supply and Logistics",
+    //"Sustainability",
+    //"Technology",
+    //"Travel and Tourism",
+    //"Vehicle Tech and Advanced Mobility",
+    //"Video"};
+    #endregion
     #region 서머리 테스트 함수(사용 안함)
     // 테스트용
     //public void OnClickTestRequest()
@@ -148,27 +154,22 @@ public class AIConnectionMgr : MonoBehaviour
 
     public void OnClickSendRecommendRequest()
     {
-        // 테스트용 url 
-        url = "http://ec2-3-36-111-173.ap-northeast-2.compute.amazonaws.com:6576/recommendation";
-        // 테스트용 데이터 셋팅
-        // 나중에는 poll 로 받아온 데이터 셋팅
-        //testUserInfo userInfo;
-
-        RequestRecommendCompay( url);
+        RequestRecommendCompay( situ_input.text);
     }
 
-    public void RequestRecommendCompay(string url)
+    public void RequestRecommendCompay(string situationText)
     {
-        StartCoroutine(IRequestRecommend(url));
+        StartCoroutine(IRequestRecommend(situationText));
     }
 
-    IEnumerator IRequestRecommend(string url)
+    IEnumerator IRequestRecommend(string situationText)
     {
         // TODO: 받아온 유저의 관심분야 데이터를 jsonData로 변환해서 보내야 함..
         // checkcheckbox에서 List 받아와서 interests 에 항목 넣어서 셋팅
         //string jsonData = JsonUtility.ToJson(userInfo);
-        
-        string jsonData = JsonConvert.SerializeObject(GetTestUserInfo(situ_input.text, "ko"), Formatting.None);
+
+
+        string jsonData = JsonConvert.SerializeObject(GetTestUserInfo(situationText, "ko"), Formatting.None);
        
         //string jsonData = "{\"industry_type\":[\"항공\"], \"selected_interests\":[\"Vehicle Tech and Advanced Mobility\"],\"situation_description\":\"우주, 항공 산업에 관련되어 기체를 만드는 회사에 대해 궁금해\", \"language\":\"JP\" }";
         print(jsonData);
@@ -193,15 +194,12 @@ public class AIConnectionMgr : MonoBehaviour
 
                 List<TestRecommendedCompany> recommendedCompany = JsonConvert.DeserializeObject<List<TestRecommendedCompany>>(receiveJsonData);
 
-                for (int i = 0; i < recommendedCompany.Count(); i++)
-                {
-                    Debug.Log("Company Name: " + recommendedCompany[i].company_name);
-                    OnReceivedRecommend?.Invoke(recommendedCompany[i]);
-                }
-                //companyName.text = recommendedCompany[0].company_name;
+                RecommendedCompanyListData data = new RecommendedCompanyListData();
+                data.recommendedCompanyList = recommendedCompany;
 
-                // TODO: 받아온 데이터 UI 만들기..
-                // 어떻게 보이게 할 건지, 플로우 확인 되면 작업 
+                ui_cr.SetRecommendField(data);
+                DatabaseManager.Instance.SaveData<RecommendedCompanyListData>(data);
+
             }else
             {
                 Debug.LogError(www.error);
@@ -216,17 +214,13 @@ public class AIConnectionMgr : MonoBehaviour
         return userInfo;
     }
 
-    public void OnClickSubmit()
-    {
-        ccbCanvas.SetActive(false);
-        sendCanvas.SetActive(true);
-    }
+    
 }
 
-[Firebase.Firestore.FirestoreData]
-public class Language
+[FirestoreData]
+public class RecommendedCompanyListData
 {
-    [Firebase.Firestore.FirestoreProperty]
-    public string lang { get; set; }
+    [FirestoreProperty]
+    public List<TestRecommendedCompany> recommendedCompanyList { get; set; }
 }
 

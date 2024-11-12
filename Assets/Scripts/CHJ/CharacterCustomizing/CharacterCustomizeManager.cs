@@ -207,7 +207,8 @@ public class CharacterCustomizeManager : MonoBehaviour
         data.isCustomTop = topClothesIndex == totalTopClothes - 1 ? true : false;
         data.customImageFileName = Path.GetFileName(imageFilePath);
         DatabaseManager.Instance.SaveData<CharacterTopBottomCustomizeData>(data);
-        DatabaseManager.Instance.UploadImage(imageFilePath);
+        if(data.isCustomTop)
+            DatabaseManager.Instance.UploadImage(imageFilePath);
     }
 }
 
