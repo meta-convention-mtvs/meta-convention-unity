@@ -180,7 +180,7 @@ public class AIWebSocket : MonoBehaviour
             type = "config.update",
             org = "cf79ea17-a487-4b27-a20d-bbd11ff885da",
             userid = userId,
-            lang = "ko",  // ISO 639 Language Code 형식 사용
+            lang = "zh",  // ISO 639 Language Code 형식 사용
             llm = "realtime"
         };
         await SendRequestAsync(configUpdate);
