@@ -38,13 +38,13 @@ public class ModelingRuntimeCreate : MonoBehaviourPun
 
         if (customzieData != null)
         {
-            photonView.RPC(nameof(RpcCreateAvatar), RpcTarget.AllBuffered, customzieData.isMan, customzieData.topIndex, customzieData.bottomIndex, customzieData.isCustomTop, customzieData.customImageFileName);
+            photonView.RPC(nameof(RpcCreateAvatar), RpcTarget.AllBuffered, customzieData.isMan, customzieData.topIndex, customzieData.bottomIndex, customzieData.isCustomTop, customzieData.customImageFileName, FireAuthManager.Instance.GetCurrentUser().UserId);
         }
     }
 
     
     [PunRPC]
-    void RpcCreateAvatar(bool isMan, int topIndex, int bottomIndex, bool isCustomTop, string customImageFileName)
+    void RpcCreateAvatar(bool isMan, int topIndex, int bottomIndex, bool isCustomTop, string customImageFileName, string OwnerUID)
     {
         GameObject character;
         if (isMan)
@@ -59,7 +59,7 @@ public class ModelingRuntimeCreate : MonoBehaviourPun
         Instantiate(character, gameObject.transform);
         if (isCustomTop)
         {
-            DatabaseManager.Instance.DownloadImage(customImageFileName, OnLoadTexture);
+            DatabaseManager.Instance.DownloadImageFrom(OwnerUID, customImageFileName, OnLoadTexture);
         }
         anim.avatar = isMan ? maleAvatar : femaleAvatar;
 

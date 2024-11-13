@@ -46,11 +46,16 @@ public class RenderBoothData : MonoBehaviour
             Destroy(currentInstantiatedObject);
         }
         currentInstantiatedObject = ObjectLoader.ImportObj(extraData.modelingPath);
-        currentInstantiatedObject.transform.localScale = new Vector3(extraData.modelingScale, extraData.modelingScale, extraData.modelingScale);
+        if(currentInstantiatedObject != null)
+            currentInstantiatedObject.transform.localScale = new Vector3(extraData.modelingScale, extraData.modelingScale, extraData.modelingScale);
     }
     void SetLogo(Texture2D images)
     {
+       
         boothLogoRenderer.material.mainTexture = images;
+        boothLogoRenderer.material.SetColor("_EmissionColor", Color.white);
+        boothLogoRenderer.material.SetTexture("_EmissionMap", images);
+        boothLogoRenderer.material.EnableKeyword("_EMISSION");
     }
 
     void SetColor(Color color)
@@ -71,6 +76,9 @@ public class RenderBoothData : MonoBehaviour
             videoRenderTexture.Create();
             videoPlayer.targetTexture = videoRenderTexture;
             boothVideoRenderer.material.mainTexture = videoRenderTexture;
+            boothVideoRenderer.material.SetTexture("_EmissionMap", videoRenderTexture);
+            boothVideoRenderer.material.SetColor("_EmissionColor", Color.white);
+            boothVideoRenderer.material.EnableKeyword("_EMISSION");
         }
         // Render Texture를 벽의 
         videoPlayer.url = path;
