@@ -37,7 +37,7 @@ public class NetworkManager : Singleton<NetworkManager>
     {
         if (aiWebSocket == null)
         {
-            Debug.LogError($"AIWebSocket이 null입니다. AI ID: {aiId}");
+            //Debug.LogError($"AIWebSocket이 null입니다. AI ID: {aiId}");
             return;
         }
         aiWebSocket.Initialize(aiId);
@@ -49,13 +49,13 @@ public class NetworkManager : Singleton<NetworkManager>
     {
         if (voiceManager == null)
         {
-            Debug.LogError($"VoiceManager가 null입니다. User ID: {userId}");
+            //Debug.LogError($"VoiceManager가 null입니다. User ID: {userId}");
             return;
         }
 
         if (string.IsNullOrEmpty(userId))  // userId null 체크 추가
         {
-            Debug.LogError("User ID가 null이거나 비어있습니다.");
+            //Debug.LogError("User ID가 null이거나 비어있습니다.");
             return;
         }
 

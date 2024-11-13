@@ -285,10 +285,17 @@ public class AIWebSocket : MonoBehaviour
     // ProcessReceivedMessage 메서드: 서버로부터 받은 메시지를 처리합니다.
     private void ProcessReceivedMessage(string message)
     {
-        Debug.Log("받은 메시지: " + message);
+        var response = JsonConvert.DeserializeObject<dynamic>(message);
+
+        if (response.type == "generated.audio.delta")
+        {
+            Debug.Log("받은 메시지: {\"type\":\"generated.audio.delta");
+        }
+        else Debug.Log("받은 메시지: " + message);
+
         //try
         //{
-            var response = JsonConvert.DeserializeObject<dynamic>(message);
+            
             
             if (response.type == "generated.text.delta")
             {

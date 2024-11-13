@@ -15,7 +15,7 @@ public class AIInitializer : MonoBehaviour
         }
         else
         {
-            Debug.LogError("AIWebSocket 컴포넌트를 찾을 수 없습니다!");
+            //Debug.LogError("AIWebSocket 컴포넌트를 찾을 수 없습니다!");
         }
     }
 }

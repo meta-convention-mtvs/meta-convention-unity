@@ -142,7 +142,7 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
     /// </summary>
     private void StartRecording()
     {
-        print("StartRecording(녹음 시작됨)");
+        print("StartRecording(녹음 시작되는 함수에 진입)");
         // currentSpeakerId 참조를 TranslationEventHandler로 변경
         print("CurrentSpeakerId: " + TranslationEventHandler.Instance.CurrentSpeakerId);
         // if (!string.IsNullOrEmpty(TranslationEventHandler.Instance.CurrentSpeakerId)) return;
@@ -159,6 +159,7 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
         }
 
         // 녹음 시작
+        Debug.Log("녹음을 진짜 시작하는 부분(recordingClip)");
         recordingClip = Microphone.Start(null, true, (int)maxRecordingTime, RECORDING_FREQUENCY);
     }
 
@@ -168,7 +169,11 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
     private void StopRecording()
     {
         print("StopRecording(일단 실행됨)");
-        if (!isRecording) return;
+        if (!isRecording)
+        {
+            Debug.LogError("isRecording이 " + isRecording + "이라서 return됨.");
+            return;  
+        }
         print("StopRecording(녹음 중지됨)");
         
         // 현재 position 저장
@@ -466,9 +471,11 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
         print("OnSpeechApproved(발언권 승인됨)");
         if (FireAuthManager.Instance.GetCurrentUser().UserId == approvedUserId)
         {
-            print("if문 통과함");
             ShowCanSpeakUI();
+            Debug.Log("UI 표시됨: ShowCanSpeakUI() 실행");
             StartRecording();
+            Debug.Log("녹음 시작됨: StartRecording() 실행");
+
         }
     }
 
