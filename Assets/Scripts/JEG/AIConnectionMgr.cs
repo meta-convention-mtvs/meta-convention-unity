@@ -43,8 +43,6 @@ public class TestRecommendedCompany
     public string link { get; set; }
     [FirestoreProperty]
     public string logo_file_name { get; set; }
-    [FirestoreProperty]
-    public string reason { get; set; }
 
 }
 
