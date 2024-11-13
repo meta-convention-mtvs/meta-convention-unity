@@ -21,7 +21,10 @@ public class SummaryMgr : MonoBehaviourPun
         public string summary { get; set; }
         public string full_script { get; set; }
     }
-
+    private void Start()
+    {
+        OnClickTakeUserID();
+    }
     public void OnClickTakeUserID()
     {
         // 내가 방장이라면
