@@ -7,9 +7,10 @@ using Hashtable = ExitGames.Client.Photon.Hashtable;
 
 public class BusinessRoomQueueManager : MonoBehaviourPunCallbacks
 {
-    public BusinessRoomLoader businessRoomLoader;
     public UIBusinessRoomQueueManager ui_br;
     Queue<string> meetingQueue;
+
+    string roomName;
 
     private void Start()
     {
@@ -62,8 +63,9 @@ public class BusinessRoomQueueManager : MonoBehaviourPunCallbacks
             Player targetPlayer = FindPlayerWithId(playerId);
             if (targetPlayer != null)
             {
-                photonView.RPC(nameof(GoToBusinessRoom), targetPlayer);
-                businessRoomLoader.GoToBusinessRoom();
+                roomName = FireAuthManager.Instance.GetCurrentUser().UserId;
+                photonView.RPC(nameof(GoToBusinessRoom), targetPlayer, roomName);
+                PhotonNetwork.LeaveRoom();
             }
         }
     }
@@ -77,8 +79,45 @@ public class BusinessRoomQueueManager : MonoBehaviourPunCallbacks
     }
 
     [PunRPC]
-    void GoToBusinessRoom()
+    void GoToBusinessRoom(string roomName)
     {
-        businessRoomLoader.GoToBusinessRoom();
+        this.roomName = roomName;
+        PhotonNetwork.LeaveRoom();
+    }
+
+    public override void OnConnectedToMaster()
+    {
+        print("Connected to master: go to business Room");
+        JoinOrCreateRoom(roomName);
+    }
+
+    void JoinOrCreateRoom(string roomName)
+    {
+        if (PhotonNetwork.IsConnected)
+        {
+            RoomOptions roomOptions = new RoomOptions();
+            roomOptions.MaxPlayers = 20;
+            PhotonNetwork.JoinOrCreateRoom(roomName, roomOptions, TypedLobby.Default);
+        }
+        else
+        {
+            PhotonNetwork.ConnectUsingSettings();
+        }
+    }
+
+    public override void OnJoinedRoom()
+    {
+        print("Entered the Room");
+        if(PhotonNetwork.CurrentRoom.Name == FireAuthManager.Instance.GetCurrentUser().UserId)
+        {
+            PhotonNetwork.CurrentRoom.SetMasterClient(PhotonNetwork.LocalPlayer);
+        }
+        PhotonNetwork.LoadLevel("BusinessRoomScene");
+
+    }
+    public override void OnJoinRoomFailed(short returnCode, string message)
+    {
+        print("Enter room failed...");
+        print(returnCode + message);
     }
 }

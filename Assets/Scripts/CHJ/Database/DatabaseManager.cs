@@ -78,16 +78,19 @@ public class DatabaseManager : Singleton<DatabaseManager>
         }
     }
 
-
+    public void GetDataFrom<T>(string uid, Action<T> OnComplete) where T : class
+    {
+        StartCoroutine(CoLoadUserInfo<T>(uid, OnComplete));
+    }
 
     public void GetData<T>(Action<T> OnComplete) where T : class
     {
-        StartCoroutine(CoLoadUserInfo<T>(OnComplete));
+        StartCoroutine(CoLoadUserInfo<T>(FireAuthManager.Instance.GetCurrentUser().UserId, OnComplete));
     }
-    IEnumerator CoLoadUserInfo<T>(Action<T> onComplete) where T : class
+    IEnumerator CoLoadUserInfo<T>(string uid, Action<T> onComplete) where T : class
     {
         // 저장 경로 USER/ID/내 정보
-        string path = "USER/" + FireAuthManager.Instance.GetCurrentUser().UserId + "/" + "Data/" + typeof(T).ToString();
+        string path = "USER/" + uid + "/" + "Data/" + typeof(T).ToString();
         // 정보 조회 요청
         Task<DocumentSnapshot> task = FirebaseFirestore.DefaultInstance.Document(path).GetSnapshotAsync();
         // 통신이 완료 될 때 까지 기다린다.
@@ -144,8 +147,13 @@ public class DatabaseManager : Singleton<DatabaseManager>
 
     public void DownloadImage(string imageFileName, Action<Texture2D> OnTextureLoad)
     {
+        DownloadImageFrom(FireAuthManager.Instance.GetCurrentUser().UserId, imageFileName, OnTextureLoad);
+    }
+
+    public void DownloadImageFrom(string uid, string imageFileName, Action<Texture2D> OnTextureLoad)
+    {
         var storageRef = storage.GetReferenceFromUrl("gs://metaconvention.appspot.com");
-        var fileRef = storageRef.Child("images/" + FireAuthManager.Instance.GetCurrentUser().UserId + "/" + imageFileName);
+        var fileRef = storageRef.Child("images/" + uid + "/" + imageFileName);
 
         fileRef.GetDownloadUrlAsync().ContinueWithOnMainThread(task =>
         {
@@ -214,9 +222,14 @@ public class DatabaseManager : Singleton<DatabaseManager>
 
     public void DownLoadVideo(string videoFileName, Action<string> OnVideoLoad)
     {
+        DownLoadVideoFrom(FireAuthManager.Instance.GetCurrentUser().UserId, videoFileName, OnVideoLoad);
+    }
+
+    public void DownLoadVideoFrom(string uid, string videoFileName, Action<string> OnVideoLoad)
+    {
         // Storage 참조 설정
         var storageRef = storage.GetReferenceFromUrl("gs://metaconvention.appspot.com");
-        var fileRef = storageRef.Child("videos/" + FireAuthManager.Instance.GetCurrentUser().UserId + "/" + videoFileName);
+        var fileRef = storageRef.Child("videos/" + uid + "/" + videoFileName);
 
 
         fileRef.GetDownloadUrlAsync().ContinueWithOnMainThread(task =>
@@ -226,7 +239,7 @@ public class DatabaseManager : Singleton<DatabaseManager>
                 string downloadUrl = task.Result.ToString();
                 Debug.Log("비디오 다운로드 URL: " + downloadUrl);
                 OnVideoLoad?.Invoke(downloadUrl);
-       
+
             }
             else
             {
@@ -262,9 +275,57 @@ public class DatabaseManager : Singleton<DatabaseManager>
             }
         });
     }
-
-    public void DownloadObject(string obejctFileName, Action<string> OnObjectLoad)
+    public void DownloadObject(string objFileName, Action<string> OnObjDownload)
     {
+        DownloadObjectFrom(FireAuthManager.Instance.GetCurrentUser().UserId, objFileName, OnObjDownload);
+    }
 
+    // .obj 파일 다운로드 메서드
+    public void DownloadObjectFrom(string uid, string objFileName, Action<string> OnObjDownload)
+    {
+        // Firebase Storage에서 객체 참조
+        var storageRef = storage.GetReferenceFromUrl("gs://metaconvention.appspot.com");
+        var fileRef = storageRef.Child("objects/" + uid + "/" + objFileName);  // models 폴더에 있는 .obj 파일
+
+        // 비디오 다운로드 URL을 가져오는 방식과 동일
+        fileRef.GetDownloadUrlAsync().ContinueWithOnMainThread(task =>
+        {
+            if (task.IsCompleted)
+            {
+                string downloadUrl = task.Result.ToString();
+                Debug.Log("파일 다운로드 URL: " + downloadUrl);
+
+                // 다운로드한 URL을 사용하여 파일을 로컬에 저장
+                StartCoroutine(DownloadFileToLocal(downloadUrl, uid, objFileName, OnObjDownload));
+            }
+            else
+            {
+                Debug.LogError("파일 URL 가져오기 실패: " + task.Exception);
+            }
+        });
+    }
+
+    // 파일 다운로드를 처리하는 코루틴
+    private IEnumerator DownloadFileToLocal(string url, string uid, string fileName, Action<string> OnObjDownload)
+    {
+        // 로컬 파일 저장 경로 설정
+        string localPath = Path.Combine(Application.persistentDataPath, uid, fileName);
+
+        // UnityWebRequest를 통해 URL에서 파일을 다운로드
+        using (var www = new UnityWebRequest(url))
+        {
+            www.downloadHandler = new DownloadHandlerFile(localPath);
+            yield return www.SendWebRequest();
+
+            if (www.result == UnityWebRequest.Result.Success)
+            {
+                Debug.Log("파일 다운로드 완료: " + localPath);
+                OnObjDownload?.Invoke(localPath);
+            }
+            else
+            {
+                Debug.LogError("파일 다운로드 실패: " + www.error);
+            }
+        }
     }
 }

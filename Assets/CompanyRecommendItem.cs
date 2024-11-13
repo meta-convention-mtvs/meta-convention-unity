@@ -6,10 +6,10 @@ using UnityEngine.UI;
 public class CompanyRecommendItem : MonoBehaviour
 {
     public Text companyName;
-    public Text companyMission;
     public Text companyItem;
     public Text companyLink;
-    public Text companyReason;
+    public Text companyMission;
+    public Image companyLogo;
 
     public void SetItemText(TestRecommendedCompany companyInfo)
     {
@@ -21,7 +21,14 @@ public class CompanyRecommendItem : MonoBehaviour
             companyItem.text = companyInfo.items;
         if(companyLink != null)
             companyLink.text = companyInfo.link;
-        if(companyReason != null)
-            companyReason.text = companyInfo.reason;
+
+        if (!string.IsNullOrEmpty(companyInfo.logo_file_name))
+        {
+            Sprite loadedSprite = Resources.Load<Sprite>("Logos/"+companyInfo.logo_file_name);
+            if (loadedSprite != null)
+            {
+                companyLogo.sprite = loadedSprite;
+            }
+        }
     }
 }

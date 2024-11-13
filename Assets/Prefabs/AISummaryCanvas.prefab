@@ -94,7 +94,7 @@ MonoBehaviour:
   m_Content: {fileID: 7406526368333723944}
   m_Horizontal: 1
   m_Vertical: 1
-  m_MovementType: 1
+  m_MovementType: 0
   m_Elasticity: 0.1
   m_Inertia: 1
   m_DecelerationRate: 0.135
@@ -322,6 +322,7 @@ GameObject:
   - component: {fileID: 9068330668240663478}
   - component: {fileID: 4743662358528505360}
   - component: {fileID: 172160241246941034}
+  - component: {fileID: 3812719893493806958}
   m_Layer: 5
   m_Name: AISummaryCanvas
   m_TagString: Untagged
@@ -342,7 +343,6 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4038030688429205185}
-  - {fileID: 5325127796856386647}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -385,10 +385,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_UiScaleMode: 0
+  m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
-  m_ReferenceResolution: {x: 800, y: 600}
+  m_ReferenceResolution: {x: 1920, y: 1080}
   m_ScreenMatchMode: 0
   m_MatchWidthOrHeight: 0
   m_PhysicalUnit: 3
@@ -413,6 +413,21 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
+--- !u!114 &3812719893493806958
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7142517359931289552}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 446a08d78d4662243915f3ad4b349e79, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  summaryText: {fileID: 7818591198506345504}
+  canvas: {fileID: 4330394437240019007}
+  contentRectTransform: {fileID: 7406526368333723944}
 --- !u!1 &7455964475524595312
 GameObject:
   m_ObjectHideFlags: 0
@@ -1068,11 +1083,11 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 6298528150058898245}
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 187635695084925239, guid: bbefda08fa0b5f94694ace2cb07c71b7,
+    - targetCorrespondingSourceObject: {fileID: 3693387922855341510, guid: bbefda08fa0b5f94694ace2cb07c71b7,
         type: 3}
       insertIndex: -1
-      addedObject: {fileID: 5988659077514223466}
+      addedObject: {fileID: 5325127796856386647}
+    m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 187635695084925239, guid: bbefda08fa0b5f94694ace2cb07c71b7,
         type: 3}
       insertIndex: -1
@@ -1084,21 +1099,6 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 813035226349456135}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &5988659077514223466
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 707881600700398128}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1c2cf6cb673f59b4f9aeb44103301d63, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  url: http://ec2-3-36-111-173.ap-northeast-2.compute.amazonaws.com:6576/recommendation
-  situ_input: {fileID: 0}
-  ui_cr: {fileID: 0}
 --- !u!225 &4330394437240019007
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -1247,12 +1247,47 @@ PrefabInstance:
   serializedVersion: 2
   m_Modification:
     serializedVersion: 3
-    m_TransformParent: {fileID: 1842046593022452059}
+    m_TransformParent: {fileID: 4038030688429205185}
     m_Modifications:
     - target: {fileID: 1508116238268087379, guid: 6f9621007d775495f9c8de66058392bc,
         type: 3}
       propertyPath: m_Text
       value: "\uB2EB\uAE30"
+      objectReference: {fileID: 0}
+    - target: {fileID: 5817510849166728196, guid: 6f9621007d775495f9c8de66058392bc,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5817510849166728196, guid: 6f9621007d775495f9c8de66058392bc,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5817510849166728196, guid: 6f9621007d775495f9c8de66058392bc,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 3812719893493806958}
+    - target: {fileID: 5817510849166728196, guid: 6f9621007d775495f9c8de66058392bc,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5817510849166728196, guid: 6f9621007d775495f9c8de66058392bc,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: Hide
+      objectReference: {fileID: 0}
+    - target: {fileID: 5817510849166728196, guid: 6f9621007d775495f9c8de66058392bc,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: UIAISummary, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 5817510849166728196, guid: 6f9621007d775495f9c8de66058392bc,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
       objectReference: {fileID: 0}
     - target: {fileID: 5817510849166728198, guid: 6f9621007d775495f9c8de66058392bc,
         type: 3}
@@ -1322,17 +1357,17 @@ PrefabInstance:
     - target: {fileID: 5817510849166728199, guid: 6f9621007d775495f9c8de66058392bc,
         type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 5817510849166728199, guid: 6f9621007d775495f9c8de66058392bc,
         type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 5817510849166728199, guid: 6f9621007d775495f9c8de66058392bc,
         type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 5817510849166728199, guid: 6f9621007d775495f9c8de66058392bc,
         type: 3}
