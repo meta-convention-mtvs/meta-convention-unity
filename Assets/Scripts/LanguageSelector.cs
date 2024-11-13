@@ -42,7 +42,7 @@ public class LanguageSelector : MonoBehaviour
         this.languageIndex = languageIndex;
     }
 
-    void OnSaveData()
+    public void OnSaveData()
     {
         if(languageIndex != -1)
         {
