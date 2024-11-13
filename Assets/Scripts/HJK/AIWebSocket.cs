@@ -72,7 +72,7 @@ public class AIWebSocket : MonoBehaviour
             Debug.Log("WebSocket 연결 성공");
             isConnected = true;
             // 연결 성공 후 초기 설정을 서버로 전송
-            SendConfigUpdate(companyUID);
+            // SendConfigUpdate(companyUID);
         };
 
         // 서버로부터 메시지를 받았을 때 호출되는 이벤트
