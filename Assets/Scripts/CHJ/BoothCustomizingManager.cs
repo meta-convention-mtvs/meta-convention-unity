@@ -166,7 +166,8 @@ public class BoothCustomizingManager : MonoBehaviour
 
     void SetBannerImage()
     {
-
+        FileUploadManager.Instance.SetUpImageFileBrowser();
+        FileUploadManager.Instance.ShowDialog(SetBannerImage);
     }
 
     void SetModelingScale(float size)
@@ -199,6 +200,12 @@ public class BoothCustomizingManager : MonoBehaviour
         boothDataChanged = true;
     }
 
+    void SetBannerImage(string[] paths)
+    {
+        string path = paths[0];
+        boothCustomizeData.bannerImagePath = path;
+        boothDataChanged = true;
+    }
     void SetVideoClip(string[] paths)
     {
         string path = paths[0];
@@ -217,6 +224,7 @@ public class BoothCustomizingManager : MonoBehaviour
         extraData.videoURL = data.videoURL;
         extraData.hasBanner = data.hasBanner;
         extraData.bannerImage = ImageUtility.LoadTexture(data.bannerImagePath);
+        extraData.homepageLink = data.homepageLink;
         return extraData;
     }
 
@@ -318,6 +326,7 @@ public class BoothCustomizeData
 public class BoothExtraData
 {
     public BoothType boothType;
+    public string homepageLink;
     public Color color;
     public Texture2D logoImage;
     public string modelingPath;

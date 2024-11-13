@@ -13,16 +13,19 @@ public class RenderBoothData : MonoBehaviour
     private Renderer boothLogoRenderer;
     private Renderer boothVideoRenderer;
     private Renderer boothRenderer;
+    private Renderer bannerRenderer;
 
     private VideoPlayer videoPlayer;
     private RenderTexture videoRenderTexture;
     private AudioSource audioSource;
 
     private GameObject currentInstantiatedObject;
+    
 
     private void Awake()
     {
         boothRenderer = GetComponent<Renderer>();
+        bannerRenderer = banner.GetComponent<Renderer>();
         boothLogoRenderer = boothLogo.GetComponent<Renderer>();
         boothVideoRenderer = boothVideoWall.GetComponent<Renderer>();
         videoPlayer = GetComponent<VideoPlayer>();
@@ -38,15 +41,7 @@ public class RenderBoothData : MonoBehaviour
         {
             currentInstantiatedObject.transform.localScale = new Vector3(extraData.modelingScale, extraData.modelingScale, extraData.modelingScale);
         }
-        if (extraData.hasBanner)
-        {
-            banner.SetActive(true);
-            SetBanner(extraData.bannerImage);
-        }
-        else
-        {
-            banner.SetActive(false);
-        }
+        SetBanner(extraData.hasBanner, extraData.bannerImage, extraData.homepageLink);
     }
 
     public void RenderBoothModeling(BoothExtraData extraData)
@@ -107,9 +102,21 @@ public class RenderBoothData : MonoBehaviour
         videoPlayer.Play();
     }
 
-    void SetBanner(Texture2D bannerImage)
+    void SetBanner(bool hasBanner, Texture2D bannerImage, string homepageURL)
     {
-
+        if (hasBanner)
+        {
+            banner.SetActive(true);
+            bannerRenderer.material.mainTexture = bannerImage;
+            bannerRenderer.material.SetColor("_EmissionColor", Color.white);
+            bannerRenderer.material.SetTexture("_EmissionMap", bannerImage);
+            bannerRenderer.material.EnableKeyword("_EMISSION");
+            banner.GetComponent<InteractableBannerObject>().homepageURL = homepageURL;
+        }
+        else
+        {
+            banner.SetActive(false);
+        }
     }
 
 }

@@ -16,6 +16,7 @@ public class BoothRuntimeCreate : MonoBehaviourPun
 
     private string boothModelingPath;
     private Texture2D logoImage;
+    private Texture2D bannerImage;
     private string videoURL;
 
     private BoothCustomizeData data;
@@ -23,6 +24,7 @@ public class BoothRuntimeCreate : MonoBehaviourPun
     private bool isLogoLoaded;
     private bool isVideoLoaded;
     private bool isObjectLoaded;
+    private bool isBannerLoaded;
 
     private string OwnerUID;
 
@@ -36,7 +38,6 @@ public class BoothRuntimeCreate : MonoBehaviourPun
     void LoadBoothCustomizeData(string uid)
     {
         DatabaseManager.Instance.GetDataFrom<BoothCustomizeData>(uid, OnLoadBoothCustomizeData);
-        
     }
 
     void OnLoadBoothCustomizeData(BoothCustomizeData data)
@@ -58,9 +59,20 @@ public class BoothRuntimeCreate : MonoBehaviourPun
         else
             isVideoLoaded = true;
 
+        if (!string.IsNullOrEmpty(data.bannerImagePath))
+            DatabaseManager.Instance.DownloadImageFrom(OwnerUID, data.bannerImagePath, OnLoadBannerImageData);
+        else
+            isBannerLoaded = true;
+
         CheckAllDataLoaded();
     }
-
+    
+    void OnLoadBannerImageData(Texture2D texture)
+    {
+        isBannerLoaded = true;
+        bannerImage = texture;
+        CheckAllDataLoaded();
+    }
     void OnLoadBoothModelingData(string path)
     {
         isObjectLoaded = true;
@@ -84,7 +96,7 @@ public class BoothRuntimeCreate : MonoBehaviourPun
 
     void CheckAllDataLoaded()
     {
-        if(isObjectLoaded && isVideoLoaded && isLogoLoaded)
+        if(isObjectLoaded && isVideoLoaded && isLogoLoaded & isBannerLoaded)
         {
             BoothExtraData extraData = GetBoothExtraData(data);
 
@@ -101,6 +113,9 @@ public class BoothRuntimeCreate : MonoBehaviourPun
         extraData.modelingScale = data.modelingScale;
         extraData.modelingPath = boothModelingPath;
         extraData.videoURL = videoURL;
+        extraData.hasBanner = data.hasBanner;
+        extraData.bannerImage = bannerImage;
+        extraData.homepageLink = data.homepageLink;
         return extraData;
     }
 }
