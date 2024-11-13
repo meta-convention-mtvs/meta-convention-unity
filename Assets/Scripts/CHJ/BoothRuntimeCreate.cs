@@ -31,7 +31,14 @@ public class BoothRuntimeCreate : MonoBehaviourPun
     private void Start()
     {
         renderBoothData = GetComponent<RenderBoothData>();
-        OwnerUID = (string)photonView.Owner.CustomProperties["id"];
+        if (photonView.IsMine)
+        {
+            OwnerUID = FireAuthManager.Instance.GetCurrentUser().UserId;
+        }
+        else
+        {
+            OwnerUID = (string)photonView.Owner.CustomProperties["id"];
+        }
         LoadBoothCustomizeData(OwnerUID);
     }
 

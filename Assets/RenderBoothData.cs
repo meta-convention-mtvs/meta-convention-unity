@@ -34,9 +34,15 @@ public class RenderBoothData : MonoBehaviour
 
     public void RenderBoothDataWith(BoothExtraData extraData)
     {
-        SetLogo(extraData.logoImage);
+        if (extraData.logoImage != null)
+        {
+            SetLogo(extraData.logoImage);
+        }
         SetColor(extraData.color);
-        SetVideo(extraData.videoURL);
+        if (!string.IsNullOrEmpty(extraData.videoURL))
+        {
+            SetVideo(extraData.videoURL);
+        }
         if (currentInstantiatedObject != null)
         {
             currentInstantiatedObject.transform.localScale = new Vector3(extraData.modelingScale, extraData.modelingScale, extraData.modelingScale);
