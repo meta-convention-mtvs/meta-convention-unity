@@ -8,17 +8,17 @@ public class UIBoothDisplay : MonoBehaviour
 {
     public Button objectButton;
     public Button videoButton;
-    public Button[] furnitureButtons;
+    public Button furnitureButton;
     public Button bannerButton;
+    public Button bannerImageButton;
     public Slider objectSizeSlider;
 
-    public Action OnObjectButtonClick, OnVideoButtonClick, OnBannerButtonClick;
-    public Action[] OnFurnitureButtonClick;
+    public Action OnObjectButtonClick, OnVideoButtonClick, OnBannerImageButtonClick;
+    public Action OnFurnitureButtonClick, OnBannerButtonClick;
     public Action<float> OnObjectSliderChanged;
 
     private void Awake()
     {
-        OnFurnitureButtonClick = new Action[furnitureButtons.Length];
         BoothCustomizingManager boothManager = GameObject.FindObjectOfType<BoothCustomizingManager>();
         if (boothManager != null)
         {
@@ -30,12 +30,8 @@ public class UIBoothDisplay : MonoBehaviour
     {
         objectButton.onClick.AddListener(_OnObjectButtonClick);
         videoButton.onClick.AddListener(_OnVideoButtonClick);
-        for(int i = 0; i<furnitureButtons.Length; i++)
-        {
-            // 이 변수는 값 참조를 위해서 필요함. 없으면 i가 바뀌면 계속 i 값 따라감.
-            int j = i;
-            furnitureButtons[i].onClick.AddListener(() => _OnFurnitureButtonClick(j));
-        }
+        furnitureButton.onClick.AddListener(_OnFurnitureButtonClick);
+        bannerImageButton.onClick.AddListener(_OnBannerImageButtonClick);
         bannerButton.onClick.AddListener(_OnBannerButtonClick);
         objectSizeSlider.onValueChanged.AddListener(_OnObjectSliderChanged);
     }
@@ -50,9 +46,9 @@ public class UIBoothDisplay : MonoBehaviour
         OnVideoButtonClick?.Invoke();
     }
 
-    void _OnFurnitureButtonClick(int index)
+    void _OnFurnitureButtonClick()
     {
-        OnFurnitureButtonClick[index]?.Invoke();
+        OnFurnitureButtonClick.Invoke();
     }
 
     void _OnBannerButtonClick()
@@ -63,5 +59,10 @@ public class UIBoothDisplay : MonoBehaviour
     void _OnObjectSliderChanged(float f)
     {
         OnObjectSliderChanged?.Invoke(f);
+    }
+
+    void _OnBannerImageButtonClick()
+    {
+        OnBannerImageButtonClick?.Invoke();
     }
 }

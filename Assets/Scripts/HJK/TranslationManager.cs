@@ -32,12 +32,6 @@ public class TranslationManager : Singleton<TranslationManager>
         dispatcher = GameObject.FindObjectOfType(typeof(UnityMainThreadDispatcher))as UnityMainThreadDispatcher;
     }
 
-    private void Update()
-    {
-        if (ws != null && ws.IsAlive)
-            print("ws is alive");
-    }
-
     private bool isConnecting = false;
 
     public void Connect()

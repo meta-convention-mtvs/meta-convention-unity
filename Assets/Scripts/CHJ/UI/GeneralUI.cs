@@ -8,7 +8,6 @@ public class GeneralUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
 {
     public KeyCode[] hideKeys;
 
-
     CanvasGroup canvas;
     bool isActivated = false;
     bool isMouseOutsideUI = true;
@@ -61,12 +60,10 @@ public class GeneralUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
     public void OnPointerEnter(PointerEventData eventData)
     {
         isMouseOutsideUI = false;
-        print(gameObject.name + "mouse Enter");
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
         isMouseOutsideUI = true;
-        print(gameObject.name + "mouse Leave");
     }
 }

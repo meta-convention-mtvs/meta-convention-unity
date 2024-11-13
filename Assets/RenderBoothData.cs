@@ -8,6 +8,7 @@ public class RenderBoothData : MonoBehaviour
 {
     public GameObject boothLogo;
     public GameObject boothVideoWall;
+    public GameObject banner;
 
     private Renderer boothLogoRenderer;
     private Renderer boothVideoRenderer;
@@ -37,6 +38,14 @@ public class RenderBoothData : MonoBehaviour
         {
             currentInstantiatedObject.transform.localScale = new Vector3(extraData.modelingScale, extraData.modelingScale, extraData.modelingScale);
         }
+        if (extraData.hasBanner)
+        {
+            SetBanner(extraData.bannerImage);
+        }
+        else
+        {
+
+        }
     }
 
     public void RenderBoothModeling(BoothExtraData extraData)
@@ -46,8 +55,11 @@ public class RenderBoothData : MonoBehaviour
             Destroy(currentInstantiatedObject);
         }
         currentInstantiatedObject = ObjectLoader.ImportObj(extraData.modelingPath);
-        if(currentInstantiatedObject != null)
+        if (currentInstantiatedObject != null)
+        {
             currentInstantiatedObject.transform.localScale = new Vector3(extraData.modelingScale, extraData.modelingScale, extraData.modelingScale);
+            currentInstantiatedObject.transform.SetParent(this.gameObject.transform, false);
+        }
     }
     void SetLogo(Texture2D images)
     {
@@ -94,5 +106,9 @@ public class RenderBoothData : MonoBehaviour
         videoPlayer.Play();
     }
 
+    void SetBanner(Texture2D bannerImage)
+    {
+
+    }
 
 }

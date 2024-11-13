@@ -48,12 +48,16 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
     // 에러 메시지 관련
     private float errorMessageDisplayTime = 3f;                // 에러 메시지 표시 시간
     private Coroutine errorMessageCoroutine;                  // 에러 메시지 표시 코루틴
+    private float lastEventTime = 0f;
 
     /// <summary>
     /// 발언 가능 상태에 따라 UI를 업데이트
     /// </summary>
     public void UpdateSpeakUI(bool canSpeak)
     {
+        float currentTime = Time.time;
+        Debug.Log($"이벤트 발생 간경: {currentTime - lastEventTime}");
+        lastEventTime = currentTime;
         if (speakButton != null)
         {
             speakButton.SetActive(canSpeak);
@@ -83,7 +87,7 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
     /// <summary>
     /// 매 프레임마다 입력 체크
     /// </summary>
-    private void Update()
+    private void FixedUpdate()
     {
         // 발언 키(M) 눌렀을 때
         if (Input.GetKeyDown(speakKey))

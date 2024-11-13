@@ -53,22 +53,17 @@ public class AIWebSocket : MonoBehaviour
         Debug.Log($"AI {aiId} 초기화됨");
     }
 
-    // Start 메서드: WebSocket 연결을 초기화하고 이벤트 핸들러를 설정합니다.
-    async void Start()
+    public async void Connect(string companyUID)
     {
-        // ConnectToWebsocket("ws://metaai2.iptime.org:44444", messageQueue);
-        //ConnectToWebsocket("ws://ec2-13-125-234-38.ap-northeast-2.compute.amazonaws.com:44444", messageQueue); 
-        ConnectToWebsocket("ws://ec2-3-36-111-173.ap-northeast-2.compute.amazonaws.com:6576/chat", messageQueue);
+        ConnectToWebsocket("ws://ec2-3-36-111-173.ap-northeast-2.compute.amazonaws.com:6576/chat", messageQueue, companyUID);
         await WaitForConnection();
         if (isConnected)
         {
-            await SendConfigUpdate();
+            await SendConfigUpdate(companyUID);
         }
-//        NetworkManager.Instance.RegisterAI(this, aiId);
-
     }
 
-    public void ConnectToWebsocket(string websocketAddress, Queue<string> messageQueue)
+    public void ConnectToWebsocket(string websocketAddress, Queue<string> messageQueue, string companyUID)
     {
         ws = new WebSocket(websocketAddress);
 
@@ -77,7 +72,7 @@ public class AIWebSocket : MonoBehaviour
             Debug.Log("WebSocket 연결 성공");
             isConnected = true;
             // 연결 성공 후 초기 설정을 서버로 전송
-            SendConfigUpdate();
+            SendConfigUpdate(companyUID);
         };
 
         // 서버로부터 메시지를 받았을 때 호출되는 이벤트
@@ -164,7 +159,7 @@ public class AIWebSocket : MonoBehaviour
     //    };
     //    await SendRequestAsync(configUpdate);
     //}
-    public async Task SendConfigUpdate()
+    public async Task SendConfigUpdate(string companyUID)
     {
         if (!isConnected)
         {
@@ -178,7 +173,7 @@ public class AIWebSocket : MonoBehaviour
         var configUpdate = new
         {
             type = "config.update",
-            org = "cf79ea17-a487-4b27-a20d-bbd11ff885da",
+            org = companyUID,
             userid = userId,
             lang = "ko",  // ISO 639 Language Code 형식 사용
             llm = "realtime"

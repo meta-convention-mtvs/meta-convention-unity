@@ -50,6 +50,8 @@ public class BoothCustomizingManager : MonoBehaviour
         display.OnObjectButtonClick += ShowModelingFileUploder;
         display.OnVideoButtonClick += ShowVideoFileUploder;
         display.OnObjectSliderChanged += SetModelingScale;
+        display.OnBannerButtonClick += SetBanner;
+        display.OnBannerImageButtonClick += SetBannerImage;
     }
     private void Update()
     {
@@ -144,7 +146,6 @@ public class BoothCustomizingManager : MonoBehaviour
         FileUploadManager.Instance.ShowDialog(SetModeling);
     }
 
-    // to do: booth도 올릴 수 있어야 한다.
     void ShowBoothFileUploader()
     {
         FileUploadManager.Instance.SetUpObjFileBrowser();
@@ -157,6 +158,11 @@ public class BoothCustomizingManager : MonoBehaviour
         FileUploadManager.Instance.ShowDialog(SetVideoClip);
     }
 
+    void SetBanner()
+    {
+        boothCustomizeData.hasBanner = !boothCustomizeData.hasBanner;
+        boothDataChanged = true;
+    }
     void SetModelingScale(float size)
     {
         boothCustomizeData.modelingScale = size;
@@ -203,6 +209,8 @@ public class BoothCustomizingManager : MonoBehaviour
         extraData.modelingScale = data.modelingScale;
         extraData.modelingPath = data.modelingPath;
         extraData.videoURL = data.videoURL;
+        extraData.hasBanner = data.hasBanner;
+        extraData.bannerImage = ImageUtility.LoadTexture(data.bannerImagePath);
         return extraData;
     }
 
@@ -228,13 +236,21 @@ public class BoothCustomizingManager : MonoBehaviour
             DatabaseManager.Instance.UploadVideo(boothCustomizeData.videoURL.Substring("file://".Length));
         }
 
+        if(boothCustomizeData.bannerImagePath != null)
+        {
+            DatabaseManager.Instance.UploadImage(boothCustomizeData.bannerImagePath);
+        }
+
         boothCustomizeData.boothObjectPath = Path.GetFileName(boothCustomizeData.boothObjectPath);
         boothCustomizeData.logoImagePath = Path.GetFileName(boothCustomizeData.logoImagePath);
         boothCustomizeData.modelingPath = Path.GetFileName(boothCustomizeData.modelingPath);
+        boothCustomizeData.bannerImagePath = Path.GetFileName(boothCustomizeData.bannerImagePath);
+
         if (boothCustomizeData.videoURL != null && boothCustomizeData.videoURL.StartsWith("file://"))
         {
             boothCustomizeData.videoURL = Path.GetFileName(boothCustomizeData.videoURL.Substring("file://".Length));
         }
+
         DatabaseManager.Instance.SaveData<BoothCustomizeData>(boothCustomizeData);
 
     }
@@ -287,6 +303,10 @@ public class BoothCustomizeData
     public float modelingScale { get; set; }
     [FirestoreProperty]
     public string videoURL { get; set; }
+    [FirestoreProperty]
+    public bool hasBanner { get; set; }
+    [FirestoreProperty]
+    public string bannerImagePath { get; set; }
 }
 
 public class BoothExtraData
@@ -297,6 +317,8 @@ public class BoothExtraData
     public string modelingPath;
     public float modelingScale;
     public string videoURL;
+    public bool hasBanner;
+    public Texture2D bannerImage;
 }
 
 public enum BoothCategory

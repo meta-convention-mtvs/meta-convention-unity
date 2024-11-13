@@ -285,7 +285,7 @@ public class DatabaseManager : Singleton<DatabaseManager>
     {
         // Firebase Storage에서 객체 참조
         var storageRef = storage.GetReferenceFromUrl("gs://metaconvention.appspot.com");
-        var fileRef = storageRef.Child("models/" + uid + "/" + objFileName);  // models 폴더에 있는 .obj 파일
+        var fileRef = storageRef.Child("objects/" + uid + "/" + objFileName);  // models 폴더에 있는 .obj 파일
 
         // 비디오 다운로드 URL을 가져오는 방식과 동일
         fileRef.GetDownloadUrlAsync().ContinueWithOnMainThread(task =>
