@@ -72,6 +72,7 @@ public class ModelingRuntimeCreate : MonoBehaviourPun
         texture.wrapMode = TextureWrapMode.Clamp;
 
         SkinnedMeshRenderer skinned = Instantiate(customTShirts);
+        skinned.gameObject.SetActive(false);
         skinned.materials[0].mainTexture = texture;
 
         ChangeClothes(this.gameObject, skinned);

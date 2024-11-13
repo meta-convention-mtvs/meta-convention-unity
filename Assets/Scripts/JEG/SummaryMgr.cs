@@ -43,6 +43,7 @@ public class SummaryMgr : MonoBehaviourPun
                     RequestSummary((string)player.CustomProperties["id"], (string)PhotonNetwork.LocalPlayer.CustomProperties["id"], OnDataLoaded);
                 }
             }
+            RequestSummary("none", "abcd", OnDataLoaded);
         }
             //GetRequestJson(PhotonNetwork.CurrentRoom., PhotonNetwork.CurrentRoom.Players[PhotonNetwork.CurrentRoom.MasterClientId].CustomProperties["id"]);
     }
