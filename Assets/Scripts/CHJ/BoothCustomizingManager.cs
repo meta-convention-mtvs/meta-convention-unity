@@ -163,6 +163,12 @@ public class BoothCustomizingManager : MonoBehaviour
         boothCustomizeData.hasBanner = !boothCustomizeData.hasBanner;
         boothDataChanged = true;
     }
+
+    void SetBannerImage()
+    {
+
+    }
+
     void SetModelingScale(float size)
     {
         boothCustomizeData.modelingScale = size;

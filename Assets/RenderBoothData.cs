@@ -40,11 +40,12 @@ public class RenderBoothData : MonoBehaviour
         }
         if (extraData.hasBanner)
         {
+            banner.SetActive(true);
             SetBanner(extraData.bannerImage);
         }
         else
         {
-
+            banner.SetActive(false);
         }
     }
 
