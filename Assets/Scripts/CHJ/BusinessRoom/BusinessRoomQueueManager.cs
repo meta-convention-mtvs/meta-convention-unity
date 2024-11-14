@@ -108,9 +108,10 @@ public class BusinessRoomQueueManager : MonoBehaviourPunCallbacks
     public override void OnJoinedRoom()
     {
         print("Entered the Room : " + PhotonNetwork.CurrentRoom.Name);
-        if(PhotonNetwork.CurrentRoom.Name == FireAuthManager.Instance.GetCurrentUser().UserId)
-        {            
-            PhotonNetwork.CurrentRoom.SetMasterClient(PhotonNetwork.LocalPlayer);
+        if(PhotonNetwork.CurrentRoom.Name != FireAuthManager.Instance.GetCurrentUser().UserId)
+        {
+            Player newMasterClient = FindPlayerWithId(PhotonNetwork.CurrentRoom.Name);
+            PhotonNetwork.CurrentRoom.SetMasterClient(newMasterClient);
         }
         PhotonNetwork.LoadLevel("BusinessRoomScene");
 

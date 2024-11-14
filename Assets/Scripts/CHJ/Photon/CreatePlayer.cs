@@ -16,8 +16,7 @@ public class CreatePlayer : MonoBehaviour
     public enum RoomType
     {
         MainHall,
-        BusinessRoom,
-        BoothEmployee
+        BusinessRoom
     };
     public RoomType roomType;
 
@@ -58,8 +57,6 @@ public class CreatePlayer : MonoBehaviour
             resourceName = "Player";
         else if (roomType == RoomType.BusinessRoom)
             resourceName = "Player_BusinessRoom";
-        else if (roomType == RoomType.BoothEmployee)
-            resourceName = "AIEmployee";
         return PhotonNetwork.Instantiate(resourceName, playerStartPosition[idx].position, playerStartPosition[idx].rotation);
     }
 

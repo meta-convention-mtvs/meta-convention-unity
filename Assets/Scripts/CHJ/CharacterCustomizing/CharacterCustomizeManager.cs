@@ -1,4 +1,5 @@
 ﻿using Firebase.Firestore;
+using Ricimi;
 using System.IO;
 using System.Linq;
 using UnityEngine;
@@ -9,6 +10,7 @@ public class CharacterCustomizeManager : MonoBehaviour
     public CharacterTemplet CharacterPrefabs;
     public UICharacterMaker ui_cm;
     public CharacterCustomizingCameraMove cameraMove;
+    public Customization_GenderSelection customization_GenderSelection;
 
     // Debug mode
     public SkinnedMeshRenderer customTShirts;
@@ -128,6 +130,9 @@ public class CharacterCustomizeManager : MonoBehaviour
         // 렌더링을 다시 해주기
         isIndexChange = true;
         topClothesIndex = totalTopClothes - 1;
+
+        // UI에서 커스텀 티셔츠로 세팅하기
+        customization_GenderSelection.SetCustomTshirts();
 
     }
 

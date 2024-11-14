@@ -76,21 +76,22 @@ public class SummaryMgr : MonoBehaviourPun
     }
 
     //콜백함수: 데이터가 로딩되면 실행됨
-    public void OnDataLoaded(string receivedSummary)
+    public void OnDataLoaded(TakeSummary summary)
     {
         // string t가 받아온 데이터
         // 데이터를 띄우는 로직
         GameObject go = Instantiate(SummaryUIFactory);
-        go.GetComponent<UIAISummary>()?.SetSummaryText(receivedSummary);
+        go.GetComponent<UIAISummary>()?.SetSummaryText(summary.summary);
+        go.GetComponent<UIAISummary>()?.SetAllText(summary.full_script);
 
     }
-    public void RequestSummary(string visitorUID, string companyUID, Action<string> OnReceived)
+    public void RequestSummary(string visitorUID, string companyUID, Action<TakeSummary> OnReceived)
     {
         string jsonData = GetRequestJson(visitorUID, companyUID);
         StartCoroutine(IRequestSummary(jsonData, OnReceived));
     }
 
-    IEnumerator IRequestSummary(string jsonRequestData, Action<string> OnReceived)
+    IEnumerator IRequestSummary(string jsonRequestData, Action<TakeSummary> OnReceived)
     {
 
         using (UnityWebRequest www = UnityWebRequest.PostWwwForm(url, ""))
@@ -107,7 +108,7 @@ public class SummaryMgr : MonoBehaviourPun
 
                 TakeSummary takeSummary = JsonConvert.DeserializeObject<TakeSummary>(receiveJsonData);
 
-                OnReceived?.Invoke(takeSummary.summary);
+                OnReceived?.Invoke(takeSummary);
 
                 Debug.Log(takeSummary);
 
