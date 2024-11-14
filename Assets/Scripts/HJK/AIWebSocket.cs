@@ -22,6 +22,7 @@ public class AIWebSocket : MonoBehaviour
     private bool isConnected = false;
 
     public Text generatingStatusText; // Inspector에서 할당할 Text 컴포넌트
+    public string lang = "zh";
 
     [SerializeField]
     private string aiId;              // AI 식별자 추가
@@ -55,11 +56,12 @@ public class AIWebSocket : MonoBehaviour
 
     public async void Connect(string companyUID)
     {
+        uiText.ResetText();
         ConnectToWebsocket("ws://ec2-3-36-111-173.ap-northeast-2.compute.amazonaws.com:6576/chat", messageQueue, companyUID);
         await WaitForConnection();
         if (isConnected)
         {
-            await SendConfigUpdate(companyUID);
+            await SendConfigUpdate(companyUID, lang);
         }
     }
 
@@ -101,7 +103,12 @@ public class AIWebSocket : MonoBehaviour
     }
 
     // OnDestroy 메서드: 오브젝트가 파괴될 때 WebSocket 연결을 종료합니다.
-    void OnDestroy()
+    private void OnDestroy()
+    {
+        WebSocketEnd();
+    }
+
+    public void WebSocketEnd()
     {
         if (ws != null)
         {
@@ -159,7 +166,7 @@ public class AIWebSocket : MonoBehaviour
     //    };
     //    await SendRequestAsync(configUpdate);
     //}
-    public async Task SendConfigUpdate(string companyUID)
+    public async Task SendConfigUpdate(string companyUID, string lang)
     {
         if (!isConnected)
         {

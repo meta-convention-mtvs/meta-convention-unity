@@ -177,7 +177,8 @@ public class BoothCustomizingManager : MonoBehaviour
     }
     void SetColor(Vector3 HSV)
     {
-        boothCustomizeData.color = new FireStoreColor(HSV.x, HSV.y, HSV.z);
+        Color color = Color.HSVToRGB(HSV.x, HSV.y, HSV.z);
+        boothCustomizeData.color = new FireStoreColor(color.r, color.g, color.b);
         boothDataChanged = true;
     }
     void SetModeling(string[] paths)
