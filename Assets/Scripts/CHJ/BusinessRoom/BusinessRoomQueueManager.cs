@@ -66,7 +66,7 @@ public class BusinessRoomQueueManager : MonoBehaviourPunCallbacks
             Player targetPlayer = FindPlayerWithId(playerId);
             if (targetPlayer != null)
             {
-                playerUID = (string)targetPlayer.CustomProperties["uid"];
+                playerUID = (string)targetPlayer.CustomProperties["id"];
                 roomName = FireAuthManager.Instance.GetCurrentUser().UserId;
                 photonView.RPC(nameof(SetRoomName), targetPlayer, roomName);
                 PhotonNetwork.LeaveRoom();             
