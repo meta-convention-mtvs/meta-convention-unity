@@ -23,15 +23,15 @@ public class RoomLoader : MonoBehaviourPunCallbacks
 
     public void OnEvent(EventData photonEvent)
     {
-        print("Event 수신");
+        print("Event 수신 : " + photonEvent.Code);
         byte eventCode = photonEvent.Code;
 
         if (eventCode == INVITE_TO_ROOM_ID)
         {
             object[] data = (object[])photonEvent.CustomData;
+            print("event code 1번");
 
             string uid = (string)data[0];
-            print("event code 1번");
             if (uid == FireAuthManager.Instance.GetCurrentUser().UserId)
             {
                 print("룸 초대됨");
