@@ -23,6 +23,7 @@ public class RoomLoader : MonoBehaviourPunCallbacks
 
     public void OnEvent(EventData photonEvent)
     {
+        print("Event 수신");
         byte eventCode = photonEvent.Code;
 
         if (eventCode == INVITE_TO_ROOM_ID)
@@ -30,22 +31,14 @@ public class RoomLoader : MonoBehaviourPunCallbacks
             object[] data = (object[])photonEvent.CustomData;
 
             string uid = (string)data[0];
-
+            print("event code 1번");
             if (uid == FireAuthManager.Instance.GetCurrentUser().UserId)
             {
+                print("룸 초대됨");
                 roomName = (string)data[1];
                 PhotonNetwork.LeaveRoom();
             }
         }
     }
 
-    public override void OnConnectedToMaster()
-    {
-        PhotonNetwork.JoinRoom(roomName);
-    }
-
-    public override void OnJoinedRoom()
-    {
-        PhotonNetwork.LoadLevel(sceneName);
-    }
 }

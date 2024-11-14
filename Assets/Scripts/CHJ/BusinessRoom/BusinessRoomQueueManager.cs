@@ -68,6 +68,7 @@ public class BusinessRoomQueueManager : MonoBehaviourPunCallbacks
             {
                 playerUID = (string)targetPlayer.CustomProperties["uid"];
                 roomName = FireAuthManager.Instance.GetCurrentUser().UserId;
+                photonView.RPC(nameof(SetRoomName), targetPlayer, roomName);
                 PhotonNetwork.LeaveRoom();             
             }
         }
@@ -81,7 +82,11 @@ public class BusinessRoomQueueManager : MonoBehaviourPunCallbacks
         }
     }
 
-
+    [PunRPC]
+    void SetRoomName(string roomName)
+    {
+        this.roomName = roomName;
+    }
     public override void OnConnectedToMaster()
     {
         print("Connected to master: go to business Room");
