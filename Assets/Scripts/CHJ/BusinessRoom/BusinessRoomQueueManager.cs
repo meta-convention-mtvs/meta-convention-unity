@@ -68,6 +68,7 @@ public class BusinessRoomQueueManager : MonoBehaviourPunCallbacks
             {
                 playerUID = (string)targetPlayer.CustomProperties["id"];
                 roomName = FireAuthManager.Instance.GetCurrentUser().UserId;
+
                 photonView.RPC(nameof(SetRoomName), targetPlayer, roomName);
                 PhotonNetwork.LeaveRoom();             
             }
@@ -86,7 +87,9 @@ public class BusinessRoomQueueManager : MonoBehaviourPunCallbacks
     void SetRoomName(string roomName)
     {
         this.roomName = roomName;
+        PhotonNetwork.LeaveRoom();  
     }
+
     public override void OnConnectedToMaster()
     {
         print("Connected to master: go to business Room");
@@ -95,28 +98,10 @@ public class BusinessRoomQueueManager : MonoBehaviourPunCallbacks
 
     void JoinOrCreateRoom(string roomName)
     {
-        if (roomName == FireAuthManager.Instance.GetCurrentUser().UserId)
-        {
-            RoomOptions roomOptions = new RoomOptions();
-            roomOptions.MaxPlayers = 20;
-            PhotonNetwork.CreateRoom(roomName, roomOptions, TypedLobby.Default);
-        }
-        else
-        {
-            PhotonNetwork.JoinRoom(roomName);
-        }
+        RoomOptions roomOptions = new RoomOptions();
+        roomOptions.MaxPlayers = 20;
+        PhotonNetwork.JoinOrCreateRoom(roomName, roomOptions, TypedLobby.Default);
     }
-
-    public override void OnCreatedRoom()
-    {
-        print("Created the Room : " + PhotonNetwork.CurrentRoom.Name);
-        // RaiseEvent를 호출하여 모든 클라이언트에게 이벤트를 보냄
-        object[] content = new object[] { playerUID, roomName };
-        RaiseEventOptions options = new RaiseEventOptions { Receivers = ReceiverGroup.Others };
-
-        PhotonNetwork.RaiseEvent(INVITE_TO_ROOM_ID, content, options, SendOptions.SendReliable);
-    }
-
 
     public override void OnJoinedRoom()
     {

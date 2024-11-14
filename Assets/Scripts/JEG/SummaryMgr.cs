@@ -27,8 +27,8 @@ public class SummaryMgr : MonoBehaviourPun
     }
     public void OnClickTakeUserID()
     {
-        // 내가 방장이라면
-        if (photonView.IsMine)
+        // 방이름을 기업이름으로 세팅함
+        if (PhotonNetwork.CurrentRoom.Name == FireAuthManager.Instance.GetCurrentUser().UserId)
         {
             Dictionary<int, Player> OtherPlayers = GetOtherPlayer(PhotonNetwork.CurrentRoom.Players);
             if (OtherPlayers.Count > 1) 
