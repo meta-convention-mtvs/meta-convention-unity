@@ -11,14 +11,14 @@ public class RoomLoader : MonoBehaviourPunCallbacks
 
     const byte INVITE_TO_ROOM_ID = 1;
 
-    private void OnEnable()
+    public void OnEnable()
     {
-        PhotonNetwork.AddCallbackTarget(this);
+        PhotonNetwork.NetworkingClient.EventReceived += OnEvent;
     }
 
-    private void OnDisable()
+    public void OnDisable()
     {
-        PhotonNetwork.RemoveCallbackTarget(this);
+        PhotonNetwork.NetworkingClient.EventReceived -= OnEvent;
     }
 
     public void OnEvent(EventData photonEvent)

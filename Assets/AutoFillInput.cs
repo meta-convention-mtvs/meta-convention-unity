@@ -11,7 +11,7 @@ public class AutoFillInput : MonoBehaviour
 
     public void Update()
     {
-        if (Input.GetKey(KeyCode.Space))
+        if (Input.GetKey(KeyCode.Space) && Input.GetKey(KeyCode.LeftControl))
         {
             StopAllCoroutines();
             StartCoroutine(Fill());
