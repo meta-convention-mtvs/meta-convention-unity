@@ -2346,6 +2346,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1468322682}
   - component: {fileID: 1468322683}
+  - component: {fileID: 1468322684}
   m_Layer: 5
   m_Name: InputUILayout
   m_TagString: Untagged
@@ -2391,6 +2392,28 @@ MonoBehaviour:
   - {fileID: 1672447036}
   - {fileID: 460432265}
   currentIdx: 0
+--- !u!114 &1468322684
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1468322681}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 23efd6abf380b1e4e99cc2c1307f8033, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  inputField:
+  - {fileID: 3739443184667162200}
+  - {fileID: 1527946140}
+  - {fileID: 1672447036}
+  - {fileID: 460432265}
+  texts:
+  - "\uC870\uD604\uC9C4"
+  - Lockheed Martin
+  - "\uAE00\uB85C\uBC8C \uC601\uC5C5\uD300"
+  - 010-3452-0697
 --- !u!224 &1510949837 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 6320224447002516431, guid: 64d4e0265226c436382d158df41d2b2d,
