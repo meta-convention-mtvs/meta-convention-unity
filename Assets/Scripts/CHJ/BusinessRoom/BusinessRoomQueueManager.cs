@@ -1,4 +1,5 @@
-﻿using Photon.Pun;
+﻿using ExitGames.Client.Photon;
+using Photon.Pun;
 using Photon.Realtime;
 using System.Collections;
 using System.Collections.Generic;
@@ -7,10 +8,12 @@ using Hashtable = ExitGames.Client.Photon.Hashtable;
 
 public class BusinessRoomQueueManager : MonoBehaviourPunCallbacks
 {
+    const byte INVITE_TO_ROOM_ID = 1;
     public UIBusinessRoomQueueManager ui_br;
     Queue<string> meetingQueue;
 
     string roomName;
+    string playerUID;
 
     private void Start()
     {
@@ -63,9 +66,9 @@ public class BusinessRoomQueueManager : MonoBehaviourPunCallbacks
             Player targetPlayer = FindPlayerWithId(playerId);
             if (targetPlayer != null)
             {
+                playerUID = (string)targetPlayer.CustomProperties["uid"];
                 roomName = FireAuthManager.Instance.GetCurrentUser().UserId;
-                photonView.RPC(nameof(GoToBusinessRoom), targetPlayer, roomName);
-                PhotonNetwork.LeaveRoom();
+                PhotonNetwork.LeaveRoom();             
             }
         }
     }
@@ -78,12 +81,6 @@ public class BusinessRoomQueueManager : MonoBehaviourPunCallbacks
         }
     }
 
-    [PunRPC]
-    void GoToBusinessRoom(string roomName)
-    {
-        this.roomName = roomName;
-        PhotonNetwork.LeaveRoom();
-    }
 
     public override void OnConnectedToMaster()
     {
@@ -93,29 +90,35 @@ public class BusinessRoomQueueManager : MonoBehaviourPunCallbacks
 
     void JoinOrCreateRoom(string roomName)
     {
-        if (PhotonNetwork.IsConnected)
+        if (roomName == FireAuthManager.Instance.GetCurrentUser().UserId)
         {
             RoomOptions roomOptions = new RoomOptions();
             roomOptions.MaxPlayers = 20;
-            PhotonNetwork.JoinOrCreateRoom(roomName, roomOptions, TypedLobby.Default);
+            PhotonNetwork.CreateRoom(roomName, roomOptions, TypedLobby.Default);
         }
         else
         {
-            PhotonNetwork.ConnectUsingSettings();
+            PhotonNetwork.JoinRoom(roomName);
         }
     }
+
+    public override void OnCreatedRoom()
+    {
+        print("Created the Room : " + PhotonNetwork.CurrentRoom.Name);
+        // RaiseEvent를 호출하여 모든 클라이언트에게 이벤트를 보냄
+        object[] content = new object[] { playerUID, roomName };
+        RaiseEventOptions options = new RaiseEventOptions { Receivers = ReceiverGroup.Others };
+
+        PhotonNetwork.RaiseEvent(INVITE_TO_ROOM_ID, content, options, SendOptions.SendReliable);
+    }
+
 
     public override void OnJoinedRoom()
     {
         print("Entered the Room : " + PhotonNetwork.CurrentRoom.Name);
-        if(PhotonNetwork.CurrentRoom.Name != FireAuthManager.Instance.GetCurrentUser().UserId)
-        {
-            Player newMasterClient = FindPlayerWithId(PhotonNetwork.CurrentRoom.Name);
-            PhotonNetwork.CurrentRoom.SetMasterClient(newMasterClient);
-        }
         PhotonNetwork.LoadLevel("BusinessRoomScene");
-
     }
+
     public override void OnJoinRoomFailed(short returnCode, string message)
     {
         print("Enter room failed...");
