@@ -356,7 +356,7 @@ PrefabInstance:
     - target: {fileID: 1020356017380317363, guid: 0c571fa731356c74aad6b297ab7d5205,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 119.60003
+      value: 119.6003
       objectReference: {fileID: 0}
     - target: {fileID: 1715086367429113594, guid: 0c571fa731356c74aad6b297ab7d5205,
         type: 3}
@@ -3071,6 +3071,7 @@ GameObject:
   - component: {fileID: 1360827848}
   - component: {fileID: 1360827847}
   - component: {fileID: 1360827849}
+  - component: {fileID: 1360827850}
   m_Layer: 0
   m_Name: BusinessRoomReservator
   m_TagString: BusinessRoomReservator
@@ -3119,6 +3120,28 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   roomName: 
   sceneName: BusinessRoomScene
+--- !u!114 &1360827850
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1360827845}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObservedComponentsFoldoutOpen: 1
+  Group: 0
+  prefixField: -1
+  Synchronization: 3
+  OwnershipTransfer: 0
+  observableSearch: 2
+  ObservedComponents: []
+  sceneViewId: 1
+  InstantiationId: 0
+  isRuntimeInstantiated: 0
 --- !u!1 &1396187451
 GameObject:
   m_ObjectHideFlags: 0
