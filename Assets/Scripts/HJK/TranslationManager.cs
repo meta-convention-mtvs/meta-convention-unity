@@ -16,6 +16,7 @@ public class TranslationManager : Singleton<TranslationManager>
 {
     private WebSocket ws;
     private const string Endpoint = "ws://ec2-3-36-111-173.ap-northeast-2.compute.amazonaws.com:6576/translation";
+    //private const string Endpoint = "ws://198.19.249.3:3000/translation";
     // private const string Endpoint = "ws://metaai2.iptime.org:44444/translation";
     
     // 1107 추가된 부분

@@ -201,7 +201,7 @@ public class AIWebSocket : MonoBehaviour
             type = "generate.text_audio"
         };
         await SendRequestAsync(request);
-        Debug.Log("audio with null text");
+        //Debug.Log("audio with null text");
     }
     // SendGenerateOnlyText 메서드: 텍스트만 생성 요청을 서버에 전송합니다.
     public async Task SendGenerateOnlyText(string text)
