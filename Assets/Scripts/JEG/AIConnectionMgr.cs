@@ -168,8 +168,6 @@ public class AIConnectionMgr : MonoBehaviour
 
 
         string jsonData = JsonConvert.SerializeObject(GetTestUserInfo(situationText, CashedDataFromDatabase.Instance.playerLanguage.language), Formatting.None);
-       
-        //string jsonData = "{\"industry_type\":[\"항공\"], \"selected_interests\":[\"Vehicle Tech and Advanced Mobility\"],\"situation_description\":\"우주, 항공 산업에 관련되어 기체를 만드는 회사에 대해 궁금해\", \"language\":\"JP\" }";
         print(jsonData);
         using (UnityWebRequest www = UnityWebRequest.PostWwwForm(url, ""))
         {
