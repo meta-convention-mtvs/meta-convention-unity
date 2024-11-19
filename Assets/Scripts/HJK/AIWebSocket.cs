@@ -54,7 +54,7 @@ public class AIWebSocket : MonoBehaviour
         Debug.Log($"AI {aiId} 초기화됨");
     }
 
-    public async void Connect(string companyUID)
+    public async void Connect(string companyUID, string lang)
     {
         uiText.ResetText();
         ConnectToWebsocket("ws://ec2-3-36-111-173.ap-northeast-2.compute.amazonaws.com:6576/chat", messageQueue, companyUID);

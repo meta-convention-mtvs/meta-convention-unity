@@ -7,7 +7,6 @@ using UnityEngine;
 using System.Linq;
 using System;
 using System.Collections;
-using Photon.Voice.PUN;
 
 public class CreatePlayer : MonoBehaviour
 {
