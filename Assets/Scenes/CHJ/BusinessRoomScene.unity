@@ -930,7 +930,7 @@ GameObject:
   - component: {fileID: 187802503}
   - component: {fileID: 187802502}
   m_Layer: 5
-  m_Name: Canvas
+  m_Name: TranslatedMessagesCanvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2838,7 +2838,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 1544580946}
   m_Direction: 2
   m_Value: 1
-  m_Size: 0.5614848
+  m_Size: 0.523855
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -3039,7 +3039,7 @@ GameObject:
   - component: {fileID: 911049896}
   - component: {fileID: 911049898}
   m_Layer: 0
-  m_Name: PlayerTranslaotr
+  m_Name: PlayerTranslator
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3101,6 +3101,9 @@ MonoBehaviour:
   speakButton: {fileID: 857600867}
   waitingText: {fileID: 170476472}
   errorMessageUI: {fileID: 0}
+  translationScrollView: {fileID: 1810792990}
+  translationTextPrefab: {fileID: 3919862047583343298, guid: 40c5ae8d761191b4dae5df81b6bf98f0,
+    type: 3}
 --- !u!1 &959575106
 GameObject:
   m_ObjectHideFlags: 0
@@ -5451,11 +5454,6 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 1291705611561895596, guid: 011d70e344cb86b49a96a9222536acb1,
-        type: 3}
-      propertyPath: m_Name
-      value: User2_Content
-      objectReference: {fileID: 0}
     - target: {fileID: 3919862047583343298, guid: 011d70e344cb86b49a96a9222536acb1,
         type: 3}
       propertyPath: m_Name
@@ -5590,19 +5588,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6595880368411826224, guid: 011d70e344cb86b49a96a9222536acb1,
-        type: 3}
-      propertyPath: m_Name
-      value: User2_Name
-      objectReference: {fileID: 0}
-    - target: {fileID: 8835252424705146409, guid: 011d70e344cb86b49a96a9222536acb1,
-        type: 3}
-      propertyPath: m_text
-      value: "\uC548\uB155, \uC800\uB294 User 2\uC785\uB2C8\uB2E4. \uC548\uB155,
-        \uC800\uB294 User 2\uC785\uB2C8\uB2E4. \uC548\uB155, \uC800\uB294 User 2\uC785\uB2C8\uB2E4.
-        \uC548\uB155, \uC800\uB294 User 2\uC785\uB2C8\uB2E4. \uC548\uB155, \uC800\uB294
-        User 2\uC785\uB2C8\uB2E4. "
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

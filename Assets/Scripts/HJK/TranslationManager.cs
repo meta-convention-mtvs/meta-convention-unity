@@ -159,8 +159,12 @@ public class TranslationManager : Singleton<TranslationManager>
     public event Action<string> OnCompleteTextReceived;   // 완성된 텍스트 수신
     public event Action<string> OnPartialAudioReceived;   // 부분 오디오 수신
     public event Action OnCompleteAudioReceived;  // 완성된 오디오 수신
-    public event Action<string> OnSpeechApproved;         // 발언권 승인 (userId 전달)
+    // public event Action<string> OnSpeechApproved;         // 발언권 승인 (userId 전달) // 기존의 것
     public event Action<string> OnError;                  // 에러 발생
+    public event Action<int, string, string> OnApprovedSpeech; // order, userid, lang 전달 // 새로 추가
+    public event Action<int, string> OnInputAudioDone; // order와 text를 전달
+    public event Action<int> OnInputAudioFailed; // order만 전달
+
 
     private void OnMessageReceived(object sender, MessageEventArgs e)
     {
@@ -168,6 +172,8 @@ public class TranslationManager : Singleton<TranslationManager>
         dispatcher.Enqueue(() => {
             var data = JsonConvert.DeserializeObject<Dictionary<string, object>>(e.Data);
             Debug.Log($"[TranslationManager] Received message: {e.Data}");
+            
+            int order;
             
             switch (data["type"] as string)
             {
@@ -195,7 +201,7 @@ public class TranslationManager : Singleton<TranslationManager>
                     break;
                     
                 case "conversation.text.delta":
-                    int order = Convert.ToInt32(data["order"]);
+                    order = Convert.ToInt32(data["order"]);
                     string delta = data["delta"] as string;
                     OnPartialTextReceived?.Invoke(order, delta);
                     break;
@@ -213,11 +219,18 @@ public class TranslationManager : Singleton<TranslationManager>
                     break;
                     
                 case "conversation.approved_speech":
-                    string approvedUserId = data["userid"] as string;
-                    Debug.Log($"[TranslationManager] Speech approved for user: {approvedUserId}");
-                    OnSpeechApproved?.Invoke(approvedUserId);  // 올바른 이벤트 사용
+                    order = Convert.ToInt32(data["order"]);
+                    string userid = data["userid"] as string;
+                    string lang = data["lang"] as string;
+                    OnApprovedSpeech?.Invoke(order, userid, lang);
                     break;
                     
+                case "conversation.input_audio.done":
+                    int inputOrder = Convert.ToInt32(data["order"]);
+                    string text = data["text"] as string;
+                    OnInputAudioDone?.Invoke(inputOrder, text);
+                    break;
+
                 default:
                     Debug.LogWarning($"Unknown message type: {data["type"]}");
                     break;

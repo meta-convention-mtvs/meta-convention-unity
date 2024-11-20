@@ -48,7 +48,10 @@ public class TranslationEventHandler : Singleton<TranslationEventHandler>
         manager.OnPartialAudioReceived += DistributePartialTranslatedAudio;
         manager.OnCompleteAudioReceived += DistributeCompleteTranslatedAudio;
         manager.OnPartialTextReceived += DistributePartialTranslatedText;
-        manager.OnSpeechApproved += HandleApprovedSpeech;
+        // manager.OnSpeechApproved += HandleApprovedSpeech; // 기존의 것
+        manager.OnApprovedSpeech += HandleApprovedSpeech; // 새로 추가
+        manager.OnInputAudioDone += HandleInputAudioDone;
+        manager.OnPartialTextReceived += HandleTextDelta;
         manager.OnError += HandleError;
         
         Debug.Log("[TranslationEventHandler] Events subscribed successfully");
@@ -63,7 +66,7 @@ public class TranslationEventHandler : Singleton<TranslationEventHandler>
             manager.OnRoomUpdated -= HandleRoomUpdate;
             manager.OnPartialAudioReceived -= DistributePartialTranslatedAudio;
             manager.OnCompleteAudioReceived -= DistributeCompleteTranslatedAudio;
-            manager.OnSpeechApproved -= HandleApprovedSpeech;
+            manager.OnApprovedSpeech -= HandleApprovedSpeech;
             manager.OnError -= HandleError;
         }
     }
@@ -125,14 +128,40 @@ public class TranslationEventHandler : Singleton<TranslationEventHandler>
         }
     }
 
-    private void HandleApprovedSpeech(string userId)
+    // 기존의 것(HandleApprovedSpeech())
+
+    // private void HandleApprovedSpeech(string userId)
+    // {
+    //     Debug.Log($"[TranslationEventHandler] Speech approved for user: {userId}");
+    //     currentSpeakerId = userId;
+    //     OnSpeakerChanged?.Invoke(userId);
+    //     if (playerTranslator != null)
+    //     {
+    //         playerTranslator.OnSpeechApproved(userId);
+    //     }
+    // }
+
+    private void HandleApprovedSpeech(int order, string userid, string lang)
     {
-        Debug.Log($"[TranslationEventHandler] Speech approved for user: {userId}");
-        currentSpeakerId = userId;
-        OnSpeakerChanged?.Invoke(userId);
         if (playerTranslator != null)
         {
-            playerTranslator.OnSpeechApproved(userId);
+            playerTranslator.OnApprovedSpeech(order, userid, lang);
+        }
+    }
+
+    private void HandleInputAudioDone(int order, string text)
+    {
+        if (playerTranslator != null)
+        {
+            playerTranslator.OnInputAudioDone(order, text);
+        }
+    }
+
+    private void HandleTextDelta(int order, string delta)
+    {
+        if (playerTranslator != null)
+        {
+            playerTranslator.UpdatePartialTranslatedText(order, delta);
         }
     }
 

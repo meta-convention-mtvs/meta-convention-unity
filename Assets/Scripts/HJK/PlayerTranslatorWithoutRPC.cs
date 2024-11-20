@@ -48,12 +48,28 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
     [SerializeField] private Text errorMessageUI;              // 에러 메시지 UI (TMP -> Text)
     [SerializeField] private ScrollRect translationScrollView;              // Scroll View
     [SerializeField] private GameObject translationTextPrefab;              // 프리팹
+    [SerializeField] private GameObject MessageBubble_Original_Mine;   // 내가 말한 메시지 프리팹 (흰색)
+    [SerializeField] private GameObject MessageBubble_Original_Yours;  // 상대방이 말한 메시지 프리팹 (파란색)
+    [SerializeField] private GameObject MessageBubble_Translated;      // 번역된 메시지 프리팹
     private Dictionary<int, TextMeshProUGUI> translationTexts = new Dictionary<int, TextMeshProUGUI>();                 // order별로 저장
 
     // 에러 메시지 관련
     private float errorMessageDisplayTime = 3f;                // 에러 메시지 표시 시간
     private Coroutine errorMessageCoroutine;                  // 에러 메시지 표시 코루틴
     private float lastEventTime = 0f;
+
+    private class MessageData
+    {
+        public GameObject userMessagePrefab;
+        public GameObject translationPrefab;
+        public int order;
+        public string userid;
+        public bool isMine;
+    }
+
+    private List<MessageData> messages = new List<MessageData>();
+
+    private int currentOrder = -1; // 현재 발언 순번
 
     /// <summary>
     /// 발언 가능 상태에 따라 UI를 업데이트
@@ -129,6 +145,7 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
     private void TryStartRecording()
     {
         string userId = FireAuthManager.Instance.GetCurrentUser().UserId;
+
         if (!TranslationEventHandler.Instance.IsRoomReady)
         {
             ShowWaitingUI("통역을 시작하려면 다른 언어 사용자가 필요합니다");
@@ -146,6 +163,22 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
         TranslationManager.Instance.RequestSpeech();
     }
 
+    public void OnApprovedSpeech(int order, string userid, string lang)
+    {
+        currentOrder = order;
+
+        if (userid == FireAuthManager.Instance.GetCurrentUser().UserId)
+        {
+            // 내가 발언권을 얻은 경우
+            StartRecording();
+        }
+        else
+        {
+            // 다른 사용자가 발언권을 얻은 경우
+            // 필요에 따라 처리
+        }
+    }
+
     /// <summary>
     /// 실제 녹음 시작
     /// </summary>
@@ -159,6 +192,16 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
         isRecording = true;
         recordingPosition = 0;
         
+        // MessageData 생성
+        MessageData messageData = new MessageData();
+        messageData.isMine = true;
+        messageData.order = currentOrder;
+        messageData.userid = FireAuthManager.Instance.GetCurrentUser().UserId;
+
+        // 내 메시지 프리팹 생성
+        messageData.userMessagePrefab = Instantiate(MessageBubble_Original_Mine, translationScrollView.content);
+        messages.Add(messageData);
+
         // 사용 가능한 마이크 확인
         string[] devices = Microphone.devices;
         if (devices.Length == 0)
@@ -221,6 +264,86 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
 
         // 발언자 상태 초기화
         TranslationEventHandler.Instance.ResetSpeaker();
+    }
+
+    public void OnInputAudioDone(int order, string text)
+    {
+        // order로 메시지 데이터를 찾음
+        MessageData messageData = messages.FirstOrDefault(m => m.order == order);
+
+        if (messageData != null)
+        {
+            // STT 결과 업데이트
+            TextMeshProUGUI textComponent = messageData.userMessagePrefab.GetComponentInChildren<TextMeshProUGUI>();
+            if (textComponent != null)
+            {
+                textComponent.text = text;
+            }
+
+            // 번역 메시지 프리팹 생성
+            messageData.translationPrefab = Instantiate(MessageBubble_Translated, translationScrollView.content);
+
+            // translationPrefab을 userMessagePrefab 아래에 위치시킴
+            int index = messageData.userMessagePrefab.transform.GetSiblingIndex();
+            messageData.translationPrefab.transform.SetSiblingIndex(index + 1);
+        }
+        else
+        {
+            // 메시지 데이터가 없으면 새로운 메시지로 간주
+            OnOtherInputAudioDone(order, text);
+        }
+    }
+
+    public void OnOtherInputAudioDone(int order, string text)
+    {
+        // 상대방의 메시지 처리
+        MessageData messageData = new MessageData();
+        messageData.isMine = false;
+        messageData.order = order;
+
+        // 상대방의 메시지 프리팹 생성
+        messageData.userMessagePrefab = Instantiate(MessageBubble_Original_Yours, translationScrollView.content);
+
+        // 텍스트 업데이트
+        TextMeshProUGUI textComponent = messageData.userMessagePrefab.GetComponentInChildren<TextMeshProUGUI>();
+        if (textComponent != null)
+        {
+            textComponent.text = text;
+        }
+
+        // 번역 메시지 프리팹 생성
+        messageData.translationPrefab = Instantiate(MessageBubble_Translated, translationScrollView.content);
+
+        // translationPrefab을 userMessagePrefab 아래에 위치시킴
+        int index = messageData.userMessagePrefab.transform.GetSiblingIndex();
+        messageData.translationPrefab.transform.SetSiblingIndex(index + 1);
+
+        messages.Add(messageData);
+    }
+
+    public void UpdatePartialTranslatedText(int order, string partialText)
+    {
+        // order로 메시지 데이터를 찾음
+        MessageData messageData = messages.FirstOrDefault(m => m.order == order);
+        if (messageData != null)
+        {
+            // 번역 프리팹의 텍스트 업데이트
+            TextMeshProUGUI textComponent = messageData.translationPrefab.GetComponentInChildren<TextMeshProUGUI>();
+            if (textComponent != null)
+            {
+                textComponent.text = partialText;
+            }
+
+            // ScrollRect를 아래로 스크롤
+            StartCoroutine(ScrollToBottomNextFrame());
+        }
+    }
+
+    private IEnumerator ScrollToBottomNextFrame()
+    {
+        yield return null;
+        Canvas.ForceUpdateCanvases();
+        translationScrollView.verticalNormalizedPosition = 0f;
     }
 
     /// <summary>
@@ -556,6 +679,8 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
     }
 
     // 부분 번역된 텍스트를 업데이트하는 메서드
+    // 이전의 것
+    /*
     public void UpdatePartialTranslatedText(int order, string partialText)
     {
         if (translationScrollView == null || translationTextPrefab == null)
@@ -586,14 +711,7 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
             Debug.LogError($"텍스트 업데이트 중 오류 발생: {e.Message}");
         }
     }
-
-    // Scroll View를 아래로 스크롤
-    private IEnumerator ScrollToBottomNextFrame()
-    {
-        yield return null;
-        Canvas.ForceUpdateCanvases();
-        translationScrollView.verticalNormalizedPosition = 0f;
-    }
+    */
 
     private void CreateNewTranslationText(int order)
     {
@@ -625,4 +743,6 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
         // 발화 완료 시 처리할 내용이 있다면 여기에 추가
         // 예를 들어 오래된 텍스트를 정리하는 등
     }
+
+    
 }

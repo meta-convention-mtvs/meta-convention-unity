@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 46110971958629617}
   - component: {fileID: 8835252424705146409}
   m_Layer: 5
-  m_Name: User1_Content
+  m_Name: User2_Content
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -65,9 +65,10 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\uD1B5\uC5ED\uB41C \uD14D\uC2A4\uD2B8\uC785\uB2C8\uB2E4. \uD1B5\uC5ED\uB41C
-    \uD14D\uC2A4\uD2B8\uC785\uB2C8\uB2E4. \uD1B5\uC5ED\uB41C \uD14D\uC2A4\uD2B8\uC785\uB2C8\uB2E4.
-    \uD1B5\uC5ED\uB41C \uD14D\uC2A4\uD2B8\uC785\uB2C8\uB2E4. "
+  m_text: "\uC548\uB155, \uC800\uB294 User 2\uC785\uB2C8\uB2E4. \uC548\uB155, \uC800\uB294
+    User 2\uC785\uB2C8\uB2E4. \uC548\uB155, \uC800\uB294 User 2\uC785\uB2C8\uB2E4.
+    \uC548\uB155, \uC800\uB294 User 2\uC785\uB2C8\uB2E4. \uC548\uB155, \uC800\uB294
+    User 2\uC785\uB2C8\uB2E4. "
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 3091d6bf0835a8d42879d79741384d62, type: 2}
   m_sharedMaterial: {fileID: 3207305331343204022, guid: 3091d6bf0835a8d42879d79741384d62,
@@ -77,8 +78,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4294967295
-  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
+    rgba: 4278190080
+  m_fontColor: {r: 0, g: 0, b: 0, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -95,14 +96,14 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 24
-  m_fontSizeBase: 24
+  m_fontSize: 25
+  m_fontSizeBase: 25
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 25
   m_fontSizeMax: 25
   m_fontStyle: 0
-  m_HorizontalAlignment: 32
+  m_HorizontalAlignment: 1
   m_VerticalAlignment: 256
   m_textAlignment: 65535
   m_characterSpacing: 0
@@ -148,7 +149,7 @@ GameObject:
   - component: {fileID: 6544193043233223863}
   - component: {fileID: 2099616058302926554}
   m_Layer: 5
-  m_Name: User2_TranslatedMessage_Ver2
+  m_Name: MessageBubble_Original_Yours
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -189,7 +190,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Padding:
-    m_Left: 124
+    m_Left: 265
     m_Right: 0
     m_Top: 22
     m_Bottom: 20
@@ -214,7 +215,7 @@ GameObject:
   - component: {fileID: 1891637565649043575}
   - component: {fileID: 3402649075747442479}
   m_Layer: 5
-  m_Name: User1_Name
+  m_Name: User2_Name
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -267,7 +268,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Translated
+  m_text: User 1
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 3091d6bf0835a8d42879d79741384d62, type: 2}
   m_sharedMaterial: {fileID: 3207305331343204022, guid: 3091d6bf0835a8d42879d79741384d62,
@@ -277,8 +278,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4294967295
-  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
+    rgba: 4278190080
+  m_fontColor: {r: 0, g: 0, b: 0, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -302,7 +303,7 @@ MonoBehaviour:
   m_fontSizeMin: 25
   m_fontSizeMax: 30
   m_fontStyle: 0
-  m_HorizontalAlignment: 32
+  m_HorizontalAlignment: 1
   m_VerticalAlignment: 256
   m_textAlignment: 65535
   m_characterSpacing: 0
@@ -331,7 +332,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: -250.9762, w: -30.110413}
+  m_margin: {x: 0, y: 0, z: -193.47487, w: -30.110413}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -372,8 +373,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 37.155006, y: 0}
-  m_SizeDelta: {x: -74.30998, y: 0}
+  m_AnchoredPosition: {x: 115.8, y: 0}
+  m_SizeDelta: {x: -231.6, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2390138674477544667
 CanvasRenderer:
@@ -403,7 +404,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 55a714cf51d6c0541ab71a6460060187, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 297988b54f704374e9b972aa2f79a4e3, type: 3}
   m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
