@@ -97,9 +97,9 @@ public class ColorPicker : MonoBehaviour, IPointerClickHandler, IBeginDragHandle
         return Vector2.zero;
     }
 
-    void SetColor(Image image, float h, float u, float v)
+    void SetColor(Image image, float h, float s, float v)
     {
-        image.color = Color.HSVToRGB(h, u, v);
+        image.color = Color.HSVToRGB(h, s, v);
         OnColorChange(new Vector3(h, s, v));
     }
 

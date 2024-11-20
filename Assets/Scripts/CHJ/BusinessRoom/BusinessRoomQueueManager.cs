@@ -1,4 +1,5 @@
-﻿using Photon.Pun;
+﻿using ExitGames.Client.Photon;
+using Photon.Pun;
 using Photon.Realtime;
 using System.Collections;
 using System.Collections.Generic;
@@ -7,10 +8,12 @@ using Hashtable = ExitGames.Client.Photon.Hashtable;
 
 public class BusinessRoomQueueManager : MonoBehaviourPunCallbacks
 {
+    const byte INVITE_TO_ROOM_ID = 1;
     public UIBusinessRoomQueueManager ui_br;
     Queue<string> meetingQueue;
 
     string roomName;
+    string playerUID;
 
     private void Start()
     {
@@ -63,9 +66,11 @@ public class BusinessRoomQueueManager : MonoBehaviourPunCallbacks
             Player targetPlayer = FindPlayerWithId(playerId);
             if (targetPlayer != null)
             {
+                playerUID = (string)targetPlayer.CustomProperties["id"];
                 roomName = FireAuthManager.Instance.GetCurrentUser().UserId;
-                photonView.RPC(nameof(GoToBusinessRoom), targetPlayer, roomName);
-                PhotonNetwork.LeaveRoom();
+
+                photonView.RPC(nameof(SetRoomName), targetPlayer, roomName);
+                PhotonNetwork.LeaveRoom();             
             }
         }
     }
@@ -79,10 +84,10 @@ public class BusinessRoomQueueManager : MonoBehaviourPunCallbacks
     }
 
     [PunRPC]
-    void GoToBusinessRoom(string roomName)
+    void SetRoomName(string roomName)
     {
         this.roomName = roomName;
-        PhotonNetwork.LeaveRoom();
+        PhotonNetwork.LeaveRoom();  
     }
 
     public override void OnConnectedToMaster()
@@ -93,28 +98,17 @@ public class BusinessRoomQueueManager : MonoBehaviourPunCallbacks
 
     void JoinOrCreateRoom(string roomName)
     {
-        if (PhotonNetwork.IsConnected)
-        {
-            RoomOptions roomOptions = new RoomOptions();
-            roomOptions.MaxPlayers = 20;
-            PhotonNetwork.JoinOrCreateRoom(roomName, roomOptions, TypedLobby.Default);
-        }
-        else
-        {
-            PhotonNetwork.ConnectUsingSettings();
-        }
+        RoomOptions roomOptions = new RoomOptions();
+        roomOptions.MaxPlayers = 20;
+        PhotonNetwork.JoinOrCreateRoom(roomName, roomOptions, TypedLobby.Default);
     }
 
     public override void OnJoinedRoom()
     {
-        print("Entered the Room");
-        if(PhotonNetwork.CurrentRoom.Name == FireAuthManager.Instance.GetCurrentUser().UserId)
-        {
-            PhotonNetwork.CurrentRoom.SetMasterClient(PhotonNetwork.LocalPlayer);
-        }
+        print("Entered the Room : " + PhotonNetwork.CurrentRoom.Name);
         PhotonNetwork.LoadLevel("BusinessRoomScene");
-
     }
+
     public override void OnJoinRoomFailed(short returnCode, string message)
     {
         print("Enter room failed...");

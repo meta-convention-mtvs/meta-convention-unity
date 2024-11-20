@@ -44,5 +44,13 @@ namespace Ricimi
 		{
 			OptionText.text = Options[selectedOption];
 		}
+
+		// Custom T shirts로 설정하는 함수
+		public void SetCustomTshirts()
+		{
+			Options.Add("커스텀티");
+			selectedOption = Options.Count - 1;
+			ChangeSelection();
+		}
 	}
 }

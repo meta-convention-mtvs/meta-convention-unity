@@ -29,6 +29,11 @@ public class TextItem : MonoBehaviour
         StartCoroutine(UpdateSize());
     }
 
+    public void ResetText()
+    {
+        chatText.text = "";
+        StartCoroutine (UpdateSize());
+    }
     IEnumerator UpdateSize()
     {
         yield return null;

@@ -25,9 +25,10 @@ public class CreatePlayer : MonoBehaviour
     private void Start()
     {
         player = Create(roomType);
-        DatabaseManager.Instance.GetData<Card>(onCardLoad);
-
-        StartCoroutine(WaitAndInvoke());
+        if(roomType == RoomType.MainHall)
+            DatabaseManager.Instance.GetData<Card>(onCardLoad);
+        if(roomType == RoomType.MainHall || roomType == RoomType.BusinessRoom)
+            StartCoroutine(WaitAndInvoke());
     }
 
     IEnumerator WaitAndInvoke()

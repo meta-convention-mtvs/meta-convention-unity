@@ -356,7 +356,7 @@ PrefabInstance:
     - target: {fileID: 1020356017380317363, guid: 0c571fa731356c74aad6b297ab7d5205,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 119.59998
+      value: 119.6003
       objectReference: {fileID: 0}
     - target: {fileID: 1715086367429113594, guid: 0c571fa731356c74aad6b297ab7d5205,
         type: 3}
@@ -2168,6 +2168,11 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 220668770239085475, guid: 0ec2b4fac7635214e8798da87199dbca,
+        type: 3}
+      propertyPath: m_Text
+      value: "\uCD94\uCC9C \uAE30\uC5C5"
+      objectReference: {fileID: 0}
     - target: {fileID: 455635119827489102, guid: 0ec2b4fac7635214e8798da87199dbca,
         type: 3}
       propertyPath: m_AnchorMax.y
@@ -2452,6 +2457,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3529346356812367931, guid: 0ec2b4fac7635214e8798da87199dbca,
+        type: 3}
+      propertyPath: m_Text
+      value: "\uCD94\uCC9C \uAE30\uC5C5"
       objectReference: {fileID: 0}
     - target: {fileID: 4011402092570821793, guid: 0ec2b4fac7635214e8798da87199dbca,
         type: 3}
@@ -3060,6 +3070,8 @@ GameObject:
   m_Component:
   - component: {fileID: 1360827848}
   - component: {fileID: 1360827847}
+  - component: {fileID: 1360827849}
+  - component: {fileID: 1360827850}
   m_Layer: 0
   m_Name: BusinessRoomReservator
   m_TagString: BusinessRoomReservator
@@ -3094,6 +3106,42 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1360827849
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1360827845}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a9d1fa553d8cc54fb46bd0d8c212ab4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  roomName: 
+  sceneName: BusinessRoomScene
+--- !u!114 &1360827850
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1360827845}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObservedComponentsFoldoutOpen: 1
+  Group: 0
+  prefixField: -1
+  Synchronization: 3
+  OwnershipTransfer: 0
+  observableSearch: 2
+  ObservedComponents: []
+  sceneViewId: 1
+  InstantiationId: 0
+  isRuntimeInstantiated: 0
 --- !u!1 &1396187451
 GameObject:
   m_ObjectHideFlags: 0
@@ -3468,7 +3516,7 @@ Transform:
   m_GameObject: {fileID: 1728808283}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
-  m_LocalPosition: {x: -1.08, y: -4.554, z: 21.93}
+  m_LocalPosition: {x: -2.22, y: -8.76, z: 30.84}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3885,7 +3933,8 @@ PrefabInstance:
       propertyPath: m_LocalPosition.z
       value: 517.21063
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 6810486640055334526, guid: eac3418f84f5a6744930cea38d392693, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []

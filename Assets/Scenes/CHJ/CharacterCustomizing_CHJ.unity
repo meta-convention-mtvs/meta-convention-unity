@@ -684,6 +684,7 @@ MonoBehaviour:
   CharacterPrefabs: {fileID: 11400000, guid: 7fd1af0460dafe34aa702c4b5cc22009, type: 2}
   ui_cm: {fileID: 1692077164}
   cameraMove: {fileID: 168327193}
+  customization_GenderSelection: {fileID: 2068499902}
   customTShirts: {fileID: 482212475}
 --- !u!114 &170923837
 MonoBehaviour:
@@ -1416,7 +1417,7 @@ MonoBehaviour:
   m_LookaheadIgnoreY: 0
   m_HorizontalDamping: 0.5
   m_VerticalDamping: 0.5
-  m_ScreenX: 0.5
+  m_ScreenX: 0.65
   m_ScreenY: 0.5
   m_DeadZoneWidth: 0
   m_DeadZoneHeight: 0
@@ -1650,7 +1651,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 677774948}
   serializedVersion: 2
-  m_LocalRotation: {x: 2.6313131e-17, y: 1, z: -1.7763568e-15, w: 7.8275946e-25}
+  m_LocalRotation: {x: -3.1509392e-23, y: 0.9888675, z: 2.0940084e-22, w: 0.1487989}
   m_LocalPosition: {x: 0, y: 1.2, z: 1}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -1886,6 +1887,21 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6320224447002516431, guid: 64d4e0265226c436382d158df41d2b2d,
         type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1.18
+      objectReference: {fileID: 0}
+    - target: {fileID: 6320224447002516431, guid: 64d4e0265226c436382d158df41d2b2d,
+        type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1.18
+      objectReference: {fileID: 0}
+    - target: {fileID: 6320224447002516431, guid: 64d4e0265226c436382d158df41d2b2d,
+        type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1.18
+      objectReference: {fileID: 0}
+    - target: {fileID: 6320224447002516431, guid: 64d4e0265226c436382d158df41d2b2d,
+        type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
       objectReference: {fileID: 0}
@@ -1943,6 +1959,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6320224447002516431, guid: 64d4e0265226c436382d158df41d2b2d,
+        type: 3}
+      propertyPath: m_ConstrainProportionsScale
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6320224447002516432, guid: 64d4e0265226c436382d158df41d2b2d,
         type: 3}
@@ -4641,7 +4662,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1811477101}
   serializedVersion: 2
-  m_LocalRotation: {x: 1.1074485e-15, y: 1, z: 0.000000042146844, w: -0.000000026275952}
+  m_LocalRotation: {x: -2.3775508e-16, y: 0.9888675, z: 1.5683447e-15, w: 0.14879888}
   m_LocalPosition: {x: 0, y: 0.8, z: 1}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -4723,7 +4744,7 @@ MonoBehaviour:
   m_LookaheadIgnoreY: 0
   m_HorizontalDamping: 0.5
   m_VerticalDamping: 0.5
-  m_ScreenX: 0.5
+  m_ScreenX: 0.65
   m_ScreenY: 0.5
   m_DeadZoneWidth: 0
   m_DeadZoneHeight: 0

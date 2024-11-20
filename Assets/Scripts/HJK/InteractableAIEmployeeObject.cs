@@ -44,6 +44,13 @@ public class InteractableAIEmployeeObject : MonoBehaviourPun, IKeyInteractableOb
     public void InteractEnd()
     {
         isInteracting = false;
+        // UI를 끈다
+        AISpeackUI.GetComponent<GeneralUI>().Hide();
+        aiWebSocket = GameObject.FindObjectOfType<AIWebSocket>();
+        if (aiWebSocket != null)
+        {
+            aiWebSocket.WebSocketEnd();
+        }
         MainHallVirtualCameraMovement.Instance.SetPlayerFollowCamera();
     }
 
