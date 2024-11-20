@@ -338,28 +338,50 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
     {
         // order로 메시지 데이터를 찾음
         MessageData messageData = messages.FirstOrDefault(m => m.order == order);
-        if (messageData != null && messageData.translationPrefab != null)
+
+        // 메시지 데이터가 없는 경우 새로 생성
+        if (messageData == null)
         {
-            // "TranslatedContent" 컴포넌트를 명시적으로 찾아서 텍스트 업데이트
-            TextMeshProUGUI textComponent = messageData.translationPrefab.transform.Find("TranslatedContent")?.GetComponent<TextMeshProUGUI>();
-            if (textComponent != null)
+            messageData = new MessageData();
+            messageData.order = order;
+            messageData.isMine = true; // 또는 false, 발화자 확인 로직 필요
+            messageData.userid = FireAuthManager.Instance.GetCurrentUser().UserId;
+
+            // 원본 메시지 프리팹 생성
+            messageData.userMessagePrefab = Instantiate(MessageBubble_Original_Mine, translationScrollView.content);
+            
+            // 번역 메시지 프리팹 생성
+            messageData.translationPrefab = Instantiate(MessageBubble_Translated, translationScrollView.content);
+            
+            // translationPrefab을 userMessagePrefab 아래에 위치시킴
+            int index = messageData.userMessagePrefab.transform.GetSiblingIndex();
+            messageData.translationPrefab.transform.SetSiblingIndex(index + 1);
+
+            messages.Add(messageData);
+        }
+        
+        // 번역 프리팹이 아직 없는 경우 생성
+        if (messageData.translationPrefab == null)
+        {
+            messageData.translationPrefab = Instantiate(MessageBubble_Translated, translationScrollView.content);
+            int index = messageData.userMessagePrefab.transform.GetSiblingIndex();
+            messageData.translationPrefab.transform.SetSiblingIndex(index + 1);
+        }
+
+        // 번역 텍스트 업데이트
+        TextMeshProUGUI textComponent = messageData.translationPrefab.transform.Find("TranslatedText")?.GetComponent<TextMeshProUGUI>();
+        if (textComponent != null)
+        {
+            textComponent.text = partialText;
+            
+            if (translationScrollView != null)
             {
-                textComponent.text = partialText;
-                
-                // ScrollRect가 null이 아닌 경우에만 스크롤 실행
-                if (translationScrollView != null)
-                {
-                    StartCoroutine(ScrollToBottomNextFrame());
-                }
-            }
-            else
-            {
-                Debug.LogError($"TranslatedContent TextMeshProUGUI component not found for order: {order}");
+                StartCoroutine(ScrollToBottomNextFrame());
             }
         }
         else
         {
-            Debug.LogError($"MessageData or translationPrefab not found for order: {order}");
+            Debug.LogError($"TranslatedText TextMeshProUGUI component not found for order: {order}");
         }
     }
 
