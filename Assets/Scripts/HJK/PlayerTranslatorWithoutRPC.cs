@@ -170,7 +170,10 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
         if (userid == FireAuthManager.Instance.GetCurrentUser().UserId)
         {
             // 내가 발언권을 얻은 경우
+            ShowCanSpeakUI();
+            Debug.Log("UI 표시됨: ShowCanSpeakUI() 실행 in OnApprovedSpeech()");
             StartRecording();
+            Debug.Log("녹음 시작됨: StartRecording() 실행 in OnApprovedSpeech()");
         }
         else
         {
@@ -613,18 +616,18 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
     /// <summary>
     /// 발언권 승인 처리
     /// </summary>
-    public void OnSpeechApproved(string approvedUserId)
-    {
-        print("OnSpeechApproved(발언권 승인됨)");
-        if (FireAuthManager.Instance.GetCurrentUser().UserId == approvedUserId)
-        {
-            ShowCanSpeakUI();
-            Debug.Log("UI 표시됨: ShowCanSpeakUI() 실행");
-            StartRecording();
-            Debug.Log("녹음 시작됨: StartRecording() 실행");
+    // public void OnSpeechApproved(string approvedUserId)
+    // {
+    //     print("OnSpeechApproved(발언권 승인됨)");
+    //     if (FireAuthManager.Instance.GetCurrentUser().UserId == approvedUserId)
+    //     {
+    //         ShowCanSpeakUI();
+    //         Debug.Log("UI 표시됨: ShowCanSpeakUI() 실행");
+    //         StartRecording();
+    //         Debug.Log("녹음 시작됨: StartRecording() 실행");
 
-        }
-    }
+    //     }
+    // }
 
     /// <summary>
     /// 에러 처리

@@ -143,6 +143,8 @@ public class TranslationEventHandler : Singleton<TranslationEventHandler>
 
     private void HandleApprovedSpeech(int order, string userid, string lang)
     {
+        currentSpeakerId = userId;
+        // OnSpeakerChanged?.Invoke(userId); // 이건 아직 사용하지 않음
         if (playerTranslator != null)
         {
             playerTranslator.OnApprovedSpeech(order, userid, lang);
