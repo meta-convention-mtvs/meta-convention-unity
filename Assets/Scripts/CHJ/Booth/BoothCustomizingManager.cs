@@ -1,9 +1,8 @@
 ﻿using Firebase.Firestore;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using TriLibCore;
 using UnityEngine;
-using UnityEngine.Video;
 
 public class BoothCustomizingManager : MonoBehaviour
 {
@@ -52,6 +51,8 @@ public class BoothCustomizingManager : MonoBehaviour
         display.OnObjectSliderChanged += SetModelingScale;
         display.OnBannerButtonClick += SetBanner;
         display.OnBannerImageButtonClick += SetBannerImage;
+        display.OnBrochureButtonClick += SetBrochure;
+        display.OnBrochureImageButtonCilck += SetBrochureImage;
     }
     private void Update()
     {
@@ -68,7 +69,8 @@ public class BoothCustomizingManager : MonoBehaviour
                     {
                         Destroy(currentInstantiatedObject);
                     }
-                    currentInstantiatedObject = ObjectLoader.ImportObj(boothCustomizeData.boothObjectPath);
+                    //currentInstantiatedObject = ObjectLoader.ImportObj(boothCustomizeData.boothObjectPath);
+                    ObjectLoader.StartImporting(boothCustomizeData.boothObjectPath, OnBoothObjectLoad);
                 }
 
             }
@@ -97,6 +99,11 @@ public class BoothCustomizingManager : MonoBehaviour
                 instantiatedObject[currentIndex].GetComponent<RenderBoothData>().RenderBoothModeling(GetBoothExtraData(boothCustomizeData));
             boothObjectModelingChanged = false;
         }
+    }
+
+    void OnBoothObjectLoad(AssetLoaderContext context)
+    {
+        currentInstantiatedObject = context.RootGameObject;
     }
 
     void LoadGamePrefab(GameObject[] prefab)
@@ -170,6 +177,18 @@ public class BoothCustomizingManager : MonoBehaviour
         FileUploadManager.Instance.ShowDialog(SetBannerImage);
     }
 
+    void SetBrochure()
+    {
+        boothCustomizeData.hasBrochure = !boothCustomizeData.hasBrochure;
+        boothDataChanged = true;
+    }
+
+    void SetBrochureImage()
+    {
+        FileUploadManager.Instance.SetUpImageFileBrowser();
+        FileUploadManager.Instance.ShowDialog(SetBrochureImage);
+    }
+
     void SetModelingScale(float size)
     {
         boothCustomizeData.modelingScale = size;
@@ -207,6 +226,14 @@ public class BoothCustomizingManager : MonoBehaviour
         boothCustomizeData.bannerImagePath = path;
         boothDataChanged = true;
     }
+
+    void SetBrochureImage(string[] paths)
+    {
+        string path = paths[0];
+        boothCustomizeData.brochureImagePath = path;
+        boothDataChanged = true;
+    }
+
     void SetVideoClip(string[] paths)
     {
         string path = paths[0];
@@ -225,6 +252,8 @@ public class BoothCustomizingManager : MonoBehaviour
         extraData.videoURL = data.videoURL;
         extraData.hasBanner = data.hasBanner;
         extraData.bannerImage = ImageUtility.LoadTexture(data.bannerImagePath);
+        extraData.hasBrochure = data.hasBrochure;
+        extraData.brochureImage = ImageUtility.LoadTexture(data.brochureImagePath);
         extraData.homepageLink = data.homepageLink;
         return extraData;
     }
@@ -256,10 +285,16 @@ public class BoothCustomizingManager : MonoBehaviour
             DatabaseManager.Instance.UploadImage(boothCustomizeData.bannerImagePath);
         }
 
+        if(boothCustomizeData.brochureImagePath != null)
+        {
+            DatabaseManager.Instance.UploadImage(boothCustomizeData.brochureImagePath);
+
+        }
         boothCustomizeData.boothObjectPath = Path.GetFileName(boothCustomizeData.boothObjectPath);
         boothCustomizeData.logoImagePath = Path.GetFileName(boothCustomizeData.logoImagePath);
         boothCustomizeData.modelingPath = Path.GetFileName(boothCustomizeData.modelingPath);
         boothCustomizeData.bannerImagePath = Path.GetFileName(boothCustomizeData.bannerImagePath);
+        boothCustomizeData.brochureImagePath = Path.GetFileName(boothCustomizeData.brochureImagePath);
 
         if (boothCustomizeData.videoURL != null && boothCustomizeData.videoURL.StartsWith("file://"))
         {
@@ -323,6 +358,10 @@ public class BoothCustomizeData
     public bool hasBanner { get; set; }
     [FirestoreProperty]
     public string bannerImagePath { get; set; }
+    [FirestoreProperty]
+    public bool hasBrochure { get; set; }
+    [FirestoreProperty]
+    public string brochureImagePath { get; set; }
 }
 
 public class BoothExtraData
@@ -336,6 +375,8 @@ public class BoothExtraData
     public string videoURL;
     public bool hasBanner;
     public Texture2D bannerImage;
+    public bool hasBrochure;
+    public Texture2D brochureImage;
 }
 
 public enum BoothCategory

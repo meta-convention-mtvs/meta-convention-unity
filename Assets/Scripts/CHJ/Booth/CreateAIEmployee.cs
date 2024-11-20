@@ -12,6 +12,6 @@ public class CreateAIEmployee : MonoBehaviourPun
     private void Start()
     {
         GameObject go = Instantiate(aiEmployeeFactory, this.transform);
-        go.GetComponent<InteractableAIEmployeeObject>().InitializeUID(new UID((string)photonView.Owner.CustomProperties["id"]));
+        go.GetComponent<UID>().SetUID(GetComponent<UID>().uid);
     }
 }

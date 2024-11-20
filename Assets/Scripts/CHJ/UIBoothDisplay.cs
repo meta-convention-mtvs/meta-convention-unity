@@ -8,13 +8,14 @@ public class UIBoothDisplay : MonoBehaviour
 {
     public Button objectButton;
     public Button videoButton;
-    public Button furnitureButton;
+    public Button brochureButton;
     public Button bannerButton;
+    public Button brochureImageButton;
     public Button bannerImageButton;
     public Slider objectSizeSlider;
 
-    public Action OnObjectButtonClick, OnVideoButtonClick, OnBannerImageButtonClick;
-    public Action OnFurnitureButtonClick, OnBannerButtonClick;
+    public Action OnObjectButtonClick, OnVideoButtonClick, OnBrochureImageButtonCilck, OnBannerImageButtonClick;
+    public Action OnBrochureButtonClick, OnBannerButtonClick;
     public Action<float> OnObjectSliderChanged;
 
     private void Awake()
@@ -30,11 +31,15 @@ public class UIBoothDisplay : MonoBehaviour
     {
         objectButton.onClick.AddListener(_OnObjectButtonClick);
         videoButton.onClick.AddListener(_OnVideoButtonClick);
-        furnitureButton.onClick.AddListener(_OnFurnitureButtonClick);
-        bannerImageButton.onClick.AddListener(_OnBannerImageButtonClick);
+
+        brochureButton.onClick.AddListener(_OnBrochureButtonClick);
         bannerButton.onClick.AddListener(_OnBannerButtonClick);
+        bannerImageButton.onClick.AddListener(_OnBannerImageButtonClick);
+        brochureImageButton.onClick.AddListener(_OnBrochureImageButtonClick);
+
         objectSizeSlider.onValueChanged.AddListener(_OnObjectSliderChanged);
     }
+
 
     void _OnObjectButtonClick()
     {
@@ -46,9 +51,9 @@ public class UIBoothDisplay : MonoBehaviour
         OnVideoButtonClick?.Invoke();
     }
 
-    void _OnFurnitureButtonClick()
+    void _OnBrochureButtonClick()
     {
-        OnFurnitureButtonClick.Invoke();
+        OnBrochureButtonClick.Invoke();
     }
 
     void _OnBannerButtonClick()
@@ -59,6 +64,11 @@ public class UIBoothDisplay : MonoBehaviour
     void _OnObjectSliderChanged(float f)
     {
         OnObjectSliderChanged?.Invoke(f);
+    }
+
+    private void _OnBrochureImageButtonClick()
+    {
+        OnBrochureImageButtonCilck?.Invoke();
     }
 
     void _OnBannerImageButtonClick()

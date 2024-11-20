@@ -4,15 +4,6 @@ using System.Collections.Generic;
 using System.Diagnostics.Eventing.Reader;
 using UnityEngine;
 
-public class UID
-{
-    public string uid;
-
-    public UID(string id)
-    {
-        uid = id;
-    }
-}
 
 [RequireComponent(typeof(RenderBoothData))]
 public class BoothRuntimeCreate : MonoBehaviourPun
@@ -27,6 +18,7 @@ public class BoothRuntimeCreate : MonoBehaviourPun
     private string boothModelingPath;
     private Texture2D logoImage;
     private Texture2D bannerImage;
+    private Texture2D brochureImage;
     private string videoURL;
 
     private BoothCustomizeData data;
@@ -35,25 +27,15 @@ public class BoothRuntimeCreate : MonoBehaviourPun
     private bool isVideoLoaded;
     private bool isObjectLoaded;
     private bool isBannerLoaded;
+    private bool isBrochureLoaded;
 
     private UID ownerUID;
-
-    public void InitializeUID(UID uid)
-    {
-        ownerUID = uid;
-    }
 
     private void Start()
     {
         renderBoothData = GetComponent<RenderBoothData>();
-        if (photonView.IsMine)
-        {
-            ownerUID.uid = FireAuthManager.Instance.GetCurrentUser().UserId;
-        }
-        else
-        {
-            ownerUID.uid = (string)photonView.Owner.CustomProperties["id"];
-        }
+        ownerUID = GetComponent<UID>();
+
         LoadBoothCustomizeData(ownerUID);
     }
 
@@ -86,6 +68,11 @@ public class BoothRuntimeCreate : MonoBehaviourPun
         else
             isBannerLoaded = true;
 
+        if (!string.IsNullOrEmpty(data.brochureImagePath))
+            DatabaseManager.Instance.DownloadImageFrom(ownerUID.uid, data.brochureImagePath, OnLoadBrochureImageData);
+        else
+            isBrochureLoaded = true;
+
         CheckAllDataLoaded();
     }
     
@@ -93,6 +80,13 @@ public class BoothRuntimeCreate : MonoBehaviourPun
     {
         isBannerLoaded = true;
         bannerImage = texture;
+        CheckAllDataLoaded();
+    }
+
+    void OnLoadBrochureImageData(Texture2D texture)
+    {
+        isBrochureLoaded = true;
+        brochureImage = texture;
         CheckAllDataLoaded();
     }
     void OnLoadBoothModelingData(string path)
@@ -118,8 +112,10 @@ public class BoothRuntimeCreate : MonoBehaviourPun
 
     void CheckAllDataLoaded()
     {
-        if(isObjectLoaded && isVideoLoaded && isLogoLoaded & isBannerLoaded)
+        print("호출됨: Check All Data Loaded");
+        if(isObjectLoaded && isVideoLoaded && isLogoLoaded && isBannerLoaded && isBrochureLoaded)
         {
+            print("호출됨: RenderBoothData");
             BoothExtraData extraData = GetBoothExtraData(data);
 
             renderBoothData.RenderBoothDataWith(extraData);
@@ -137,6 +133,8 @@ public class BoothRuntimeCreate : MonoBehaviourPun
         extraData.videoURL = videoURL;
         extraData.hasBanner = data.hasBanner;
         extraData.bannerImage = bannerImage;
+        extraData.hasBrochure = data.hasBrochure;
+        extraData.brochureImage = brochureImage;
         extraData.homepageLink = data.homepageLink;
         return extraData;
     }
