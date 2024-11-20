@@ -9,11 +9,13 @@ public class RenderBoothData : MonoBehaviour
     public GameObject boothLogo;
     public GameObject boothVideoWall;
     public GameObject banner;
+    public GameObject brochure;
 
     private Renderer boothLogoRenderer;
     private Renderer boothVideoRenderer;
     private Renderer boothRenderer;
     private Renderer bannerRenderer;
+    private Renderer brochureRenderer;
 
     private VideoPlayer videoPlayer;
     private RenderTexture videoRenderTexture;
@@ -26,6 +28,7 @@ public class RenderBoothData : MonoBehaviour
     {
         boothRenderer = GetComponent<Renderer>();
         bannerRenderer = banner.GetComponent<Renderer>();
+        brochureRenderer = brochure.GetComponent<Renderer>();
         boothLogoRenderer = boothLogo.GetComponent<Renderer>();
         boothVideoRenderer = boothVideoWall.GetComponent<Renderer>();
         videoPlayer = GetComponent<VideoPlayer>();
@@ -48,6 +51,7 @@ public class RenderBoothData : MonoBehaviour
             currentInstantiatedObject.transform.localScale = new Vector3(extraData.modelingScale, extraData.modelingScale, extraData.modelingScale);
         }
         SetBanner(extraData.hasBanner, extraData.bannerImage, extraData.homepageLink);
+        SetBrochure(extraData.hasBrochure, extraData.brochureImage);
     }
 
     public void RenderBoothModeling(BoothExtraData extraData)
@@ -122,6 +126,22 @@ public class RenderBoothData : MonoBehaviour
         else
         {
             banner.SetActive(false);
+        }
+    }
+
+    void SetBrochure(bool hasBrochure, Texture2D brochureImage)
+    {
+        if (hasBrochure)
+        {
+            brochure.SetActive(true);
+            brochureRenderer.material.mainTexture = brochureImage;
+            brochureRenderer.material.SetColor("_EmissionColor", Color.white);
+            brochureRenderer.material.SetTexture("_EmissionMap", brochureImage);
+            brochureRenderer.material.EnableKeyword("_EMISSION");
+        }
+        else
+        {
+            brochure.SetActive(false);
         }
     }
 

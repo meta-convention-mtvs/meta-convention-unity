@@ -40,10 +40,10 @@ public class SummaryMgr : MonoBehaviourPun
             {
                 if (player != null)
                 {
-                    RequestSummary((string)player.CustomProperties["id"], (string)PhotonNetwork.LocalPlayer.CustomProperties["id"], OnDataLoaded);
+                    RequestSummary((string)player.CustomProperties["id"], (string)PhotonNetwork.LocalPlayer.CustomProperties["id"], CashedDataFromDatabase.Instance.playerLanguage.language, OnDataLoaded);
                 }
             }
-            RequestSummary("none", "abcd", OnDataLoaded);
+            RequestSummary(FireAuthManager.Instance.GetCurrentUser().UserId, "cf79ea17-a487-4b27-a20d-bbd11ff885da", CashedDataFromDatabase.Instance.playerLanguage.language, OnDataLoaded);
         }
             //GetRequestJson(PhotonNetwork.CurrentRoom., PhotonNetwork.CurrentRoom.Players[PhotonNetwork.CurrentRoom.MasterClientId].CustomProperties["id"]);
     }
@@ -62,16 +62,17 @@ public class SummaryMgr : MonoBehaviourPun
         return result;
     }
     // MeetingInfo 함수에 user UID, company UID 넣으면 됨
-    public string GetRequestJson(string userId, string companyId)
+    public string GetRequestJson(string userId, string companyId, string lang)
     {
-        string meetingJson = "{\"user_id\":\"" + userId + "\", \"org_id\":\"" + companyId + "\", \"lang\":\"ko\"}";
+        string meetingJson = "{\"user_id\":\"" + userId + "\", \"org_id\":\"" + companyId + "\", \"lang\":\"" + lang + "\"}";
+        print(meetingJson);
         return meetingJson;
     }
 
     public void OnClickToTakeSummary()
     {
 
-        RequestSummary("none", "abcd", OnDataLoaded);
+        RequestSummary("none", "abcd","ko", OnDataLoaded);
         //RequestSummary("none", "abcd", OnDataLoaded );
     }
 
@@ -85,9 +86,9 @@ public class SummaryMgr : MonoBehaviourPun
         go.GetComponent<UIAISummary>()?.SetAllText(summary.full_script);
 
     }
-    public void RequestSummary(string visitorUID, string companyUID, Action<TakeSummary> OnReceived)
+    public void RequestSummary(string visitorUID, string companyUID, string language, Action<TakeSummary> OnReceived)
     {
-        string jsonData = GetRequestJson(visitorUID, companyUID);
+        string jsonData = GetRequestJson(visitorUID, companyUID, language);
         StartCoroutine(IRequestSummary(jsonData, OnReceived));
     }
 

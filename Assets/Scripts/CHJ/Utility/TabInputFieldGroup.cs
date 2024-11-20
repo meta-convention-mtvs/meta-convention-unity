@@ -10,8 +10,14 @@ public class TabInputFieldGroup : MonoBehaviour
     [SerializeField]
     int currentIdx = 0;
 
+    private void Start()
+    {
+        SetInputFieldActive(inputFieldGroup, 0);
+    }
     void Update()
     {
+        currentIdx = GetCurrentActiveInputField(inputFieldGroup);
+
         if (Input.GetKeyDown(KeyCode.Tab))
         {
             currentIdx++;
@@ -23,5 +29,18 @@ public class TabInputFieldGroup : MonoBehaviour
     void SetInputFieldActive(InputField[] inputFields, int idx)
     {
         inputFields[idx].ActivateInputField();
+    }
+
+    int GetCurrentActiveInputField(InputField[] inputFields)
+    {
+        for(int i = 0; i<inputFields.Length; i++)
+        {
+            if (inputFields[i].isFocused)
+            {
+                return i;
+            }
+        }
+
+        return -1;
     }
 }

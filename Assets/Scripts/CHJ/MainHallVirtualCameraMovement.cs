@@ -17,18 +17,46 @@ public class MainHallVirtualCameraMovement : MonoBehaviour
 
     public CinemachineVirtualCamera aiSpeackVirtualCamera;
     public CinemachineVirtualCamera playerFollowCamera;
-    public CinemachineTargetGroup targetGroup;
+    public CinemachineVirtualCamera brocureCamera;
 
-    public void SetAiSpeackUICamera()
+    public List<CinemachineVirtualCamera> virtualCameras;
+
+    public enum MainHallCameraType
     {
-        // priority를 높게 바꿔준다
-        aiSpeackVirtualCamera.Priority = 20;
-        playerFollowCamera.Priority = 10;
+        PlayerFollowCam,
+        AiEmployeeCam,
+        BrocureCam
     }
 
-    public void SetPlayerFollowCamera()
+    private void Start()
     {
-        aiSpeackVirtualCamera.Priority = 10;
-        playerFollowCamera.Priority = 20;
+        virtualCameras = new List<CinemachineVirtualCamera>();
+        virtualCameras.Add(playerFollowCamera);
+        virtualCameras.Add(aiSpeackVirtualCamera);
+        virtualCameras.Add(brocureCamera);
     }
+
+    public void SetActiveVirtualCamera(CinemachineVirtualCamera activeCamera)
+    {
+        virtualCameras = ResetVirtualCameraPrioriy(virtualCameras);
+        activeCamera.Priority = 20;
+    }
+
+    public void SetBrochureCameraPosition(Transform brochure, Transform brochureCamTransform)
+    {
+        brocureCamera.gameObject.transform.position = brochureCamTransform.position;
+        brocureCamera.LookAt = brochure;
+    }
+
+    List<CinemachineVirtualCamera> ResetVirtualCameraPrioriy(List<CinemachineVirtualCamera> cameras)
+    {
+        List<CinemachineVirtualCamera> newCameras = new List<CinemachineVirtualCamera>(cameras);
+        foreach(CinemachineVirtualCamera camera in newCameras)
+        {
+            camera.Priority = 10;
+        }
+        return newCameras;
+    }
+
+
 }
