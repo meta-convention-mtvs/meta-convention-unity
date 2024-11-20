@@ -155,7 +155,7 @@ public class TranslationManager : Singleton<TranslationManager>
     public event Action<string> OnRoomJoined;        // 방 입장 성공
     public event Action OnRoomLeft;                  // 방 퇴장
     public event Action<bool, List<Dictionary<string, object>>> OnRoomUpdated;  // 방 상태 업데이트
-    public event Action<string> OnPartialTextReceived;    // 부분 텍스트 수신
+    public event Action<int, string> OnPartialTextReceived;
     public event Action<string> OnCompleteTextReceived;   // 완성된 텍스트 수신
     public event Action<string> OnPartialAudioReceived;   // 부분 오디오 수신
     public event Action OnCompleteAudioReceived;  // 완성된 오디오 수신
@@ -195,7 +195,9 @@ public class TranslationManager : Singleton<TranslationManager>
                     break;
                     
                 case "conversation.text.delta":
-                    OnPartialTextReceived?.Invoke(data["text"] as string);
+                    int order = Convert.ToInt32(data["order"]);
+                    string delta = data["delta"] as string;
+                    OnPartialTextReceived?.Invoke(order, delta);
                     break;
                     
                 case "conversation.text.done":

@@ -4,6 +4,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.UI;
+using TMPro;
 using System.Linq;  // Text 컴포넌트 사용을 위해 추가
 
 /// <summary>
@@ -13,6 +14,7 @@ using System.Linq;  // Text 컴포넌트 사용을 위해 추가
 /// - 발화 상태 UI 관리
 /// - 다중 사용자 간 발화 제어
 /// </summary>
+
 [RequireComponent(typeof(PhotonView))]
 public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
 {
@@ -43,7 +45,10 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
     [SerializeField] private GameObject cantSpeakUI;            // 발언 불가 시 표시할 UI
     [SerializeField] private GameObject speakButton;            // 발언 가능 상태 표시 UI
     [SerializeField] private GameObject waitingText;            // 대기 상태 표시 UI
-    [SerializeField] private Text errorMessageUI;               // 에러 메시지 UI (TMP -> Text)
+    [SerializeField] private Text errorMessageUI;              // 에러 메시지 UI (TMP -> Text)
+    [SerializeField] private ScrollRect translationScrollView;              // Scroll View
+    [SerializeField] private GameObject translationTextPrefab;              // 프리팹
+    private Dictionary<int, TextMeshProUGUI> translationTexts = new Dictionary<int, TextMeshProUGUI>();                 // order별로 저장
 
     // 에러 메시지 관련
     private float errorMessageDisplayTime = 3f;                // 에러 메시지 표시 시간
@@ -548,5 +553,76 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
             waitingText.SetActive(false);
         if (speakButton != null)
             speakButton.SetActive(true);
+    }
+
+    // 부분 번역된 텍스트를 업데이트하는 메서드
+    public void UpdatePartialTranslatedText(int order, string partialText)
+    {
+        if (translationScrollView == null || translationTextPrefab == null)
+        {
+            Debug.LogError("필수 UI 컴포넌트가 할당되지 않았습니다!");
+            return;
+        }
+
+        try
+        {
+            if (!translationTexts.ContainsKey(order))
+            {
+                // 새로운 order이므로 프리팹 생성
+                CreateNewTranslationText(order);
+            }
+
+            if (translationTexts.TryGetValue(order, out TextMeshProUGUI textComponent))
+            {
+                // 텍스트 업데이트
+                textComponent.text = partialText;
+                
+                // UI 업데이트를 다음 프레임에서 실행
+                StartCoroutine(ScrollToBottomNextFrame());
+            }
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"텍스트 업데이트 중 오류 발생: {e.Message}");
+        }
+    }
+
+    // Scroll View를 아래로 스크롤
+    private IEnumerator ScrollToBottomNextFrame()
+    {
+        yield return null;
+        Canvas.ForceUpdateCanvases();
+        translationScrollView.verticalNormalizedPosition = 0f;
+    }
+
+    private void CreateNewTranslationText(int order)
+    {
+        if (translationScrollView.content == null)
+        {
+            Debug.LogError("ScrollView의 content가 없습니다!");
+            return;
+        }
+
+        // 프리팹 인스턴스 생성
+        GameObject newTextObj = Instantiate(translationTextPrefab, translationScrollView.content);
+        TextMeshProUGUI newText = newTextObj.GetComponent<TextMeshProUGUI>();
+
+        if (newText != null)
+        {
+            translationTexts.Add(order, newText);
+        }
+        else
+        {
+            Debug.LogError("프리팹에 TextMeshProUGUI 컴포넌트가 없습니다!");
+        }
+    }
+
+    // 발화가 완료되었을 때 호출되는 메서드
+    public void OnCompleteAudioReceived()
+    {
+        // ... 기존 코드 ...
+
+        // 발화 완료 시 처리할 내용이 있다면 여기에 추가
+        // 예를 들어 오래된 텍스트를 정리하는 등
     }
 }

@@ -47,6 +47,7 @@ public class TranslationEventHandler : Singleton<TranslationEventHandler>
         manager.OnRoomUpdated += HandleRoomUpdate;
         manager.OnPartialAudioReceived += DistributePartialTranslatedAudio;
         manager.OnCompleteAudioReceived += DistributeCompleteTranslatedAudio;
+        manager.OnPartialTextReceived += DistributePartialTranslatedText;
         manager.OnSpeechApproved += HandleApprovedSpeech;
         manager.OnError += HandleError;
         
@@ -114,6 +115,14 @@ public class TranslationEventHandler : Singleton<TranslationEventHandler>
         Debug.Log("[TranslationEventHandler] Audio playback completed");
         currentSpeakerId = "";
         OnSpeakerChanged?.Invoke("");
+    }
+    // 부분 번역된 텍스트를 분배하는 메서드
+    private void DistributePartialTranslatedText(int order, string partialText)
+    {
+        if (playerTranslator != null)
+        {
+            playerTranslator.UpdatePartialTranslatedText(order, partialText);
+        }
     }
 
     private void HandleApprovedSpeech(string userId)
