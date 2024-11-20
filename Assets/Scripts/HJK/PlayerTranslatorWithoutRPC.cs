@@ -397,7 +397,7 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
         }
 
         // 텍스트 컴포넌트 찾기 시도
-        TextMeshProUGUI textComponent = messageData.translationPrefab.transform.Find("TranslatedText")?.GetComponent<TextMeshProUGUI>();
+        TextMeshProUGUI textComponent = messageData.translationPrefab.transform.Find("TranslatedContent")?.GetComponent<TextMeshProUGUI>();
         Debug.Log($"[Translation Debug] Found TextMeshProUGUI component: {(textComponent != null ? "Yes" : "No")}");
 
         if (textComponent != null)
