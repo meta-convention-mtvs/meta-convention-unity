@@ -351,16 +351,27 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
         // 메시지 데이터가 없는 경우 새로 생성
         if (messageData == null)
         {
+            string currentUserId = FireAuthManager.Instance.GetCurrentUser().UserId;
+            string speakerId = TranslationEventHandler.Instance.CurrentSpeakerId;
+            bool isMine = (speakerId == currentUserId);
+
             messageData = new MessageData();
             messageData.order = order;
-            messageData.isMine = true; // 또는 false, 발화자 확인 로직 필요
-            messageData.userid = FireAuthManager.Instance.GetCurrentUser().UserId;
+            messageData.isMine = isMine;
+            messageData.userid = speakerId;
 
-            // 원본 메시지 프리팹만 생성
-            messageData.userMessagePrefab = Instantiate(MessageBubble_Original_Mine, translationScrollView.content);
-            messages.Add(messageData);
+            // 발화자에 따라 적절한 프리팹 선택
+            if (isMine)
+            {
+                messageData.userMessagePrefab = Instantiate(MessageBubble_Original_Mine, translationScrollView.content);
+            }
+            else
+            {
+                messageData.userMessagePrefab = Instantiate(MessageBubble_Original_Yours, translationScrollView.content);
+            }
             
-            Debug.Log($"Created new MessageData for order: {order}");
+            messages.Add(messageData);
+            Debug.Log($"Created new MessageData for order: {order}, isMine: {isMine}");
         }
         
         // 번역 프리팹이 없는 경우에만 생성
