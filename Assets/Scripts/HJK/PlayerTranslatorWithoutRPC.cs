@@ -345,10 +345,10 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
     {
         Debug.Log($"[Translation Debug] Starting UpdatePartialTranslatedText for order: {order}");
 
-        // order에 해당하는 메시지 데이터를 찾습니다.
+        // order로 메시지 데이터를 찾음
         MessageData messageData = messages.FirstOrDefault(m => m.order == order);
 
-        // 메시지 데이터가 없으면 새로 생성합니다.
+        // 메시지 데이터가 없는 경우 새로 생성
         if (messageData == null)
         {
             string currentUserId = FireAuthManager.Instance.GetCurrentUser().UserId;
@@ -360,7 +360,7 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
             messageData.isMine = isMine;
             messageData.userid = speakerId;
 
-            // 발화자에 따라 적절한 프리팹을 선택하여 생성합니다.
+            // 발화자에 따라 적절한 프리팹 선택
             if (isMine)
             {
                 messageData.userMessagePrefab = Instantiate(MessageBubble_Original_Mine, translationScrollView.content);
@@ -374,7 +374,7 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
             Debug.Log($"Created new MessageData for order: {order}, isMine: {isMine}");
         }
 
-        // 번역 프리팹이 없는 경우 생성합니다.
+        // 번역 프리팹이 없는 경우에만 생성
         if (messageData.translationPrefab == null)
         {
             Debug.Log("[Translation Debug] Creating new translation prefab");
@@ -384,20 +384,30 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
             Debug.Log($"[Translation Debug] Translation prefab created and positioned at index: {index + 1}");
         }
 
-        // 프리팹의 계층 구조를 디버깅 로그로 출력합니다.
-        Transform prefabTransform = messageData.translationPrefab.transform;
-        Debug.Log("[Translation Debug] Translation prefab hierarchy:");
-        for (int i = 0; i < prefabTransform.childCount; i++)
-        {
-            Debug.Log($"- Child {i}: {prefabTransform.GetChild(i).name}");
-        }
-
         // 번역된 내용을 표시하는 TextMeshProUGUI 컴포넌트를 찾습니다.
         TextMeshProUGUI textComponent = messageData.translationPrefab.transform.Find("TranslatedContent")?.GetComponent<TextMeshProUGUI>();
         if (textComponent != null)
         {
-            // 기존 텍스트를 새로운 partialText로 대체합니다.
-            textComponent.text = partialText;
+            // 기존 텍스트에 partialText를 추가합니다.
+            if (string.IsNullOrEmpty(textComponent.text))
+            {
+                textComponent.text = partialText;
+            }
+            else
+            {
+                // 중복을 방지하기 위해 마지막 단어를 확인합니다.
+                string[] existingWords = textComponent.text.Split(' ');
+                string[] newWords = partialText.Split(' ');
+
+                // 새로운 단어에서 기존에 없는 단어들만 추가합니다.
+                foreach (string word in newWords)
+                {
+                    if (!existingWords.Contains(word))
+                    {
+                        textComponent.text += " " + word;
+                    }
+                }
+            }
 
             Debug.Log($"[Translation Debug] Updated accumulated text: {textComponent.text}");
 
@@ -411,6 +421,7 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
             Debug.LogError("[Translation Debug] Failed to find TranslatedContent component");
         }
     }
+
 
 
     private IEnumerator ScrollToBottomNextFrame()
