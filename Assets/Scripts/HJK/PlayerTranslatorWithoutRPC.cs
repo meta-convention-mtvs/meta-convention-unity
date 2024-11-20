@@ -47,7 +47,7 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
     [SerializeField] private GameObject waitingText;            // 대기 상태 표시 UI
     [SerializeField] private Text errorMessageUI;              // 에러 메시지 UI (TMP -> Text)
     [SerializeField] private ScrollRect translationScrollView;              // Scroll View
-    [SerializeField] private GameObject translationTextPrefab;              // 프리팹
+    //[SerializeField] private GameObject translationTextPrefab;              // 프리팹
     [SerializeField] private GameObject MessageBubble_Original_Mine;   // 내가 말한 메시지 프리팹 (흰색)
     [SerializeField] private GameObject MessageBubble_Original_Yours;  // 상대방이 말한 메시지 프리팹 (파란색)
     [SerializeField] private GameObject MessageBubble_Translated;      // 번역된 메시지 프리팹
@@ -731,27 +731,27 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
     }
     */
 
-    private void CreateNewTranslationText(int order)
-    {
-        if (translationScrollView.content == null)
-        {
-            Debug.LogError("ScrollView의 content가 없습니다!");
-            return;
-        }
+    //private void CreateNewTranslationText(int order)
+    //{
+    //    if (translationScrollView.content == null)
+    //    {
+    //        Debug.LogError("ScrollView의 content가 없습니다!");
+    //        return;
+    //    }
 
-        // 프리팹 인스턴스 생성
-        GameObject newTextObj = Instantiate(translationTextPrefab, translationScrollView.content);
-        TextMeshProUGUI newText = newTextObj.GetComponent<TextMeshProUGUI>();
+    //    // 프리팹 인스턴스 생성
+    //    GameObject newTextObj = Instantiate(translationTextPrefab, translationScrollView.content);
+    //    TextMeshProUGUI newText = newTextObj.GetComponent<TextMeshProUGUI>();
 
-        if (newText != null)
-        {
-            translationTexts.Add(order, newText);
-        }
-        else
-        {
-            Debug.LogError("프리팹에 TextMeshProUGUI 컴포넌트가 없습니다!");
-        }
-    }
+    //    if (newText != null)
+    //    {
+    //        translationTexts.Add(order, newText);
+    //    }
+    //    else
+    //    {
+    //        Debug.LogError("프리팹에 TextMeshProUGUI 컴포넌트가 없습니다!");
+    //    }
+    //}
 
     // 발화가 완료되었을 때 호출되는 메서드
     public void OnCompleteAudioReceived()
