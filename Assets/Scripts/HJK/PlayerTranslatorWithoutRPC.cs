@@ -343,10 +343,14 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
 
     public void UpdatePartialTranslatedText(int order, string partialText)
     {
-        Debug.Log($"Updating translation for order: {order}");
+        Debug.Log($"[Translation Debug] Starting UpdatePartialTranslatedText for order: {order}");
+        Debug.Log($"[Translation Debug] Partial text received: {partialText}");
+        Debug.Log($"[Translation Debug] Current messages count: {messages.Count}");
+        Debug.Log($"[Translation Debug] Available orders: {string.Join(", ", messages.Select(m => m.order))}");
         
         // order로 메시지 데이터를 찾음
         MessageData messageData = messages.FirstOrDefault(m => m.order == order);
+        Debug.Log($"[Translation Debug] Found MessageData: {(messageData != null ? "Yes" : "No")}");
 
         // 메시지 데이터가 없는 경우 새로 생성
         if (messageData == null)
@@ -377,18 +381,29 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
         // 번역 프리팹이 없는 경우에만 생성
         if (messageData.translationPrefab == null)
         {
+            Debug.Log("[Translation Debug] Creating new translation prefab");
             messageData.translationPrefab = Instantiate(MessageBubble_Translated, translationScrollView.content);
             int index = messageData.userMessagePrefab.transform.GetSiblingIndex();
             messageData.translationPrefab.transform.SetSiblingIndex(index + 1);
-            Debug.Log($"Created translation prefab for order: {order}");
+            Debug.Log($"[Translation Debug] Translation prefab created and positioned at index: {index + 1}");
         }
 
-        // 실제 프리팹의 계층 구조에 맞는 정확한 경로 사용
+        // 프리팹의 계층 구조 출력
+        Transform prefabTransform = messageData.translationPrefab.transform;
+        Debug.Log("[Translation Debug] Translation prefab hierarchy:");
+        for (int i = 0; i < prefabTransform.childCount; i++)
+        {
+            Debug.Log($"- Child {i}: {prefabTransform.GetChild(i).name}");
+        }
+
+        // 텍스트 컴포넌트 찾기 시도
         TextMeshProUGUI textComponent = messageData.translationPrefab.transform.Find("TranslatedText")?.GetComponent<TextMeshProUGUI>();
+        Debug.Log($"[Translation Debug] Found TextMeshProUGUI component: {(textComponent != null ? "Yes" : "No")}");
+
         if (textComponent != null)
         {
             textComponent.text = partialText;
-            Debug.Log($"Updated translation text for order: {order}");
+            Debug.Log($"[Translation Debug] Successfully updated text to: {partialText}");
             
             if (translationScrollView != null)
             {
@@ -397,13 +412,25 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
         }
         else
         {
-            // 계층 구조 디버깅을 위한 로그
-            Debug.LogError($"TranslatedText component not found for order: {order}");
-            Transform prefabTransform = messageData.translationPrefab.transform;
-            Debug.LogError("Available children: " + string.Join(", ", 
-                Enumerable.Range(0, prefabTransform.childCount)
-                .Select(i => prefabTransform.GetChild(i).name)));
+            Debug.LogError("[Translation Debug] Failed to find TranslatedText component. Attempting to find any TextMeshProUGUI components:");
+            var allTextComponents = messageData.translationPrefab.GetComponentsInChildren<TextMeshProUGUI>();
+            foreach (var comp in allTextComponents)
+            {
+                Debug.LogError($"- Found TextMeshProUGUI in: {GetGameObjectPath(comp.transform)}");
+            }
         }
+    }
+
+    // GameObject의 전체 경로를 반환하는 헬퍼 메서드
+    private string GetGameObjectPath(Transform transform)
+    {
+        string path = transform.name;
+        while (transform.parent != null)
+        {
+            transform = transform.parent;
+            path = transform.name + "/" + path;
+        }
+        return path;
     }
 
     private IEnumerator ScrollToBottomNextFrame()
