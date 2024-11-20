@@ -273,11 +273,15 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
 
         if (messageData != null)
         {
-            // STT 결과 업데이트
-            TextMeshProUGUI textComponent = messageData.userMessagePrefab.GetComponentInChildren<TextMeshProUGUI>();
-            if (textComponent != null)
+            // User1_Content TMP 컴포넌트를 찾아서 텍스트 업데이트
+            TextMeshProUGUI contentText = messageData.userMessagePrefab.transform.Find("User1_Content")?.GetComponent<TextMeshProUGUI>();
+            if (contentText != null)
             {
-                textComponent.text = text;
+                contentText.text = text;
+            }
+            else
+            {
+                Debug.LogError("User1_Content TMP component not found");
             }
 
             // 번역 메시지 프리팹 생성
@@ -325,17 +329,28 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
     {
         // order로 메시지 데이터를 찾음
         MessageData messageData = messages.FirstOrDefault(m => m.order == order);
-        if (messageData != null)
+        if (messageData != null && messageData.translationPrefab != null)
         {
-            // 번역 프리팹의 텍스트 업데이트
+            // 번역 프리팹의 텍스트 컴포넌트 찾기
             TextMeshProUGUI textComponent = messageData.translationPrefab.GetComponentInChildren<TextMeshProUGUI>();
             if (textComponent != null)
             {
                 textComponent.text = partialText;
+                
+                // ScrollRect가 null이 아닌 경우에만 스크롤 실행
+                if (translationScrollView != null)
+                {
+                    StartCoroutine(ScrollToBottomNextFrame());
+                }
             }
-
-            // ScrollRect를 아래로 스크롤
-            StartCoroutine(ScrollToBottomNextFrame());
+            else
+            {
+                Debug.LogError($"Translation TextMeshProUGUI component not found for order: {order}");
+            }
+        }
+        else
+        {
+            Debug.LogError($"MessageData or translationPrefab not found for order: {order}");
         }
     }
 
