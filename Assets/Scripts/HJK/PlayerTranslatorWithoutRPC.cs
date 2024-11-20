@@ -283,23 +283,30 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
             if (contentText != null)
             {
                 contentText.text = text;
+                Debug.Log($"Updated original text for order: {order}");
             }
             else
             {
-                Debug.LogError("User1_Content TMP component not found");
+                Debug.LogError("Content_Mine TMP component not found");
             }
-
-            // 번역 메시지 프리팹 생성
-            messageData.translationPrefab = Instantiate(MessageBubble_Translated, translationScrollView.content);
-
-            // translationPrefab을 userMessagePrefab 아래에 위치시킴
-            int index = messageData.userMessagePrefab.transform.GetSiblingIndex();
-            messageData.translationPrefab.transform.SetSiblingIndex(index + 1);
         }
         else
         {
-            // 메시지 데이터가 없으면 새로운 메시지로 간주
-            OnOtherInputAudioDone(order, text);
+            // 새로운 메시지 데이터 생성 (translation prefab 생성 제외)
+            messageData = new MessageData();
+            messageData.order = order;
+            messageData.isMine = true;
+            messageData.userid = FireAuthManager.Instance.GetCurrentUser().UserId;
+            
+            messageData.userMessagePrefab = Instantiate(MessageBubble_Original_Mine, translationScrollView.content);
+            TextMeshProUGUI contentText = messageData.userMessagePrefab.transform.Find("Content_Mine")?.GetComponent<TextMeshProUGUI>();
+            if (contentText != null)
+            {
+                contentText.text = text;
+            }
+
+            messages.Add(messageData);
+            Debug.Log($"Created new message data for order: {order}");
         }
     }
 
@@ -336,6 +343,8 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
 
     public void UpdatePartialTranslatedText(int order, string partialText)
     {
+        Debug.Log($"Updating translation for order: {order}");
+        
         // order로 메시지 데이터를 찾음
         MessageData messageData = messages.FirstOrDefault(m => m.order == order);
 
@@ -347,32 +356,28 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
             messageData.isMine = true; // 또는 false, 발화자 확인 로직 필요
             messageData.userid = FireAuthManager.Instance.GetCurrentUser().UserId;
 
-            // 원본 메시지 프리팹 생성
+            // 원본 메시지 프리팹만 생성
             messageData.userMessagePrefab = Instantiate(MessageBubble_Original_Mine, translationScrollView.content);
-            
-            // 번역 메시지 프리팹 생성
-            messageData.translationPrefab = Instantiate(MessageBubble_Translated, translationScrollView.content);
-            
-            // translationPrefab을 userMessagePrefab 아래에 위치시킴
-            int index = messageData.userMessagePrefab.transform.GetSiblingIndex();
-            messageData.translationPrefab.transform.SetSiblingIndex(index + 1);
-
             messages.Add(messageData);
+            
+            Debug.Log($"Created new MessageData for order: {order}");
         }
         
-        // 번역 프리팹이 아직 없는 경우 생성
+        // 번역 프리팹이 없는 경우에만 생성
         if (messageData.translationPrefab == null)
         {
             messageData.translationPrefab = Instantiate(MessageBubble_Translated, translationScrollView.content);
             int index = messageData.userMessagePrefab.transform.GetSiblingIndex();
             messageData.translationPrefab.transform.SetSiblingIndex(index + 1);
+            Debug.Log($"Created translation prefab for order: {order}");
         }
 
-        // 번역 텍스트 업데이트
+        // 실제 프리팹의 계층 구조에 맞는 정확한 경로 사용
         TextMeshProUGUI textComponent = messageData.translationPrefab.transform.Find("TranslatedText")?.GetComponent<TextMeshProUGUI>();
         if (textComponent != null)
         {
             textComponent.text = partialText;
+            Debug.Log($"Updated translation text for order: {order}");
             
             if (translationScrollView != null)
             {
@@ -381,7 +386,12 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
         }
         else
         {
-            Debug.LogError($"TranslatedText TextMeshProUGUI component not found for order: {order}");
+            // 계층 구조 디버깅을 위한 로그
+            Debug.LogError($"TranslatedText component not found for order: {order}");
+            Transform prefabTransform = messageData.translationPrefab.transform;
+            Debug.LogError("Available children: " + string.Join(", ", 
+                Enumerable.Range(0, prefabTransform.childCount)
+                .Select(i => prefabTransform.GetChild(i).name)));
         }
     }
 
