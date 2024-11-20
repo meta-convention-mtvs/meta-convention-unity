@@ -343,80 +343,25 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
 
     public void UpdatePartialTranslatedText(int order, string partialText)
     {
-        Debug.Log($"[Translation Debug] Starting UpdatePartialTranslatedText for order: {order}");
-        Debug.Log($"[Translation Debug] Partial text received: {partialText}");
-        Debug.Log($"[Translation Debug] Current messages count: {messages.Count}");
-        Debug.Log($"[Translation Debug] Available orders: {string.Join(", ", messages.Select(m => m.order))}");
-        
-        // order로 메시지 데이터를 찾음
         MessageData messageData = messages.FirstOrDefault(m => m.order == order);
-        Debug.Log($"[Translation Debug] Found MessageData: {(messageData != null ? "Yes" : "No")}");
-
-        // 메시지 데이터가 없는 경우 새로 생성
-        if (messageData == null)
+        TextMeshProUGUI textComponent = messageData.translationPrefab.transform.Find("TranslatedContent")?.GetComponent<TextMeshProUGUI>();
+        
+        if (textComponent != null)
         {
-            string currentUserId = FireAuthManager.Instance.GetCurrentUser().UserId;
-            string speakerId = TranslationEventHandler.Instance.CurrentSpeakerId;
-            bool isMine = (speakerId == currentUserId);
-
-            messageData = new MessageData();
-            messageData.order = order;
-            messageData.isMine = isMine;
-            messageData.userid = speakerId;
-
-            // 발화자에 따라 적절한 프리팹 선택
-            if (isMine)
+            // 첫 텍스트인 경우
+            if (string.IsNullOrEmpty(textComponent.text))
             {
-                messageData.userMessagePrefab = Instantiate(MessageBubble_Original_Mine, translationScrollView.content);
+                textComponent.text = partialText;
             }
             else
             {
-                messageData.userMessagePrefab = Instantiate(MessageBubble_Original_Yours, translationScrollView.content);
+                // 새로운 텍스트 조각을 기존 텍스트에 추가
+                textComponent.text = textComponent.text.TrimEnd() + partialText;
             }
-            
-            messages.Add(messageData);
-            Debug.Log($"Created new MessageData for order: {order}, isMine: {isMine}");
-        }
-        
-        // 번역 프리팹이 없는 경우에만 생성
-        if (messageData.translationPrefab == null)
-        {
-            Debug.Log("[Translation Debug] Creating new translation prefab");
-            messageData.translationPrefab = Instantiate(MessageBubble_Translated, translationScrollView.content);
-            int index = messageData.userMessagePrefab.transform.GetSiblingIndex();
-            messageData.translationPrefab.transform.SetSiblingIndex(index + 1);
-            Debug.Log($"[Translation Debug] Translation prefab created and positioned at index: {index + 1}");
-        }
-
-        // 프리팹의 계층 구조 출력
-        Transform prefabTransform = messageData.translationPrefab.transform;
-        Debug.Log("[Translation Debug] Translation prefab hierarchy:");
-        for (int i = 0; i < prefabTransform.childCount; i++)
-        {
-            Debug.Log($"- Child {i}: {prefabTransform.GetChild(i).name}");
-        }
-
-        // 텍스트 컴포넌트 찾기 시도
-        TextMeshProUGUI textComponent = messageData.translationPrefab.transform.Find("TranslatedContent")?.GetComponent<TextMeshProUGUI>();
-        Debug.Log($"[Translation Debug] Found TextMeshProUGUI component: {(textComponent != null ? "Yes" : "No")}");
-
-        if (textComponent != null)
-        {
-            textComponent.text = partialText;
-            Debug.Log($"[Translation Debug] Successfully updated text to: {partialText}");
             
             if (translationScrollView != null)
             {
                 StartCoroutine(ScrollToBottomNextFrame());
-            }
-        }
-        else
-        {
-            Debug.LogError("[Translation Debug] Failed to find TranslatedText component. Attempting to find any TextMeshProUGUI components:");
-            var allTextComponents = messageData.translationPrefab.GetComponentsInChildren<TextMeshProUGUI>();
-            foreach (var comp in allTextComponents)
-            {
-                Debug.LogError($"- Found TextMeshProUGUI in: {GetGameObjectPath(comp.transform)}");
             }
         }
     }
