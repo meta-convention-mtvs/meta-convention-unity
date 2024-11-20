@@ -279,7 +279,7 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
         if (messageData != null)
         {
             // User1_Content TMP 컴포넌트를 찾아서 텍스트 업데이트
-            TextMeshProUGUI contentText = messageData.userMessagePrefab.transform.Find("User1_Content")?.GetComponent<TextMeshProUGUI>();
+            TextMeshProUGUI contentText = messageData.userMessagePrefab.transform.Find("Content_Mine")?.GetComponent<TextMeshProUGUI>();
             if (contentText != null)
             {
                 contentText.text = text;
@@ -314,10 +314,14 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
         messageData.userMessagePrefab = Instantiate(MessageBubble_Original_Yours, translationScrollView.content);
 
         // 텍스트 업데이트
-        TextMeshProUGUI textComponent = messageData.userMessagePrefab.GetComponentInChildren<TextMeshProUGUI>();
-        if (textComponent != null)
+        TextMeshProUGUI contentText = messageData.userMessagePrefab.transform.Find("Content_Yours")?.GetComponent<TextMeshProUGUI>();
+        if (contentText != null)
         {
-            textComponent.text = text;
+            contentText.text = text;
+        }
+        else
+        {
+            Debug.LogError("Content_Yours TMP component not found");
         }
 
         // 번역 메시지 프리팹 생성
@@ -336,8 +340,8 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
         MessageData messageData = messages.FirstOrDefault(m => m.order == order);
         if (messageData != null && messageData.translationPrefab != null)
         {
-            // 번역 프리팹의 텍스트 컴포넌트 찾기
-            TextMeshProUGUI textComponent = messageData.translationPrefab.GetComponentInChildren<TextMeshProUGUI>();
+            // "TranslatedContent" 컴포넌트를 명시적으로 찾아서 텍스트 업데이트
+            TextMeshProUGUI textComponent = messageData.translationPrefab.transform.Find("TranslatedContent")?.GetComponent<TextMeshProUGUI>();
             if (textComponent != null)
             {
                 textComponent.text = partialText;
@@ -350,7 +354,7 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
             }
             else
             {
-                Debug.LogError($"Translation TextMeshProUGUI component not found for order: {order}");
+                Debug.LogError($"TranslatedContent TextMeshProUGUI component not found for order: {order}");
             }
         }
         else
