@@ -278,8 +278,9 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
 
         if (messageData != null)
         {
-            // User1_Content TMP 컴포넌트를 찾아서 텍스트 업데이트
-            TextMeshProUGUI contentText = messageData.userMessagePrefab.transform.Find("Content_Mine")?.GetComponent<TextMeshProUGUI>();
+            // 발화자가 나인지 상대방인지에 따라 적절한 컴포넌트를 찾습니다.
+            string contentName = messageData.isMine ? "Content_Mine" : "Content_Yours";
+            TextMeshProUGUI contentText = messageData.userMessagePrefab.transform.Find(contentName)?.GetComponent<TextMeshProUGUI>();
             if (contentText != null)
             {
                 contentText.text = text;
@@ -287,48 +288,44 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
             }
             else
             {
-                Debug.LogError("Content_Mine TMP component not found");
+                Debug.LogError($"{contentName} TMP component not found");
             }
         }
         else
         {
-            // 새로운 메시지 데이터 생성 (translation prefab 생성 제외)
-            messageData = new MessageData();
-            messageData.order = order;
-            messageData.isMine = true;
-            messageData.userid = FireAuthManager.Instance.GetCurrentUser().UserId;
-            
-            messageData.userMessagePrefab = Instantiate(MessageBubble_Original_Mine, translationScrollView.content);
-            TextMeshProUGUI contentText = messageData.userMessagePrefab.transform.Find("Content_Mine")?.GetComponent<TextMeshProUGUI>();
-            if (contentText != null)
-            {
-                contentText.text = text;
-            }
-
-            messages.Add(messageData);
-            Debug.Log($"Created new message data for order: {order}");
+            Debug.LogError($"MessageData not found for order: {order}");
         }
     }
 
-    public void OnOtherInputAudioDone(int order, string text)
+
+    public void OnOtherInputAudioDone(int order, string text, string speakerId)
     {
         // 상대방의 메시지 처리
         MessageData messageData = new MessageData();
-        messageData.isMine = false;
+        messageData.isMine = (speakerId == FireAuthManager.Instance.GetCurrentUser().UserId);
         messageData.order = order;
+        messageData.userid = speakerId;
 
-        // 상대방의 메시지 프리팹 생성
-        messageData.userMessagePrefab = Instantiate(MessageBubble_Original_Yours, translationScrollView.content);
+        // 발화자에 따라 적절한 프리팹 선택
+        if (messageData.isMine)
+        {
+            messageData.userMessagePrefab = Instantiate(MessageBubble_Original_Mine, translationScrollView.content);
+        }
+        else
+        {
+            messageData.userMessagePrefab = Instantiate(MessageBubble_Original_Yours, translationScrollView.content);
+        }
 
         // 텍스트 업데이트
-        TextMeshProUGUI contentText = messageData.userMessagePrefab.transform.Find("Content_Yours")?.GetComponent<TextMeshProUGUI>();
+        string contentName = messageData.isMine ? "Content_Mine" : "Content_Yours";
+        TextMeshProUGUI contentText = messageData.userMessagePrefab.transform.Find(contentName)?.GetComponent<TextMeshProUGUI>();
         if (contentText != null)
         {
             contentText.text = text;
         }
         else
         {
-            Debug.LogError("Content_Yours TMP component not found");
+            Debug.LogError($"{contentName} TMP component not found");
         }
 
         // 번역 메시지 프리팹 생성
@@ -341,7 +338,8 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
         messages.Add(messageData);
     }
 
-    public void UpdatePartialTranslatedText(int order, string partialText)
+
+    public void UpdatePartialTranslatedText(int order, string partialText, string speakerId)
     {
         Debug.Log($"[Translation Debug] Starting UpdatePartialTranslatedText for order: {order}");
 
@@ -351,9 +349,7 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
         // 메시지 데이터가 없는 경우 새로 생성
         if (messageData == null)
         {
-            string currentUserId = FireAuthManager.Instance.GetCurrentUser().UserId;
-            string speakerId = TranslationEventHandler.Instance.CurrentSpeakerId;
-            bool isMine = (speakerId == currentUserId);
+            bool isMine = (speakerId == FireAuthManager.Instance.GetCurrentUser().UserId);
 
             messageData = new MessageData();
             messageData.order = order;
@@ -389,25 +385,7 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
         if (textComponent != null)
         {
             // 기존 텍스트에 partialText를 추가합니다.
-            if (string.IsNullOrEmpty(textComponent.text))
-            {
-                textComponent.text = partialText;
-            }
-            else
-            {
-                // 중복을 방지하기 위해 마지막 단어를 확인합니다.
-                string[] existingWords = textComponent.text.Split(' ');
-                string[] newWords = partialText.Split(' ');
-
-                // 새로운 단어에서 기존에 없는 단어들만 추가합니다.
-                foreach (string word in newWords)
-                {
-                    if (!existingWords.Contains(word))
-                    {
-                        textComponent.text += " " + word;
-                    }
-                }
-            }
+            textComponent.text += partialText;
 
             Debug.Log($"[Translation Debug] Updated accumulated text: {textComponent.text}");
 
@@ -421,7 +399,6 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
             Debug.LogError("[Translation Debug] Failed to find TranslatedContent component");
         }
     }
-
 
 
     private IEnumerator ScrollToBottomNextFrame()

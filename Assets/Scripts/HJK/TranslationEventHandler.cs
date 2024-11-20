@@ -51,7 +51,7 @@ public class TranslationEventHandler : Singleton<TranslationEventHandler>
         // manager.OnSpeechApproved += HandleApprovedSpeech; // 기존의 것
         manager.OnApprovedSpeech += HandleApprovedSpeech; // 새로 추가
         manager.OnInputAudioDone += HandleInputAudioDone;
-        manager.OnPartialTextReceived += HandleTextDelta;
+        // manager.OnPartialTextReceived += HandleTextDelta; // 중복되므로 제거
         manager.OnError += HandleError;
         
         Debug.Log("[TranslationEventHandler] Events subscribed successfully");
@@ -120,11 +120,11 @@ public class TranslationEventHandler : Singleton<TranslationEventHandler>
         OnSpeakerChanged?.Invoke("");
     }
     // 부분 번역된 텍스트를 분배하는 메서드
-    private void DistributePartialTranslatedText(int order, string partialText)
+    private void DistributePartialTranslatedText(int order, string partialText, string speakerId)
     {
         if (playerTranslator != null)
         {
-            playerTranslator.UpdatePartialTranslatedText(order, partialText);
+            playerTranslator.UpdatePartialTranslatedText(order, partialText, speakerId);
         }
     }
 
@@ -159,13 +159,12 @@ public class TranslationEventHandler : Singleton<TranslationEventHandler>
         }
     }
 
-    private void HandleTextDelta(int order, string delta)
-    {
-        if (playerTranslator != null)
-        {
-            playerTranslator.UpdatePartialTranslatedText(order, delta);
-        }
-    }
+    // public void HandleTextDelta(int order, string partialText, string speakerId)
+    // {
+    //     // `speakerId`를 함께 전달
+    //     playerTranslator.UpdatePartialTranslatedText(order, partialText, speakerId);
+    // }
+
 
     private void HandleError(string errorMessage)
     {

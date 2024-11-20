@@ -155,7 +155,7 @@ public class TranslationManager : Singleton<TranslationManager>
     public event Action<string> OnRoomJoined;        // 방 입장 성공
     public event Action OnRoomLeft;                  // 방 퇴장
     public event Action<bool, List<Dictionary<string, object>>> OnRoomUpdated;  // 방 상태 업데이트
-    public event Action<int, string> OnPartialTextReceived;
+    public event Action<int, string, string> OnPartialTextReceived;
     public event Action<string> OnCompleteTextReceived;   // 완성된 텍스트 수신
     public event Action<string> OnPartialAudioReceived;   // 부분 오디오 수신
     public event Action OnCompleteAudioReceived;  // 완성된 오디오 수신
@@ -168,12 +168,12 @@ public class TranslationManager : Singleton<TranslationManager>
 
     private void OnMessageReceived(object sender, MessageEventArgs e)
     {
-        // UnityMainThread에서 실행되도록 래핑
         dispatcher.Enqueue(() => {
             var data = JsonConvert.DeserializeObject<Dictionary<string, object>>(e.Data);
             Debug.Log($"[TranslationManager] Received message: {e.Data}");
             
             int order;
+            string userid;
             
             switch (data["type"] as string)
             {
@@ -203,7 +203,8 @@ public class TranslationManager : Singleton<TranslationManager>
                 case "conversation.text.delta":
                     order = Convert.ToInt32(data["order"]);
                     string delta = data["delta"] as string;
-                    OnPartialTextReceived?.Invoke(order, delta);
+                    userid = data["userid"] as string;
+                    OnPartialTextReceived?.Invoke(order, delta, userid);
                     break;
                     
                 case "conversation.text.done":
@@ -220,7 +221,7 @@ public class TranslationManager : Singleton<TranslationManager>
                     
                 case "conversation.approved_speech":
                     order = Convert.ToInt32(data["order"]);
-                    string userid = data["userid"] as string;
+                    userid = data["userid"] as string;
                     string lang = data["lang"] as string;
                     OnApprovedSpeech?.Invoke(order, userid, lang);
                     break;
