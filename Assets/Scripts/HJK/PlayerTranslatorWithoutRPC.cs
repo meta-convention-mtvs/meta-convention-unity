@@ -113,11 +113,13 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
         // 발언 키(M) 눌렀을 때
         if (Input.GetKeyDown(speakKey))
         {
+            Debug.Log("M키가 눌렸습니다.");
             TryStartRecording();
         }
         // 발언 키(M)에서 손을 뗐을 때
         else if (Input.GetKeyUp(speakKey))
         {
+            Debug.Log("M키에서 손을 뗐습니다.");
             StopRecording();
         }
         // 취소 키(ESC)를 눌렀을 때
