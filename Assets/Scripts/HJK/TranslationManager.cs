@@ -168,6 +168,7 @@ public class TranslationManager : Singleton<TranslationManager>
 
     private void OnMessageReceived(object sender, MessageEventArgs e)
     {
+        // UnityMainThread에서 실행되도록 래핑
         dispatcher.Enqueue(() => {
             var data = JsonConvert.DeserializeObject<Dictionary<string, object>>(e.Data);
             Debug.Log($"[TranslationManager] Received message: {e.Data}");
@@ -203,7 +204,7 @@ public class TranslationManager : Singleton<TranslationManager>
                 case "conversation.text.delta":
                     order = Convert.ToInt32(data["order"]);
                     string delta = data["delta"] as string;
-                    userid = data["userid"] as string;
+                    userid = data.ContainsKey("userid") ? data["userid"] as string : string.Empty;
                     OnPartialTextReceived?.Invoke(order, delta, userid);
                     break;
                     
@@ -221,8 +222,8 @@ public class TranslationManager : Singleton<TranslationManager>
                     
                 case "conversation.approved_speech":
                     order = Convert.ToInt32(data["order"]);
-                    userid = data["userid"] as string;
-                    string lang = data["lang"] as string;
+                    userid = data.ContainsKey("userid") ? data["userid"] as string : string.Empty;
+                    string lang = data.ContainsKey("lang") ? data["lang"] as string : string.Empty;
                     OnApprovedSpeech?.Invoke(order, userid, lang);
                     break;
                     
