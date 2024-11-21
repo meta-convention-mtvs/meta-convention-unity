@@ -105,8 +105,8 @@ public class UuidMgr : MonoBehaviour
 // 유저 데이터 저장
 // 유저 데이터에서 기업 이름으로 uuid 할당하기
 // .. 유저는 uuid 가지고만 있으면 될.. 듯?
-// TODO: user class, 데이터에  uuid 항목 만들기
-// TODO: uuid 할당하는 함수 만들기 (기업명 -> uuid)
+// user class, 데이터에  uuid 항목 만들기
+// uuid 할당하는 함수 만들기 (기업명 -> uuid)
 
 
 
