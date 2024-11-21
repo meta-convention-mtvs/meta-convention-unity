@@ -35,6 +35,10 @@ public class TranslationManager : Singleton<TranslationManager>
 
     private bool isConnecting = false;
 
+    // 클래스 상단에 추가
+    private Dictionary<int, string> accumulatedText = new Dictionary<int, string>();
+
+
     public void Connect()
     {
         Debug.Log("[TranslationManager] Connect method called");
@@ -229,9 +233,21 @@ public class TranslationManager : Singleton<TranslationManager>
                     break;
                     
                 case "conversation.input_audio.done":
-                    int inputOrder = Convert.ToInt32(data["order"]);
+                    order = Convert.ToInt32(data["order"]);
                     string text = data["text"] as string;
-                    OnInputAudioDone?.Invoke(inputOrder, text);
+                    
+                    // order별로 텍스트 누적
+                    if (!accumulatedText.ContainsKey(order))
+                    {
+                        accumulatedText[order] = text;
+                    }
+                    else
+                    {
+                        accumulatedText[order] += text;
+                    }
+                    
+                    // 누적된 텍스트로 이벤트 호출
+                    OnInputAudioDone?.Invoke(order, accumulatedText[order]);
                     break;
 
                 default:
