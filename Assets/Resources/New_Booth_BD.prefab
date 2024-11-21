@@ -228,10 +228,13 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6276801375140233669}
-  - component: {fileID: 8968912586063902350}
-  - component: {fileID: 3017577057827841372}
-  - component: {fileID: 7302023617649680360}
-  - component: {fileID: 3143642043148366314}
+  - component: {fileID: 8433960011162773457}
+  - component: {fileID: 2951827913920415498}
+  - component: {fileID: 677086870483176057}
+  - component: {fileID: 106644385800541175}
+  - component: {fileID: 8134764942052561114}
+  - component: {fileID: 172627740622223492}
+  - component: {fileID: 7994779026307306765}
   m_Layer: 0
   m_Name: New_Booth_BD
   m_TagString: Untagged
@@ -259,7 +262,7 @@ Transform:
   - {fileID: 4574634794261689799}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!328 &8968912586063902350
+--- !u!328 &8433960011162773457
 VideoPlayer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -295,7 +298,7 @@ VideoPlayer:
   m_WaitForFirstFrame: 1
   m_FrameReadyEventEnabled: 0
   m_VideoShaders: []
---- !u!82 &3017577057827841372
+--- !u!82 &2951827913920415498
 AudioSource:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -391,7 +394,7 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
---- !u!114 &7302023617649680360
+--- !u!114 &677086870483176057
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -407,7 +410,57 @@ MonoBehaviour:
   boothVideoWall: {fileID: 8956967039886160628}
   banner: {fileID: 8433482231757584204}
   brochure: {fileID: 5882455539060750719}
---- !u!23 &3143642043148366314
+--- !u!114 &106644385800541175
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3980610965405944250}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObservedComponentsFoldoutOpen: 1
+  Group: 0
+  prefixField: -1
+  Synchronization: 3
+  OwnershipTransfer: 0
+  observableSearch: 2
+  ObservedComponents: []
+  sceneViewId: 0
+  InstantiationId: 0
+  isRuntimeInstantiated: 0
+--- !u!114 &8134764942052561114
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3980610965405944250}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6bf198a501eb85144bd31cda8d062b2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  AIEmployeePosition: {fileID: 6276801375140233669}
+  aiEmployeeFactory: {fileID: 5829460551445718063, guid: 6f5fafcc2c2023c4c9e702d1d4bf130c,
+    type: 3}
+--- !u!114 &172627740622223492
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3980610965405944250}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 16d6b2a5507983b45aaee3dc181f7529, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  uid: 
+--- !u!23 &7994779026307306765
 MeshRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -461,7 +514,6 @@ GameObject:
   - component: {fileID: 4490779889397691605}
   - component: {fileID: 30614551674219745}
   - component: {fileID: 7540246916539168131}
-  - component: {fileID: 1223487224850293297}
   m_Layer: 0
   m_Name: Banner
   m_TagString: Untagged
@@ -556,19 +608,6 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
---- !u!114 &1223487224850293297
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8433482231757584204}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dc2c6b485377ea94cbc8045b63a49e8f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  homepageURL: 
 --- !u!1001 &367143209933269364
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1297,11 +1336,7 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 7193869763155359957, guid: 8134e00563223fa49ba35fa75bc8eb58,
-        type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 4334418794723083344}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8134e00563223fa49ba35fa75bc8eb58, type: 3}
 --- !u!4 &2381992655069554256 stripped
 Transform:
@@ -1315,19 +1350,6 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 3636494290247664042}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &4334418794723083344
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5882455539060750719}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4630c57d5477ccc42ab6ea8608291154, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  brochureCameraTransform: {fileID: 0}
 --- !u!1001 &4010418049452103023
 PrefabInstance:
   m_ObjectHideFlags: 0

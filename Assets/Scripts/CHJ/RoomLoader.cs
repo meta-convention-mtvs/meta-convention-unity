@@ -1,4 +1,4 @@
-﻿using ExitGames.Client.Photon;
+﻿sing ExitGames.Client.Photon;
 using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;

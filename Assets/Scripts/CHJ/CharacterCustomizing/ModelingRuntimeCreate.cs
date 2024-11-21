@@ -26,19 +26,19 @@ public class ModelingRuntimeCreate : MonoBehaviourPun
 
     }
 
-    private void Start()
-    {
-        ownerUID = GetComponent<UID>();
-        LoadPlayerCustomizeData(ownerUID.uid);
-    }
+    //private void Start()
+    //{
+    //    ownerUID = GetComponent<UID>();
+    //    LoadPlayerCustomizeData(ownerUID.uid);
+    //}
 
-    void LoadPlayerCustomizeData(string uid)
-    {
-        // data를 읽어온다.
-        DatabaseManager.Instance.GetDataFrom<CharacterTopBottomCustomizeData>(uid, CreateAvatar);
-    }
+    //void LoadPlayerCustomizeData(string uid)
+    //{
+    //    // data를 읽어온다.
+    //    DatabaseManager.Instance.GetDataFrom<CharacterTopBottomCustomizeData>(uid, CreateAvatar);
+    //}
 
-    void CreateAvatar(CharacterTopBottomCustomizeData customizeData)
+    public void CreateAvatar(CharacterTopBottomCustomizeData customizeData)
     {
 
         // data에 적혀있는 gender, idx 에 따라 prefab을 생성후 플레이어의 prefab의 자식으로 만든다.
@@ -58,10 +58,10 @@ public class ModelingRuntimeCreate : MonoBehaviourPun
             }
 
             Instantiate(character, gameObject.transform);
-            if (customizeData.isCustomTop)
-            {
-                DatabaseManager.Instance.DownloadImageFrom(ownerUID.uid, customizeData.customImageFileName, OnLoadTexture);
-            }
+            //if (customizeData.isCustomTop)
+            //{
+            //    DatabaseManager.Instance.DownloadImageFrom(ownerUID.uid, customizeData.customImageFileName, OnLoadTexture);
+            //}
             anim.avatar = customizeData.isMan ? maleAvatar : femaleAvatar;
 
             anim.Rebind();
@@ -92,7 +92,7 @@ public class ModelingRuntimeCreate : MonoBehaviourPun
     //    anim.Rebind();
     //}
 
-    void OnLoadTexture(Texture2D texture)
+    public void OnLoadTexture(Texture2D texture)
     {
         // texture 불러옴
         texture.wrapMode = TextureWrapMode.Clamp;
