@@ -7,7 +7,6 @@ using UnityEngine;
 using System.Linq;
 using System;
 using System.Collections;
-using Photon.Voice.PUN;
 
 public class CreatePlayer : MonoBehaviour
 {
@@ -25,8 +24,8 @@ public class CreatePlayer : MonoBehaviour
     private void Start()
     {
         player = Create(roomType);
-        if(roomType == RoomType.MainHall)
-            DatabaseManager.Instance.GetData<Card>(onCardLoad);
+        if (roomType == RoomType.MainHall)
+            SaveCardInProperties(PhotonNetwork.LocalPlayer, CashedDataFromDatabase.Instance.playerInfo);
         if(roomType == RoomType.MainHall || roomType == RoomType.BusinessRoom)
             StartCoroutine(WaitAndInvoke());
     }
@@ -38,10 +37,10 @@ public class CreatePlayer : MonoBehaviour
         OnPlayerCreate?.Invoke(player);
     }
 
-    private void onCardLoad(Card myCard)
-    {
-        SaveCardInProperties(player.GetPhotonView().Owner, myCard);
-    }
+    //private void onCardLoad(Card myCard)
+    //{
+    //    SaveCardInProperties(player.GetPhotonView().Owner, myCard);
+    //}
 
     public GameObject Create(RoomType roomType)
     {

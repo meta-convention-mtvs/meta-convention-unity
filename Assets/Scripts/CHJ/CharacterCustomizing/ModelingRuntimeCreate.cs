@@ -16,25 +16,21 @@ public class ModelingRuntimeCreate : MonoBehaviourPun
 
     public SkinnedMeshRenderer customTShirts;
 
-    public string OwnerUID;
+    private UID ownerUID;
     
     Animator anim;
-
 
     private void Awake()
     {
         anim = gameObject.GetComponent<Animator>();
-        if (photonView.IsMine)
-        {
-            OwnerUID = FireAuthManager.Instance.GetCurrentUser().UserId;
-        }
-        else
-        {
-            OwnerUID = (string)photonView.Owner.CustomProperties["id"];
-        }
-        LoadPlayerCustomizeData(OwnerUID);
+
     }
 
+    private void Start()
+    {
+        ownerUID = GetComponent<UID>();
+        LoadPlayerCustomizeData(ownerUID.uid);
+    }
 
     void LoadPlayerCustomizeData(string uid)
     {
@@ -64,7 +60,7 @@ public class ModelingRuntimeCreate : MonoBehaviourPun
             Instantiate(character, gameObject.transform);
             if (customizeData.isCustomTop)
             {
-                DatabaseManager.Instance.DownloadImageFrom(OwnerUID, customizeData.customImageFileName, OnLoadTexture);
+                DatabaseManager.Instance.DownloadImageFrom(ownerUID.uid, customizeData.customImageFileName, OnLoadTexture);
             }
             anim.avatar = customizeData.isMan ? maleAvatar : femaleAvatar;
 
