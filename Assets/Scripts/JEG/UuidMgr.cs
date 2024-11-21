@@ -3,10 +3,19 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Networking;
+using UnityEngine.UI;
 
 
 public class UuidMgr : MonoBehaviour
 {
+    string url = "http://ec2-3-36-111-173.ap-northeast-2.compute.amazonaws.com:6576/translation/uuid";
+    public Text genUuid;
+
+    public InputField companyName;
+    public Text findedUuid;
+
+
     [System.Serializable]
     public class UuidCompany
     {
@@ -29,16 +38,20 @@ public class UuidMgr : MonoBehaviour
 
         companyData = JsonUtility.FromJson<UuidCompanyList>($"{{\"companies\":{jsonData}}}");
 
-        string inputCompanyName = "Lockheed Martine Corporation";
-        string closestUUID = FindClosestCompanyUUID(inputCompanyName);
 
-        Debug.Log($"Closest Company UUID: {closestUUID}");
     }
 
-    public string FindClosestCompanyUUID(string inputCompanyName)
+    
+
+    public void OnClickFindClosestCompanyUUID()
     {
-        UuidCompany closestCompany = companyData.companies.OrderBy(c => LevenshteinDistance(inputCompanyName, c.company_name)).First();
-        return closestCompany.uuid;
+        
+        UuidCompany closestCompany = companyData.companies.OrderBy(c => LevenshteinDistance(companyName.text, c.company_name)).First();
+
+        Debug.Log($"Closest Company UUID: {closestCompany.uuid}");
+
+        findedUuid.text = closestCompany.uuid;
+
     }
 
     private int LevenshteinDistance(string a, string b)
@@ -62,12 +75,31 @@ public class UuidMgr : MonoBehaviour
     }
 
 
-
-    // Update is called once per frame
-    void Update()
+    public void OnClickGenerateUuid()
     {
-        
+        StartCoroutine(IGetUuid(url));
+
     }
+    // url 주소로 get 요청으로 갔을 때 받는 문자열 을 반환 한다. 
+    // 그게 나의 uuid... 
+    IEnumerator IGetUuid(string url)
+    {
+        UnityWebRequest www = new UnityWebRequest(url, "GET");
+        www.downloadHandler = new DownloadHandlerBuffer();
+        www.SetRequestHeader("Content-Type", "application/json");
+
+        yield return www.SendWebRequest();
+
+        if(www.result == UnityWebRequest.Result.ConnectionError || www.result == UnityWebRequest.Result.ProtocolError)
+        {
+            Debug.Log("Error: " + www.error);
+        }else
+        {
+            Debug.Log("response: " + www.downloadHandler.text);
+            genUuid.text = www.downloadHandler.text;
+        }
+    }
+
 }
 
 // 유저 데이터 저장
@@ -89,6 +121,8 @@ public class UuidMgr : MonoBehaviour
 // 트레이닝 정보도.. uuid 기반으로 저장, 접근 해야 함
 // 우리가 건드릴게 있나? 
 // 그냥 받은거 있으면 uuid 기반으로 경로 잘 정해서 저장 해주기
+
+
 
 
 
