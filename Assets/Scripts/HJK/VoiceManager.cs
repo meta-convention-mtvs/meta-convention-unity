@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System;
 using System.Linq;
 using System.Collections;
@@ -107,16 +107,22 @@ public class VoiceManager : MonoBehaviour
             int position = Microphone.GetPosition(null);
             Debug.Log($"[시간] 녹음 종료. 녹음된 위치: {position}, 전체 샘플 수: {recordedClip.samples}");
             
+            // 녹음 중지 전에 현재 AudioClip 저장
+            AudioClip tempClip = recordedClip;
+            
             Debug.Log("[시간] Microphone.End 호출 직전");
             Microphone.End(null);
             Debug.Log("[시간] Microphone.End 호출 완료");
             
             isRecording = false;
 
-            if (recordedClip != null)
+            if (tempClip != null)
             {
+                // 약간의 지연을 주어 오디오 버퍼가 안정화되도록 함
+                await Task.Delay(100);
+                
                 Debug.Log("[시간] ConvertAudioDataToBytes 시작");
-                lastRecordedAudioBase64 = ConvertAudioDataToBytes(recordedClip);
+                lastRecordedAudioBase64 = ConvertAudioDataToBytes(tempClip);
                 Debug.Log($"[시간] 변환된 오디오 데이터 길이: {(lastRecordedAudioBase64?.Length ?? 0)}");
 
                 if (string.IsNullOrEmpty(lastRecordedAudioBase64))
@@ -145,21 +151,78 @@ public class VoiceManager : MonoBehaviour
 
     string ConvertAudioDataToBytes(AudioClip recordedClip)
     {
-        // 녹음된 실제 위치 확인
-        int position = Microphone.GetPosition(null);
-        if (position <= 0) position = recordedClip.samples;
-
-        float[] samples = new float[position * recordedClip.channels];
-
-        // 원본 데이터 가져오기
-        if (!recordedClip.GetData(samples, 0))
+        if (recordedClip == null)
         {
-            Debug.LogError("오디오 데이터를 가져오는데 실패했습니다.");
+            Debug.LogError("recordedClip이 null입니다.");
             return null;
         }
 
+        // 전체 샘플 수 가져오기
+        int totalSamples = recordedClip.samples;
+        Debug.Log($"전체 샘플 수: {totalSamples}, 채널 수: {recordedClip.channels}");
+
+        // 전체 데이터 가져오기
+        float[] samples = new float[totalSamples * recordedClip.channels];
+        recordedClip.GetData(samples, 0);
+
+        // RMS 값을 사용하여 실제 음성이 있는 부분 찾기
+        float threshold = 0.01f;
+        int windowSize = 1024;
+        List<float> rmsValues = new List<float>();
+
+        for (int i = 0; i < samples.Length; i += windowSize)
+        {
+            float sum = 0;
+            int count = Math.Min(windowSize, samples.Length - i);
+            for (int j = 0; j < count; j++)
+            {
+                sum += samples[i + j] * samples[i + j];
+            }
+            float rms = Mathf.Sqrt(sum / count);
+            rmsValues.Add(rms);
+        }
+
+        // 시작과 끝 지점 찾기
+        int startIndex = 0;
+        int endIndex = rmsValues.Count - 1;
+
+        // 시작 지점 찾기
+        while (startIndex < rmsValues.Count && rmsValues[startIndex] < threshold)
+        {
+            startIndex++;
+        }
+
+        // 끝 지점 찾기
+        while (endIndex > startIndex && rmsValues[endIndex] < threshold)
+        {
+            endIndex--;
+        }
+
+        // 실제 오디오 데이터 추출
+        startIndex = Math.Max(0, startIndex * windowSize);
+        endIndex = Math.Min(samples.Length - 1, (endIndex + 1) * windowSize);
+        
+        int actualLength = endIndex - startIndex;
+        if (actualLength <= 0)
+        {
+            Debug.LogWarning("유효한 오디오 데이터가 없어 전체 데이터를 사용합니다.");
+            startIndex = 0;
+            actualLength = samples.Length;
+        }
+
+        float[] trimmedSamples = new float[actualLength];
+        Array.Copy(samples, startIndex, trimmedSamples, 0, actualLength);
+        
+        Debug.Log($"전체 샘플 수: {samples.Length}, 실제 사용된 샘플 수: {actualLength}, 시작 인덱스: {startIndex}");
+
         // 변환 및 반환
-        byte[] audioData = ConvertToByteArray(samples);
+        byte[] audioData = ConvertToByteArray(trimmedSamples);
+        if (audioData == null || audioData.Length == 0)
+        {
+            Debug.LogError($"오디오 데이터 변환 실패 - 데이터 길이: {(audioData?.Length ?? 0)}");
+            return null;
+        }
+
         return Convert.ToBase64String(audioData);
     }
 
@@ -227,7 +290,6 @@ public class VoiceManager : MonoBehaviour
             }
             playCoroutine = StartCoroutine(PlayBufferedAudio());
         }
-
     }
 
     // 버퍼링된 오디오를 재생하는 코루틴
@@ -252,7 +314,7 @@ public class VoiceManager : MonoBehaviour
 
             audioSource.clip = clip;
             audioSource.Play();
-
+            
             yield return new WaitForSeconds(clip.length);
         }
 
@@ -263,28 +325,28 @@ public class VoiceManager : MonoBehaviour
 
     // float 배열을 byte 배열로 변환하는 메서드
     private byte[] ConvertToByteArray(float[] samples)
-{
-    short[] intData = new short[samples.Length];
-    byte[] bytesData = new byte[samples.Length * 2];
-    float rescaleFactor = 32767f; // short.MaxValue와 동일
-
-    for (int i = 0; i < samples.Length; i++)
     {
-        float sample = samples[i];
-        // 노이즈 게이트 임계값을 낮춤
-        if (Mathf.Abs(sample) < 0.001f)
-            sample = 0f;
-        
-        // 클리핑 방지를 위한 부드러운 제한
-        if (sample > 1f) sample = 1f;
-        if (sample < -1f) sample = -1f;
-        
-        intData[i] = (short)(sample * rescaleFactor);
-    }
+        short[] intData = new short[samples.Length];
+        byte[] bytesData = new byte[samples.Length * 2];
+        float rescaleFactor = 32767f; // short.MaxValue와 동일
 
-    Buffer.BlockCopy(intData, 0, bytesData, 0, bytesData.Length);
-    return bytesData;
-}
+        for (int i = 0; i < samples.Length; i++)
+        {
+            float sample = samples[i];
+            // 노이즈 게이트 임계값을 낮춤
+            if (Mathf.Abs(sample) < 0.001f)
+                sample = 0f;
+            
+            // 클리핑 방지를 위한 부드러운 제한
+            if (sample > 1f) sample = 1f;
+            if (sample < -1f) sample = -1f;
+            
+            intData[i] = (short)(sample * rescaleFactor);
+        }
+
+        Buffer.BlockCopy(intData, 0, bytesData, 0, bytesData.Length);
+        return bytesData;
+    }
 
     // UI 업데이트를 위한 새로운 메서드
     private void UpdatePlayingStatusUI()

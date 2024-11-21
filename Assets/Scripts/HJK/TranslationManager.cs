@@ -74,7 +74,8 @@ public class TranslationManager : Singleton<TranslationManager>
         {
             { "type", "room.create" },
             { "lang", language },
-            { "userid", userId }
+            { "userid", userId },
+            { "orgid", userId }
         };
         Send(message);
     }
