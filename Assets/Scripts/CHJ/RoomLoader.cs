@@ -23,7 +23,7 @@ public class RoomLoader : MonoBehaviourPunCallbacks
 
     public void OnEvent(EventData photonEvent)
     {
-        print("Event 수신 : " + photonEvent.Code);
+        //print("Event 수신 : " + photonEvent.Code);  
         byte eventCode = photonEvent.Code;
 
         if (eventCode == INVITE_TO_ROOM_ID)

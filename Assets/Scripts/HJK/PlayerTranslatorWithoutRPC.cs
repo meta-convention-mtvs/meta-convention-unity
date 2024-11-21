@@ -25,6 +25,10 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
     private float[] tempRecordingBuffer;       // 임시 녹음 버퍼
     private int recordingPosition = 0;         // 현재 녹음 위치
 
+    private const float CHUNK_DURATION = 0.1f;                  // 청크 단위 (100ms)
+    private const int SAMPLES_PER_CHUNK = (int)(RECORDING_FREQUENCY * CHUNK_DURATION);  // 청크당 샘플 수
+    private Coroutine recordingCoroutine;                      // 녹음 코루틴
+
     // 설정값들
     [SerializeField] private KeyCode speakKey = KeyCode.M;      // 발언 시작/종료 키
     [SerializeField] private float maxRecordingTime = 60f;      // 최대 녹음 시간(초)
@@ -218,6 +222,59 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
         // 녹음 시작
         Debug.Log("녹음을 진짜 시작하는 부분(recordingClip)");
         recordingClip = Microphone.Start(null, true, (int)maxRecordingTime, RECORDING_FREQUENCY);
+
+        // 실시간 스트리밍 코루틴 시작
+        if (recordingCoroutine != null)
+        {
+            StopCoroutine(recordingCoroutine);
+        }
+        recordingCoroutine = StartCoroutine(StreamAudioData());
+    }
+
+    private IEnumerator StreamAudioData()
+    {
+        int lastPosition = 0;
+        float[] tempBuffer = new float[SAMPLES_PER_CHUNK];
+    
+        while (isRecording)
+        {
+            int currentPosition = Microphone.GetPosition(null);
+            if (currentPosition < 0 || lastPosition == currentPosition)
+            {
+                yield return new WaitForSeconds(CHUNK_DURATION / 2);
+                continue;
+            }
+    
+            // 청크 크기만큼의 데이터가 있는지 확인
+            int availableSamples = 0;
+            if (currentPosition < lastPosition)
+            {
+                // 버퍼가 순환된 경우
+                availableSamples = (recordingClip.samples - lastPosition) + currentPosition;
+            }
+            else
+            {
+                availableSamples = currentPosition - lastPosition;
+            }
+    
+            if (availableSamples >= SAMPLES_PER_CHUNK)
+            {
+                // 청크 데이터 추출
+                recordingClip.GetData(tempBuffer, lastPosition);
+                
+                // Base64로 변환하여 전송
+                string audioData = ConvertAudioToBase64(tempBuffer);
+                if (!string.IsNullOrEmpty(audioData))
+                {
+                    TranslationManager.Instance.SendAudioData(audioData);
+                }
+    
+                // 다음 청크를 위한 위치 업데이트
+                lastPosition = (lastPosition + SAMPLES_PER_CHUNK) % recordingClip.samples;
+            }
+    
+            yield return new WaitForSeconds(CHUNK_DURATION / 2);
+        }
     }
 
     /// <summary>
@@ -225,48 +282,22 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
     /// </summary>
     private void StopRecording()
     {
-        print("StopRecording(일단 실행됨)");
-        if (!isRecording)
-        {
-            Debug.LogError("isRecording이 " + isRecording + "이라서 return됨.");
-            return;  
-        }
-        print("StopRecording(녹음 중지됨)");
+        if (!isRecording) return;
         
-        // 현재 position 저장
-        int position = Microphone.GetPosition(null);
-        Debug.Log($"[Debug] 녹음 중지 전 position: {position}");
+        // 녹음 중지
+        isRecording = false;
+        if (recordingCoroutine != null)
+        {
+            StopCoroutine(recordingCoroutine);
+            recordingCoroutine = null;
+        }
+    
+        // 마이크 녹음 중지
+        Microphone.End(null);
         
-        // position이 유효한 경우에만 처리
-        if (position > 0)
-        {
-            // 녹음된 데이터를 임시 배열에 저장
-            float[] samples = new float[position];
-            recordingClip.GetData(samples, 0);
-            
-            // 마이크 녹음 중지
-            Microphone.End(null);
-            isRecording = false;
-            
-            // 저장된 샘플을 base64로 변환
-            string audioData = ConvertAudioToBase64(samples);
-            print("오디오 변환 성공 -> audioData: " + audioData);
-            
-            if (!string.IsNullOrEmpty(audioData))
-            {
-                // 오디오 데이터 전송
-                TranslationManager.Instance.SendAudioData(audioData);
-                // 발언 종료 신호 전송
-                TranslationManager.Instance.DoneSpeech();
-            }
-        }
-        else
-        {
-            Microphone.End(null);
-            isRecording = false;
-            Debug.LogWarning("녹음된 데이터가 없습니다.");
-        }
-
+        // 발언 종료 신호 전송
+        TranslationManager.Instance.DoneSpeech();
+    
         // 발언자 상태 초기화
         TranslationEventHandler.Instance.ResetSpeaker();
     }

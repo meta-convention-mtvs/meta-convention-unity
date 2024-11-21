@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿/*
+using UnityEngine;
 using System;
 using System.Linq;
 using System.Collections;
@@ -9,7 +10,7 @@ using UnityEngine.UI;
 using System.Threading.Tasks; // UI 네임스페이스 추가
 
 // VoiceManager 클래스: 음성 녹음, 재생 및 AI와의 통신을 관리합니다.
-public class VoiceManager : MonoBehaviour
+public class VoiceManager_Original : MonoBehaviour
 { 
     public AudioSource audioSource; // 오디오 재생을 위한 AudioSource 컴포넌트
     public AIWebSocket aiWebSocket; // AI 서버와의 WebSocket 통신을 위한 컴포넌트
@@ -30,11 +31,6 @@ public class VoiceManager : MonoBehaviour
     private string userId;           // 사용자 식별자 추가
     private AIWebSocket currentAI;   // 현재 연결된 AI 참조 추가
 
-    private const int SAMPLE_RATE = 24000;
-    private const float CHUNK_DURATION = 0.1f; // 100ms
-    private const int SAMPLES_PER_CHUNK = (int)(SAMPLE_RATE * CHUNK_DURATION);
-    private Coroutine recordingCoroutine;
-
     // 시작 시 실행되는 메서드
     void Start()
     {
@@ -52,15 +48,7 @@ public class VoiceManager : MonoBehaviour
     // 매 프레임마다 실행되는 메서드
     void Update()
     {
-        // M 키를 누르고 있는 동안 녹음
-        if (Input.GetKeyDown(KeyCode.M))
-        {
-            StartRecording();
-        }
-        else if (Input.GetKeyUp(KeyCode.M))
-        {
-            StopRecordingAndSend();
-        }
+
     }
 
     // 녹음을 시작하는 메서드
@@ -79,142 +67,88 @@ public class VoiceManager : MonoBehaviour
             }
             
             Debug.Log("[시간] Microphone.Start 호출 직전");
-            recordedClip = Microphone.Start(null, true, 30, SAMPLE_RATE);
+            recordedClip = Microphone.Start(null, true, 30, 24000);
             Debug.Log("[시간] Microphone.Start 호출 완료");
             
             isRecording = true;
             audioBuffer.Clear();
-            
-            // 실시간 녹음 코루틴 시작
-            recordingCoroutine = StartCoroutine(StreamAudioData());
             Debug.Log("[시간] StartRecording 완료");
         }
     }
 
-    private IEnumerator StreamAudioData()
-    {
-        int lastPosition = 0;
-        float[] tempBuffer = new float[SAMPLES_PER_CHUNK];
+    // 녹음을 중지하고 서버로 전송하는 메서드
+    //public void StopRecordingAndSend()
+    //{
+    //    if (isRecording)
+    //    {
+    //        Microphone.End(null); // 녹음 중지
+    //        isRecording = false;
+    //        Debug.Log("녹음 중지");
 
-        while (isRecording)
-        {
-            int currentPosition = Microphone.GetPosition(null);
-            if (currentPosition < 0 || lastPosition == currentPosition)
-            {
-                yield return new WaitForSeconds(CHUNK_DURATION / 2);
-                continue;
-            }
-
-            // 청크 크기만큼의 데이터가 있는지 확인
-            int availableSamples = 0;
-            if (currentPosition < lastPosition)
-            {
-                // 버퍼가 순환된 경우
-                availableSamples = (recordedClip.samples - lastPosition) + currentPosition;
-            }
-            else
-            {
-                availableSamples = currentPosition - lastPosition;
-            }
-
-            if (availableSamples >= SAMPLES_PER_CHUNK)
-            {
-                // 청크 데이터 추출
-                recordedClip.GetData(tempBuffer, lastPosition);
-                
-                // Base64로 변환하여 전송
-                string base64Data = ConvertAudioChunkToBase64(tempBuffer);
-                aiWebSocket.SendBufferAddAudio(base64Data);
-
-                // 다음 청크를 위한 위치 업데이트
-                lastPosition = (lastPosition + SAMPLES_PER_CHUNK) % recordedClip.samples;
-            }
-
-            yield return new WaitForSeconds(CHUNK_DURATION / 2);
-        }
-    }
-
-    private string ConvertAudioChunkToBase64(float[] audioData)
-    {
-        byte[] byteArray = ConvertToByteArray(audioData);
-        return Convert.ToBase64String(byteArray);
-    }
+    //        //int position = Microphone.GetPosition(null); // 현재 녹음 위치 가져오기
+    //        //float[] samples = new float[position];
+    //        //recordedClip.GetData(samples, 0); // 녹음된 데이터 가져오기
+    //        //byte[] audioData = ConvertToByteArray(samples); // float 배열을 byte 배열로 변환
+    //        lastRecordedAudioBase64 = ConvertAudioDataToBytes(recordedClip); // byte 배열을 Base64 문자열로 변환
+    //        if(lastRecordedAudioBase64 == null)
+    //        {
+    //            Debug.Log("녹음된 오디오 데이터가 없습니다.");
+    //            return;
+    //        }
+    //        aiWebSocket.SendBufferAddAudio(lastRecordedAudioBase64); // 녹음된 오디오 데이터를 서버로 전송
+    //        aiWebSocket.SendGenerateTextAudio(); // 텍스트 및 오디오 생성 요청
+    //    }
+    //}
 
     public async Task StopRecordingAndSend()
     {
         if (isRecording)
         {
             Debug.Log("[시간] StopRecordingAndSend 시작");
+            int position = Microphone.GetPosition(null);
+            Debug.Log($"[시간] 녹음 종료. 녹음된 위치: {position}, 전체 샘플 수: {recordedClip.samples}");
             
-            isRecording = false;
-            if (recordingCoroutine != null)
-            {
-                StopCoroutine(recordingCoroutine);
-                recordingCoroutine = null;
-            }
+            // 녹음 중지 전에 현재 AudioClip 저장
+            AudioClip tempClip = recordedClip;
             
             Debug.Log("[시간] Microphone.End 호출 직전");
             Microphone.End(null);
             Debug.Log("[시간] Microphone.End 호출 완료");
+            
+            isRecording = false;
 
-            // 최종 텍스트 및 오디오 생성 요청
-            Debug.Log("[시간] SendGenerateTextAudio 호출 직전");
-            await aiWebSocket.SendGenerateTextAudio();
-            Debug.Log("[시간] StopRecordingAndSend 완료");
+            if (tempClip != null)
+            {
+                // 약간의 지연을 주어 오디오 버퍼가 안정화되도록 함
+                await Task.Delay(100);
+                
+                Debug.Log("[시간] ConvertAudioDataToBytes 시작");
+                lastRecordedAudioBase64 = ConvertAudioDataToBytes(tempClip);
+                Debug.Log($"[시간] 변환된 오디오 데이터 길이: {(lastRecordedAudioBase64?.Length ?? 0)}");
+
+                if (string.IsNullOrEmpty(lastRecordedAudioBase64))
+                {
+                    Debug.LogError("오디오 데이터 변환 실패");
+                    return;
+                }
+
+                // PCM 파일로 저장
+                SaveAsPCMFile(lastRecordedAudioBase64);
+                
+                Debug.Log("[시간] SendBufferAddAudio 호출 직전");
+                await aiWebSocket.SendBufferAddAudio(lastRecordedAudioBase64);
+                Debug.Log("[시간] SendGenerateTextAudio 호출 직전");
+                await aiWebSocket.SendGenerateTextAudio();
+                Debug.Log("[시간] StopRecordingAndSend 완료");
+            }
+            else
+            {
+                Debug.LogError("recordedClip이 null입니다");
+            }
         }
-    }
-
-    // 기존에 오디오를 한 번에 보내던 코드
-
-    // public async Task StopRecordingAndSend()
-    // {
-    //     if (isRecording)
-    //     {
-    //         Debug.Log("[시간] StopRecordingAndSend 시작");
-    //         int position = Microphone.GetPosition(null);
-    //         Debug.Log($"[시간] 녹음 종료. 녹음된 위치: {position}, 전체 샘플 수: {recordedClip.samples}");
-            
-    //         // 녹음 중지 전에 현재 AudioClip 저장
-    //         AudioClip tempClip = recordedClip;
-            
-    //         Debug.Log("[시간] Microphone.End 호출 직전");
-    //         Microphone.End(null);
-    //         Debug.Log("[시간] Microphone.End 호출 완료");
-            
-    //         isRecording = false;
-
-    //         if (tempClip != null)
-    //         {
-    //             // 약간의 지연을 주어 오디오 버퍼가 안정화되도록 함
-    //             await Task.Delay(100);
-                
-    //             Debug.Log("[시간] ConvertAudioDataToBytes 시작");
-    //             lastRecordedAudioBase64 = ConvertAudioDataToBytes(tempClip);
-    //             Debug.Log($"[시간] 변환된 오디오 데이터 길이: {(lastRecordedAudioBase64?.Length ?? 0)}");
-
-    //             if (string.IsNullOrEmpty(lastRecordedAudioBase64))
-    //             {
-    //                 Debug.LogError("오디오 데이터 변환 실패");
-    //                 return;
-    //             }
-
-    //             // PCM 파일로 저장
-    //             SaveAsPCMFile(lastRecordedAudioBase64);
-                
-    //             Debug.Log("[시간] SendBufferAddAudio 호출 직전");
-    //             await aiWebSocket.SendBufferAddAudio(lastRecordedAudioBase64);
-    //             Debug.Log("[시간] SendGenerateTextAudio 호출 직전");
-    //             await aiWebSocket.SendGenerateTextAudio();
-    //             Debug.Log("[시간] StopRecordingAndSend 완료");
-    //         }
-    //         else
-    //         {
-    //             Debug.LogError("recordedClip이 null입니다");
-    //         }
-    //     }
         
-    //     // Task.CompletedTask를 반환하는 대신 메소드를 여기서 종료합니다.
-    // }
+        // Task.CompletedTask를 반환하는 대신 메소드를 여기서 종료합니다.
+    }
 
     string ConvertAudioDataToBytes(AudioClip recordedClip)
     {
@@ -510,3 +444,4 @@ public void PlayLastRecordedAudio()
         }
     }
 }
+*/
