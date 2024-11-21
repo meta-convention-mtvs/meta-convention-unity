@@ -59,9 +59,6 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
     private bool isRecording = false;  // 현재 녹음 중인지 여부를 나타내는 변수 추가
     private Queue<string> pendingAudioBuffer = new Queue<string>();  // 녹음 중에 받은 오디오를 저장할 큐
 
-    // 현재 누군가 말하고 있는지 확인하는 프로퍼티
-    private bool IsSomeoneSpeaking => !string.IsNullOrEmpty(TranslationEventHandler.Instance.CurrentSpeakerId);
-
     // 에러 메시지 관련
     private float errorMessageDisplayTime = 3f;                // 에러 메시지 표시 시간
     private Coroutine errorMessageCoroutine;                  // 에러 메시지 표시 코루틴
@@ -293,10 +290,7 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
         
         isRecording = false;
         
-        // 발언자 상태 초기화 (이 부분이 currentSpeakerId를 비움)
-        TranslationEventHandler.Instance.ResetSpeaker();
-        
-        // currentSpeakerId가 비워진 후에 대기 중인 오디오를 재생 큐로 이동
+        // 녹음이 끝났으므로 대기 중인 모든 오디오를 재생 큐로 이동
         while (pendingAudioBuffer.Count > 0)
         {
             string audioData = pendingAudioBuffer.Dequeue();
@@ -315,6 +309,9 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
         }
         
         Microphone.End(null);
+        
+        // 발언자 상태 초기화
+        TranslationEventHandler.Instance.ResetSpeaker();
     }
 
     public void OnInputAudioDone(int order, string text)
@@ -504,25 +501,60 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
 
         try
         {
-            if (IsSomeoneSpeaking)
+            // base64 디코딩 과정 로깅
+            // Debug.Log($"[Audio] Received base64 length: {base64AudioData.Length}");
+            
+            byte[] audioData = Convert.FromBase64String(base64AudioData);
+            // Debug.Log($"[Audio] Converted to bytes length: {audioData.Length}");
+            
+            short[] shortArray = new short[audioData.Length / 2];
+            Buffer.BlockCopy(audioData, 0, shortArray, 0, audioData.Length);
+            // Debug.Log($"[Audio] Converted to shorts length: {shortArray.Length}");
+            
+            float[] samples = new float[shortArray.Length];
+            for (int i = 0; i < shortArray.Length; i++)
             {
-                // 누군가 말하고 있으면 pendingAudioBuffer에 저장
-                pendingAudioBuffer.Enqueue(base64AudioData);
-                Debug.Log($"[Audio] Someone is speaking ({TranslationEventHandler.Instance.CurrentSpeakerId}), buffering audio");
+                samples[i] = shortArray[i] / 32768f;
+            }
+            // Debug.Log($"[Audio] Final samples length: {samples.Length}");
+
+            // 현재 청크의 길이를 초 단위로 계산
+            float currentChunkSeconds = (float)samples.Length / RECORDING_FREQUENCY;
+            // Debug.Log($"[Audio] 현재 청크 duration: {currentChunkSeconds:F2} seconds");
+
+            // 유효한 오디오 데이터 체크
+            bool hasValidAudio = samples.Any(s => Mathf.Abs(s) > 0.0001f);
+            // Debug.Log($"[Audio] Contains valid audio data: {hasValidAudio}");
+
+            if (hasValidAudio)
+            {
+                audioBuffer.AddRange(samples);
+                // 전체 버퍼의 길이를 초 단위로 계산
+                float totalBufferSeconds = (float)audioBuffer.Count / RECORDING_FREQUENCY;
+                // Debug.Log($"[Audio] 전체 버퍼 duration: {totalBufferSeconds:F2} seconds");
+                StartAudioBuffer();
             }
             else
             {
-                // 아무도 말하고 있지 않으면 바로 재생 큐에 추가
-                audioBuffer.Enqueue(base64AudioData);
-                if (!isPlaying)
-                {
-                    StartAudioBuffer();
-                }
+                Debug.LogWarning("[Audio] Skipping empty or invalid audio data");
             }
         }
         catch (Exception e)
         {
-            Debug.LogError($"[Audio] Error processing audio stream: {e.Message}");
+            Debug.LogError($"[Audio] Processing error: {e.GetType().Name} - {e.Message}\nStack: {e.StackTrace}");
+            Debug.LogError($"[Audio] Processing error: {e.GetType().Name} - {e.Message}\nStack: {e.StackTrace}");
+       float totalBufferSeconds = (float)audioBuffer.Count / RECORDING_FREQUENCY;
+                // Debug.Log($"[Audio] 전체 버퍼 duration: {totalBufferSeconds:F2} seconds");
+                StartAudioBuffer();
+            }
+            else
+            {
+                Debug.LogWarning("[Audio] Skipping empty or invalid audio data");
+            }
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"[Audio] Processing error: {e.GetType().Name} - {e.Message}\nStack: {e.StackTrace}");
         }
     }
 
