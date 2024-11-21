@@ -56,8 +56,9 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
     [SerializeField] private GameObject MessageBubble_Original_Yours;  // 상대방이 말한 메시지 프리팹 (파란색)
     [SerializeField] private GameObject MessageBubble_Translated;      // 번역된 메시지 프리팹
     private Dictionary<int, TextMeshProUGUI> translationTexts = new Dictionary<int, TextMeshProUGUI>();                 // order별로 저장
-    private bool isRecording = false;  // 현재 녹음 중인지 여부를 나타내는 변수 추가
-    private Queue<string> pendingAudioBuffer = new Queue<string>();  // 녹음 중에 받은 오디오를 저장할 큐
+y<int, TextMeshProUGUI>();                 // order별로 저장
+y<int, TextMeshProUGUI>();                 // order별로 저장
+y<int, TextMeshProUGUI>();                 // order별로 저장
 
     // 에러 메시지 관련
     private float errorMessageDisplayTime = 3f;                // 에러 메시지 표시 시간
@@ -195,16 +196,14 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
     /// </summary>
     private void StartRecording()
     {
-        if (isRecording) return;
-        
-        isRecording = true;
-        pendingAudioBuffer.Clear();  // 녹음 시작 시 버퍼 초기화
-        
         print("StartRecording(녹음 시작되는 함수에 진입)");
         // currentSpeakerId 참조를 TranslationEventHandler로 변경
         print("CurrentSpeakerId: " + TranslationEventHandler.Instance.CurrentSpeakerId);
         // if (!string.IsNullOrEmpty(TranslationEventHandler.Instance.CurrentSpeakerId)) return;
 
+        isRecording = true;
+        recordingPosition = 0;
+        
         // MessageData 생성
         MessageData messageData = new MessageData();
         messageData.isMine = true;
@@ -288,28 +287,20 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
     {
         if (!isRecording) return;
         
+        // 녹음 중지
         isRecording = false;
-        
-        // 녹음이 끝났으므로 대기 중인 모든 오디오를 재생 큐로 이동
-        while (pendingAudioBuffer.Count > 0)
-        {
-            string audioData = pendingAudioBuffer.Dequeue();
-            audioBuffer.Enqueue(audioData);
-        }
-        
-        if (audioBuffer.Count > 0)
-        {
-            StartAudioBuffer();  // 재생 시작
-        }
-
         if (recordingCoroutine != null)
         {
             StopCoroutine(recordingCoroutine);
             recordingCoroutine = null;
         }
-        
+    
+        // 마이크 녹음 중지
         Microphone.End(null);
         
+        // 발언 종료 신호 전송
+        TranslationManager.Instance.DoneSpeech();
+    
         // 발언자 상태 초기화
         TranslationEventHandler.Instance.ResetSpeaker();
     }
@@ -524,6 +515,25 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
 
             // 유효한 오디오 데이터 체크
             bool hasValidAudio = samples.Any(s => Mathf.Abs(s) > 0.0001f);
+            // Debug.Log($"[Audio] Contains valid audio data: {hasValidAudio}");
+
+            if (hasValidAudio)
+            {
+                audioBuffer.AddRange(samples);
+                // 전체 버퍼의 길이를 초 단위로 계산
+                float totalBufferSeconds = (float)audioBuffer.Count / RECORDING_FREQUENCY;
+                // Debug.Log($"[Audio] 전체 버퍼 duration: {totalBufferSeconds:F2} seconds");
+                StartAudioBuffer();
+            }
+            else
+            {
+                Debug.LogWarning("[Audio] Skipping empty or invalid audio data");
+            }
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"[Audio] Processing error: {e.GetType().Name} - {e.Message}\nStack: {e.StackTrace}");
+  bool hasValidAudio = samples.Any(s => Mathf.Abs(s) > 0.0001f);
             // Debug.Log($"[Audio] Contains valid audio data: {hasValidAudio}");
 
             if (hasValidAudio)
