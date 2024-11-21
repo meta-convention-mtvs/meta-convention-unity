@@ -385,7 +385,7 @@ public enum BoothCategory
     DigitalHealth,
     ARXRVR,
     ThreeDPrinting,
-    Lifestyle,
+    Robotics,
     Technology
 }
 

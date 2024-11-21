@@ -70,17 +70,4 @@ public class CreateBooth : MonoBehaviourPun
             }
         }
     }
-
-    //[PunRPC]
-    //void RPCDownloadAndInstantiateObject(string uid, string objectFileName, int positionIndex)
-    //{
-    //    DatabaseManager.Instance.DownloadObjectFrom(uid, objectFileName, InstantiateObject);
-
-    //}
-
-    //void InstantiateObject(string filePath, int positionIndex)
-    //{
-    //    GameObject go = ObjectLoader.ImportObj(filePath);
-    //    go.transform.position = BoothPosition[positionIndex].position;
-    //}
 }
