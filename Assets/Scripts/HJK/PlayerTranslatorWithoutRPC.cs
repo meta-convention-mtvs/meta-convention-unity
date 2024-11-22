@@ -33,6 +33,11 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
     [SerializeField] private KeyCode speakKey = KeyCode.M;      // 발언 시작/종료 키
     [SerializeField] private float maxRecordingTime = 60f;      // 최대 녹음 시간(초)
     [SerializeField] private KeyCode cancelKey = KeyCode.Escape; // 발언 취소 키
+    
+    // 스크롤 관련
+    [Header("Scroll Animation Settings")]
+    public float scrollAnimationDuration = 0.5f;  // 스크롤 애니메이션 지속 시간
+
 
     // 오디오 녹음 관련 상수
     private const int RECORDING_FREQUENCY = 24000;              // 녹음 주파수
@@ -414,21 +419,20 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
 
     private IEnumerator ScrollToBottomNextFrame()
     {
-        yield return null; // UI 업데이트를 위해 한 프레임 대기
+        yield return new WaitForEndOfFrame(); // 모든 UI 업데이트가 완료될 때까지 대기
         Canvas.ForceUpdateCanvases(); // Canvas를 강제로 업데이트하여 content 크기를 정확하게 계산
         
         float targetPos = 0f; // 스크롤의 맨 아래 (0이 맨 아래, 1이 맨 위)
         float startPos = translationScrollView.verticalNormalizedPosition;
-        float duration = 0.3f; // 애니메이션 지속 시간 (초)
         float elapsed = 0f;
     
-        while (elapsed < duration)
+        while (elapsed < scrollAnimationDuration)
         {
             elapsed += Time.deltaTime;
-            float t = elapsed / duration;
+            float t = elapsed / scrollAnimationDuration;
             
-            // easeOutCubic 곡선 적용 (시작은 빠르고 끝은 부드럽게)
-            t = 1f - Mathf.Pow(1f - t, 3f);
+            // easeInOutCubic 곡선 적용 (시작과 끝이 모두 부드럽게)
+            t = t < 0.5f ? 4f * t * t * t : 1f - Mathf.Pow(-2f * t + 2f, 3f) / 2f;
             
             // 현재 위치에서 목표 위치까지 부드럽게 보간
             translationScrollView.verticalNormalizedPosition = Mathf.Lerp(startPos, targetPos, t);
