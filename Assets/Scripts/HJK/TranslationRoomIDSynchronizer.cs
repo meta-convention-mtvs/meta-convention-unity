@@ -12,7 +12,6 @@ public class TranslationRoomIDSynchronizer : MonoBehaviourPun
         TranslationManager.Instance.OnRoomJoined += JoinRoom;
         TranslationManager.Instance.Connect();
     }
-
     void CreateRoom()
     {
         // 이 스크립트는 공용 오브젝트에 붙을 것이다 => owner이면 isMine은 true, 아니면 false

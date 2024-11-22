@@ -99,6 +99,21 @@ public class TranslationEventHandler : Singleton<TranslationEventHandler>
         HandleUserCountChange(users.Count);
     }
 
+    private void HandleUserCountChange(int userCount)
+    {
+        Debug.Log($"[HandleUserCountChange] Current user count: {userCount}");
+        
+        // 사용자 수에 따른 처리
+        if (userCount < 2)
+        {
+            Debug.Log("[HandleUserCountChange] 통역을 시작하려면 다른 언어 사용자가 필요합니다.");
+        }
+        else
+        {
+            Debug.Log("[HandleUserCountChange] 통역 준비가 완료되었습니다.");
+        }
+    }
+
     private void DistributePartialTranslatedAudio(string base64Audio)
     {
         if (playerTranslator != null)
@@ -188,21 +203,6 @@ public class TranslationEventHandler : Singleton<TranslationEventHandler>
         //    }
         //}
         playerTranslator.UpdateSpeakUI(isReady);
-    }
-
-    private void HandleUserCountChange(int userCount)
-    {
-        Debug.Log($"[HandleUserCountChange] Current user count: {userCount}");
-        
-        // 사용자 수에 따른 처리
-        if (userCount < 2)
-        {
-            Debug.Log("[HandleUserCountChange] 통역을 시작하려면 다른 언어 사용자가 필요합니다.");
-        }
-        else
-        {
-            Debug.Log("[HandleUserCountChange] 통역 준비가 완료되었습니다.");
-        }
     }
 
     // 현재 방의 사용자 수 반환
