@@ -13,6 +13,7 @@ public class PlayerInfo
     public string userName { get; set; }
     public string companyName { get; set; }
     public string companyUuid { get; set; }
+    public string language { get; set; }
 
     public PlayerInfo(string uid, string userName, string companyName, string companyUuid)
     {
@@ -20,6 +21,7 @@ public class PlayerInfo
         this.userName = userName;
         this.companyName = companyName;
         this.companyUuid = companyUuid;
+        this.language = "KO";
     }
 }
 public class UuidMgr : MonoBehaviour
@@ -61,6 +63,7 @@ public class UuidMgr : MonoBehaviour
 
     void Start()
     {
+        // company name , uuid 연결하기 위해 json 파일 가져오기
         string filePath = Path.Combine(Application.streamingAssetsPath, "uuidb.json");
         string jsonData = File.ReadAllText(filePath);
 
@@ -120,7 +123,6 @@ public class UuidMgr : MonoBehaviour
         }
     }
 
-
     public void PrintUserInfo()
     {
         Debug.Log($"User ID: {currentUserInfo.uid}");
@@ -128,9 +130,6 @@ public class UuidMgr : MonoBehaviour
         Debug.Log($"Company Name: {currentUserInfo.companyName}");
         Debug.Log($"Company UUID: {currentUserInfo.companyUuid}");
     }
-
-
-
 }
 
 
