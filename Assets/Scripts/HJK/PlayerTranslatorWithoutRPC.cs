@@ -451,9 +451,29 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
 
     private IEnumerator ScrollToBottomNextFrame()
     {
-        yield return null;
-        Canvas.ForceUpdateCanvases();
-        translationScrollView.verticalNormalizedPosition = 0f;
+        yield return null; // UI 업데이트를 위해 한 프레임 대기
+        Canvas.ForceUpdateCanvases(); // Canvas를 강제로 업데이트하여 content 크기를 정확하게 계산
+        
+        float targetPos = 0f; // 스크롤의 맨 아래 (0이 맨 아래, 1이 맨 위)
+        float startPos = translationScrollView.verticalNormalizedPosition;
+        float duration = 0.3f; // 애니메이션 지속 시간 (초)
+        float elapsed = 0f;
+    
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            float t = elapsed / duration;
+            
+            // easeOutCubic 곡선 적용 (시작은 빠르고 끝은 부드럽게)
+            t = 1f - Mathf.Pow(1f - t, 3f);
+            
+            // 현재 위치에서 목표 위치까지 부드럽게 보간
+            translationScrollView.verticalNormalizedPosition = Mathf.Lerp(startPos, targetPos, t);
+            yield return null;
+        }
+    
+        // 정확한 최종 위치 설정
+        translationScrollView.verticalNormalizedPosition = targetPos;
     }
 
     /// <summary>
