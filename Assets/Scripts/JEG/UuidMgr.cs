@@ -13,6 +13,14 @@ public class PlayerInfo
     public string userName { get; set; }
     public string companyName { get; set; }
     public string companyUuid { get; set; }
+
+    public PlayerInfo(string uid, string userName, string companyName, string companyUuid)
+    {
+        this.uid = uid;
+        this.userName = userName;
+        this.companyName = companyName;
+        this.companyUuid = companyUuid;
+    }
 }
 public class UuidMgr : MonoBehaviour
 {
@@ -20,7 +28,7 @@ public class UuidMgr : MonoBehaviour
 
     string url = "http://ec2-3-36-111-173.ap-northeast-2.compute.amazonaws.com:6576/translation/uuid";
     
-    public PlayerInfo currentUserInfo;
+    public PlayerInfo currentUserInfo = new PlayerInfo("방","구","뿡","뿡");
     
 
     [System.Serializable]
