@@ -211,6 +211,7 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
         Debug.Log("StartRecording()에서 MessageBubble_Original_Mine 생성");
         messageData.userMessagePrefab = Instantiate(MessageBubble_Original_Mine, translationScrollView.content);
         messages.Add(messageData);
+        StartCoroutine(ScrollToBottomNextFrame());
 
         // 사용 가능한 마이크 확인
         string[] devices = Microphone.devices;
