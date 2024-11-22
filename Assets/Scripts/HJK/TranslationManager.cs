@@ -38,6 +38,8 @@ public class TranslationManager : Singleton<TranslationManager>
     // 클래스 상단에 추가
     private Dictionary<int, string> accumulatedText = new Dictionary<int, string>();
 
+    
+
 
     public void Connect()
     {
@@ -169,6 +171,7 @@ public class TranslationManager : Singleton<TranslationManager>
     public event Action<int, string, string> OnApprovedSpeech; // order, userid, lang 전달 // 새로 추가
     public event Action<int, string> OnInputAudioDone; // order와 text를 전달
     public event Action<int> OnInputAudioFailed; // order만 전달
+    
 
 
     private void OnMessageReceived(object sender, MessageEventArgs e)
