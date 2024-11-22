@@ -1,7 +1,9 @@
-﻿using Firebase.Firestore;
+﻿using CHJ;
+using Firebase.Firestore;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 using UnityEngine;
 
 public class BoothCustomizingManager : MonoBehaviour
@@ -402,6 +404,31 @@ public class BoothExtraData
     public BoothExtraData()
     {
 
+    }
+
+    public static async Task<BoothExtraData> LoadBoothExtraDataInDatabase(UID uidComponent, BoothCustomizeData data)
+    {
+        try
+        {
+            BoothExtraData extraData = new BoothExtraData(data);
+            //logo image
+            if (data.hasLogoImage) extraData.logoImage = await AsyncDatabase.GetTextureFromDatabaseWithUid(uidComponent.uuid, data.logoImagePath);
+            // banner image
+            if (data.hasBannerImage) extraData.bannerImage = await AsyncDatabase.GetTextureFromDatabaseWithUid(uidComponent.uuid, data.bannerImagePath);
+            // brochure image
+            if (data.hasBrochureImage) extraData.brochureImage = await AsyncDatabase.GetTextureFromDatabaseWithUid(uidComponent.uuid, data.brochureImagePath);
+            //tv video url
+            if (data.hasVideoUrl) extraData.videoURL = (await AsyncDatabase.GetVideoDownloadUrl(uidComponent.uuid, data.videoURL)).ToString();
+            //object file
+            if (data.hasModelingPath) extraData.modelingPath = await AsyncDatabase.GetObjectFileLocalPathFromDatabaseWithUid(uidComponent.uuid, data.modelingPath);
+
+            return extraData;
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"UID {uidComponent.uuid}에서 부스 생성 중 오류 발생: {ex.Message}");
+            return null;
+        }
     }
 }
 

@@ -39,9 +39,8 @@ namespace CHJ
             return localPath;
         }
 
-        public static async Task<T> GetDataFromDatabaseWithUrl<T>(string path) where T : class
+        public static async Task<T> GetDataFromDatabase<T>(string path) where T : class
         {
-
             Task<DocumentSnapshot> task = FirebaseFirestore.DefaultInstance.Document(path).GetSnapshotAsync();
             await task;
 

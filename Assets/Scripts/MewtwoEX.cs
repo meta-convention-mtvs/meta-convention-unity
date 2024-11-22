@@ -16,8 +16,6 @@ public class MewtwoEX : MonoBehaviour
     public string[] companyUuidList;
     public Transform[] boothPositionList;
 
-    //Debug
-    public Renderer renderer;
     private void Start()
     {
         //GameObject[] playerList = GameObject.FindGameObjectsWithTag("Player");
@@ -30,11 +28,11 @@ public class MewtwoEX : MonoBehaviour
             go.GetComponent<UID>().SetUUID(companyUuidList[i]);
             boothList[i] = go;
         }
-        psychicSphere(boothList);
+        ApplyBoothDatasFromDatabaseInList(boothList);
 
     }
 
-    private async Task psycowave(GameObject[] playerList)
+    private async Task ApplyAvatarDatasFromDatabaseInList(GameObject[] playerList)
     {
         List<UID> uidList = GetUidCompontentsIn(playerList);
 
@@ -57,7 +55,7 @@ public class MewtwoEX : MonoBehaviour
     {
         try
         {
-            var runtimeCreate = uidComponent.gameObject.GetComponent<ModelingRuntimeCreate>();
+            var runtimeCreate = uidComponent.gameObject.GetComponent<RenderAvatarData>();
             runtimeCreate.CreateAvatar(data);
 
             if (data.isCustomTop)
@@ -75,52 +73,29 @@ public class MewtwoEX : MonoBehaviour
         }
     }
 
-    private async Task psychicSphere(GameObject[] boothList)
+    private async Task ApplyBoothDatasFromDatabaseInList(GameObject[] boothList)
     {
         List<UID> uidList = GetUidCompontentsIn(boothList);
 
-        var boothCustomizeDatas = await LoadAllDatasWithUUID<BoothCustomizeData>(uidList);
+        BoothCustomizeData[] boothCustomizeDatas = await LoadAllDatasWithUUID<BoothCustomizeData>(uidList);
 
-        var dictionary = uidList.Zip(boothCustomizeDatas, (key, value) => new { key, value }).ToDictionary(pair => pair.key, pair => pair.value);
+        var boothExtraDataLoadingTasks = uidList.Zip(boothCustomizeDatas, (uid, data) => BoothExtraData.LoadBoothExtraDataInDatabase(uid, data));
 
-        var tasks = dictionary.Keys.Select(uid =>  CreateBoothsWithBoothCustomizeDataAsync(uid.gameObject.GetComponent<RenderBoothData>(), uid, dictionary[uid]));
-        var results = await Task.WhenAll(tasks);
+        BoothExtraData[] boothExtraDatas = await Task.WhenAll(boothExtraDataLoadingTasks);
 
-        // 성공 여부 집계
-        int successCount = results.Count(r => r);
-        int failureCount = results.Length - successCount;
+        var successCount = uidList.Zip(boothExtraDatas, (uid, data) => RenderBoothDataWithExtraData(uid.GetComponent<RenderBoothData>(), data)).Count(r => r);
 
-        Debug.Log($"성공: {successCount}, 실패: {failureCount}");
+        Debug.Log(successCount);
+        
     }
 
-    private async Task<bool> CreateBoothsWithBoothCustomizeDataAsync(RenderBoothData renderBoothData, UID uidComponent, BoothCustomizeData data)
+
+
+    private bool RenderBoothDataWithExtraData(RenderBoothData renderBoothData, BoothExtraData datas)
     {
-        try
-        {
-            BoothExtraData extraData = new BoothExtraData(data);
-            //logo image
-            if (data.hasLogoImage)  extraData.logoImage = await AsyncDatabase.GetTextureFromDatabaseWithUid(uidComponent.uuid, data.logoImagePath);
-            // banner image
-            if (data.hasBannerImage) extraData.bannerImage = await AsyncDatabase.GetTextureFromDatabaseWithUid(uidComponent.uuid, data.bannerImagePath);
-            // brochure image
-            if (data.hasBrochureImage) extraData.brochureImage = await AsyncDatabase.GetTextureFromDatabaseWithUid(uidComponent.uuid, data.brochureImagePath);
-            Debug.Log(data.hasModelingPath);
-            Debug.Log(data.hasVideoUrl);
-            //tv video url
-            if (data.hasVideoUrl) extraData.videoURL = (await AsyncDatabase.GetVideoDownloadUrl(uidComponent.uuid, data.videoURL)).ToString();
-            //object file
-            if (data.hasModelingPath) extraData.modelingPath = await AsyncDatabase.GetObjectFileLocalPathFromDatabaseWithUid(uidComponent.uuid, data.modelingPath);
-
-            renderBoothData.RenderBoothDataWith(extraData);
-            renderBoothData.RenderBoothModeling(extraData);
-
-            return true;
-        }
-        catch (Exception ex)
-        {
-            Debug.LogError($"UID {uidComponent.uuid}에서 부스 생성 중 오류 발생: {ex.Message}");
-            return false;
-        }
+        renderBoothData.RenderBoothDataWith(datas);
+        renderBoothData.RenderBoothModeling(datas);
+        return true;
     }
 
     async Task<T[]> LoadAllDatasWithUID<T>(List<UID> uidList) where T:class
@@ -128,7 +103,7 @@ public class MewtwoEX : MonoBehaviour
         var databaseTasks = new Task<T>[uidList.Count];
         for (int i = 0; i < uidList.Count; i++)
         {
-            databaseTasks[i] = AsyncDatabase.GetDataFromDatabaseWithUrl<T>(DatabasePath.GetUserDataPath(uidList[i].uid, typeof(T).ToString()));
+            databaseTasks[i] = AsyncDatabase.GetDataFromDatabase<T>(DatabasePath.GetUserDataPath(uidList[i].uid, typeof(T).ToString()));
         }
 
         var datas = await Task.WhenAll(databaseTasks);
@@ -141,7 +116,7 @@ public class MewtwoEX : MonoBehaviour
         var databaseTasks = new Task<T>[uidList.Count];
         for (int i = 0; i < uidList.Count; i++)
         {
-            databaseTasks[i] = AsyncDatabase.GetDataFromDatabaseWithUrl<T>(DatabasePath.GetCompanyDataPath(uidList[i].uuid, typeof(T).ToString()));
+            databaseTasks[i] = AsyncDatabase.GetDataFromDatabase<T>(DatabasePath.GetCompanyDataPath(uidList[i].uuid, typeof(T).ToString()));
         }
 
         var datas = await Task.WhenAll(databaseTasks);

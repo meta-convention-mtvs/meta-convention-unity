@@ -356,7 +356,7 @@ PrefabInstance:
     - target: {fileID: 1020356017380317363, guid: 0c571fa731356c74aad6b297ab7d5205,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 119.60014
+      value: 119.60003
       objectReference: {fileID: 0}
     - target: {fileID: 1715086367429113594, guid: 0c571fa731356c74aad6b297ab7d5205,
         type: 3}
@@ -2146,50 +2146,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 866837047}
   m_CullTransparentMesh: 1
---- !u!1 &948470688
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 948470690}
-  - component: {fileID: 948470689}
-  m_Layer: 0
-  m_Name: Mewtwo
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &948470689
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 948470688}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 37dd26df4eda5654694e4697573ea5ea, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!4 &948470690
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 948470688}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 755.23596, y: 561.8636, z: 583.763}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &948876756
 GameObject:
   m_ObjectHideFlags: 0
@@ -3188,7 +3144,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1360827848}
   - component: {fileID: 1360827847}
-  - component: {fileID: 1360827849}
   - component: {fileID: 1360827850}
   m_Layer: 0
   m_Name: BusinessRoomReservator
@@ -3224,20 +3179,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1360827849
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1360827845}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7a9d1fa553d8cc54fb46bd0d8c212ab4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  roomName: 
-  sceneName: BusinessRoomScene
 --- !u!114 &1360827850
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5236,4 +5177,3 @@ SceneRoots:
   - {fileID: 6376886177527463858}
   - {fileID: 1032403822}
   - {fileID: 381673531}
-  - {fileID: 948470690}
