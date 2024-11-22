@@ -8,12 +8,16 @@ using Photon.Pun;
 public class InteractableAIEmployeeObject : MonoBehaviourPun, IKeyInteractableObject
 {
     public string companyID = "cf79ea17-a487-4b27-a20d-bbd11ff885da";
+
     GameObject AISpeackUI;
     BusinessRoomReservator businessRoomReservator;
     VoiceManager voiceManager;
     AIWebSocket aiWebSocket;
 
     bool isInteracting = false;
+
+    private UID ownerUID;
+
     public void ShowText()
     {
         UIManager.Instance.ShowPopupUI("(F)키를 눌러 AI 직원과 실시간 상담을 시작해 보세요!");
@@ -34,11 +38,11 @@ public class InteractableAIEmployeeObject : MonoBehaviourPun, IKeyInteractableOb
             button.onClick.AddListener(() => businessRoomReservator.MakeAppointmentWith(photonView.Owner));
         }
         // 카메라 움직임을 조정한다.
-        MainHallVirtualCameraMovement.Instance.SetAiSpeackUICamera();
+        MainHallVirtualCameraMovement.Instance.SetActiveVirtualCamera(MainHallVirtualCameraMovement.Instance.aiSpeackVirtualCamera);
         aiWebSocket = GameObject.FindObjectOfType<AIWebSocket>();
         if (aiWebSocket != null)
         {
-            aiWebSocket.Connect(companyID);
+            aiWebSocket.Connect(ownerUID.uid, CashedDataFromDatabase.Instance.playerLanguage.language);
         }
     }
     public void InteractEnd()
@@ -51,7 +55,7 @@ public class InteractableAIEmployeeObject : MonoBehaviourPun, IKeyInteractableOb
         {
             aiWebSocket.WebSocketEnd();
         }
-        MainHallVirtualCameraMovement.Instance.SetPlayerFollowCamera();
+        MainHallVirtualCameraMovement.Instance.SetActiveVirtualCamera(MainHallVirtualCameraMovement.Instance.playerFollowCamera);
     }
 
     void Start()
@@ -65,6 +69,7 @@ public class InteractableAIEmployeeObject : MonoBehaviourPun, IKeyInteractableOb
             Debug.LogError("Can't find AISpeackUI, set tag");
         if (businessRoomReservator == null)
             Debug.LogError("Can't find BusinessRoomReservator, set tag");
+        ownerUID = GetComponent<UID>();
     }
 
     async void Update()

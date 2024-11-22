@@ -1,5 +1,7 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using TriLibCore;
 using UnityEngine;
 using UnityEngine.Video;
 
@@ -9,23 +11,27 @@ public class RenderBoothData : MonoBehaviour
     public GameObject boothLogo;
     public GameObject boothVideoWall;
     public GameObject banner;
+    public GameObject brochure;
 
     private Renderer boothLogoRenderer;
     private Renderer boothVideoRenderer;
     private Renderer boothRenderer;
     private Renderer bannerRenderer;
+    private Renderer brochureRenderer;
 
     private VideoPlayer videoPlayer;
     private RenderTexture videoRenderTexture;
     private AudioSource audioSource;
 
     private GameObject currentInstantiatedObject;
-    
+
+    private BoothExtraData extraData;
 
     private void Awake()
     {
         boothRenderer = GetComponent<Renderer>();
         bannerRenderer = banner.GetComponent<Renderer>();
+        brochureRenderer = brochure.GetComponent<Renderer>();
         boothLogoRenderer = boothLogo.GetComponent<Renderer>();
         boothVideoRenderer = boothVideoWall.GetComponent<Renderer>();
         videoPlayer = GetComponent<VideoPlayer>();
@@ -34,6 +40,8 @@ public class RenderBoothData : MonoBehaviour
 
     public void RenderBoothDataWith(BoothExtraData extraData)
     {
+        this.extraData = extraData;
+
         if (extraData.logoImage != null)
         {
             SetLogo(extraData.logoImage);
@@ -48,28 +56,40 @@ public class RenderBoothData : MonoBehaviour
             currentInstantiatedObject.transform.localScale = new Vector3(extraData.modelingScale, extraData.modelingScale, extraData.modelingScale);
         }
         SetBanner(extraData.hasBanner, extraData.bannerImage, extraData.homepageLink);
+        SetBrochure(extraData.hasBrochure, extraData.brochureImage);
     }
 
     public void RenderBoothModeling(BoothExtraData extraData)
     {
+        this.extraData = extraData;
+
         if(currentInstantiatedObject != null)
         {
             Destroy(currentInstantiatedObject);
         }
-        currentInstantiatedObject = ObjectLoader.ImportObj(extraData.modelingPath);
+        ObjectLoader.StartImporting(extraData.modelingPath, OnModelLoad);
+
+    }
+
+    private void OnModelLoad(AssetLoaderContext context)
+    {
+        ShowBoothModeling(context.RootGameObject, extraData);
+    }
+
+    void ShowBoothModeling(GameObject modeling, BoothExtraData extraData)
+    {
+        currentInstantiatedObject = modeling;
         if (currentInstantiatedObject != null)
         {
             currentInstantiatedObject.transform.localScale = new Vector3(extraData.modelingScale, extraData.modelingScale, extraData.modelingScale);
             currentInstantiatedObject.transform.SetParent(this.gameObject.transform, false);
         }
     }
+
     void SetLogo(Texture2D images)
-    {
-       
+    {      
         boothLogoRenderer.material.mainTexture = images;
-        boothLogoRenderer.material.SetColor("_EmissionColor", Color.white);
-        boothLogoRenderer.material.SetTexture("_EmissionMap", images);
-        boothLogoRenderer.material.EnableKeyword("_EMISSION");
+        SetEmissionInImage(boothLogoRenderer, images);
     }
 
     void SetColor(Color color)
@@ -90,9 +110,7 @@ public class RenderBoothData : MonoBehaviour
             videoRenderTexture.Create();
             videoPlayer.targetTexture = videoRenderTexture;
             boothVideoRenderer.material.mainTexture = videoRenderTexture;
-            boothVideoRenderer.material.SetTexture("_EmissionMap", videoRenderTexture);
-            boothVideoRenderer.material.SetColor("_EmissionColor", Color.white);
-            boothVideoRenderer.material.EnableKeyword("_EMISSION");
+            SetEmissionInImage(boothVideoRenderer, videoRenderTexture);
         }
         // Render Texture를 벽의 
         videoPlayer.url = path;
@@ -114,9 +132,7 @@ public class RenderBoothData : MonoBehaviour
         {
             banner.SetActive(true);
             bannerRenderer.material.mainTexture = bannerImage;
-            bannerRenderer.material.SetColor("_EmissionColor", Color.white);
-            bannerRenderer.material.SetTexture("_EmissionMap", bannerImage);
-            bannerRenderer.material.EnableKeyword("_EMISSION");
+            SetEmissionInImage(bannerRenderer, bannerImage);
             banner.GetComponent<InteractableBannerObject>().homepageURL = homepageURL;
         }
         else
@@ -125,4 +141,24 @@ public class RenderBoothData : MonoBehaviour
         }
     }
 
+    void SetBrochure(bool hasBrochure, Texture2D brochureImage)
+    {
+        if (hasBrochure)
+        {
+            brochure.SetActive(true);
+            brochureRenderer.material.mainTexture = brochureImage;
+            SetEmissionInImage(brochureRenderer, brochureImage);
+        }
+        else
+        {
+            brochure.SetActive(false);
+        }
+    }
+
+    void SetEmissionInImage(Renderer objectRenderer, Texture texture)
+    {
+        objectRenderer.material.SetColor("_EmissionColor", Color.white);
+        objectRenderer.material.SetTexture("_EmissionMap", texture);
+        objectRenderer.material.EnableKeyword("_EMISSION");
+    }
 }

@@ -4,6 +4,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using TriLibCore;
 using UnityEngine;
 
 public class ObjectLoader : MonoBehaviour
@@ -40,4 +41,25 @@ public class ObjectLoader : MonoBehaviour
         Importer.ImportGLTFAsync(filepath, new ImportSettings(), OnLoadFinish);
     }
 
+    public static void StartImporting(string filePath, Action<AssetLoaderContext> OnLoad)
+    {
+        AssetLoaderOptions _assetLoaderOptions = AssetLoader.CreateDefaultLoaderOptions(false, true);
+
+        AssetLoader.LoadModelFromFile(filePath, OnLoad, OnMaterialsLoad, OnProgress, OnError, null, _assetLoaderOptions);
+    }
+
+    private static void OnError(IContextualizedError obj)
+    {
+        Debug.LogError($"An error occurred while loading your Model: {obj.GetInnerException()}");
+    }
+
+    private static void OnProgress(AssetLoaderContext arg1, float progress)
+    {
+        Debug.Log($"Loading Model. Progress: {progress:P}");
+    }
+
+    private static void OnMaterialsLoad(AssetLoaderContext obj)
+    {
+        Debug.Log("Materials loaded. Model fully loaded.");
+    }
 }

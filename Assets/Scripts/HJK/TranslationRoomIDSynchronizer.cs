@@ -20,7 +20,7 @@ public class TranslationRoomIDSynchronizer : MonoBehaviourPun
         {
             string userID = FireAuthManager.Instance.GetCurrentUser().UserId;
             // 내가 owner이다 room create를 요청하자
-            TranslationManager.Instance.CreateRoom(userID, "en");
+            TranslationManager.Instance.CreateRoom(userID, CashedDataFromDatabase.Instance.playerLanguage.language); ;
         }
     }
     void JoinRoom(string roomID)
@@ -35,7 +35,7 @@ public class TranslationRoomIDSynchronizer : MonoBehaviourPun
             {
                 print("Room ID: " + roomID);
                 // RPC를 통해 모든 클라이언트에게 roomID 전달
-                photonView.RPC("SetRoomID", RpcTarget.Others, roomID);
+                photonView.RPC(nameof(SetRoomID), RpcTarget.Others, roomID);
             }
         }
     }
@@ -44,6 +44,6 @@ public class TranslationRoomIDSynchronizer : MonoBehaviourPun
     void SetRoomID(string newRoomID)
     {
         string userID = FireAuthManager.Instance.GetCurrentUser().UserId;
-        TranslationManager.Instance.JoinRoom(newRoomID, userID, "ko");
+        TranslationManager.Instance.JoinRoom(newRoomID, userID, CashedDataFromDatabase.Instance.playerLanguage.language);
     }
 }

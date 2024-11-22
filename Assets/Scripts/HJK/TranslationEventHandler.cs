@@ -47,7 +47,11 @@ public class TranslationEventHandler : Singleton<TranslationEventHandler>
         manager.OnRoomUpdated += HandleRoomUpdate;
         manager.OnPartialAudioReceived += DistributePartialTranslatedAudio;
         manager.OnCompleteAudioReceived += DistributeCompleteTranslatedAudio;
-        manager.OnSpeechApproved += HandleApprovedSpeech;
+        manager.OnPartialTextReceived += DistributePartialTranslatedText;
+        // manager.OnSpeechApproved += HandleApprovedSpeech; // 기존의 것
+        manager.OnApprovedSpeech += HandleApprovedSpeech; // 새로 추가
+        manager.OnInputAudioDone += HandleInputAudioDone;
+        // manager.OnPartialTextReceived += HandleTextDelta; // 중복되므로 제거
         manager.OnError += HandleError;
         
         Debug.Log("[TranslationEventHandler] Events subscribed successfully");
@@ -62,7 +66,7 @@ public class TranslationEventHandler : Singleton<TranslationEventHandler>
             manager.OnRoomUpdated -= HandleRoomUpdate;
             manager.OnPartialAudioReceived -= DistributePartialTranslatedAudio;
             manager.OnCompleteAudioReceived -= DistributeCompleteTranslatedAudio;
-            manager.OnSpeechApproved -= HandleApprovedSpeech;
+            manager.OnApprovedSpeech -= HandleApprovedSpeech;
             manager.OnError -= HandleError;
         }
     }
@@ -115,17 +119,52 @@ public class TranslationEventHandler : Singleton<TranslationEventHandler>
         currentSpeakerId = "";
         OnSpeakerChanged?.Invoke("");
     }
-
-    private void HandleApprovedSpeech(string userId)
+    // 부분 번역된 텍스트를 분배하는 메서드
+    private void DistributePartialTranslatedText(int order, string partialText, string speakerId)
     {
-        Debug.Log($"[TranslationEventHandler] Speech approved for user: {userId}");
-        currentSpeakerId = userId;
-        OnSpeakerChanged?.Invoke(userId);
         if (playerTranslator != null)
         {
-            playerTranslator.OnSpeechApproved(userId);
+            playerTranslator.UpdatePartialTranslatedText(order, partialText, speakerId);
         }
     }
+
+    // 기존의 것(HandleApprovedSpeech())
+
+    // private void HandleApprovedSpeech(string userId)
+    // {
+    //     Debug.Log($"[TranslationEventHandler] Speech approved for user: {userId}");
+    //     currentSpeakerId = userId;
+    //     OnSpeakerChanged?.Invoke(userId);
+    //     if (playerTranslator != null)
+    //     {
+    //         playerTranslator.OnSpeechApproved(userId);
+    //     }
+    // }
+
+    private void HandleApprovedSpeech(int order, string userid, string lang)
+    {
+        currentSpeakerId = userid;
+        // OnSpeakerChanged?.Invoke(userId); // 이건 아직 사용하지 않음
+        if (playerTranslator != null)
+        {
+            playerTranslator.OnApprovedSpeech(order, userid, lang);
+        }
+    }
+
+    private void HandleInputAudioDone(int order, string text)
+    {
+        if (playerTranslator != null)
+        {
+            playerTranslator.OnInputAudioDone(order, text);
+        }
+    }
+
+    // public void HandleTextDelta(int order, string partialText, string speakerId)
+    // {
+    //     // `speakerId`를 함께 전달
+    //     playerTranslator.UpdatePartialTranslatedText(order, partialText, speakerId);
+    // }
+
 
     private void HandleError(string errorMessage)
     {
