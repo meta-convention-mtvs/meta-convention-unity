@@ -1,7 +1,7 @@
 ﻿using Firebase.Firestore;
+using System;
 using System.Collections.Generic;
 using System.IO;
-using TriLibCore;
 using UnityEngine;
 
 public class BoothCustomizingManager : MonoBehaviour
@@ -70,7 +70,7 @@ public class BoothCustomizingManager : MonoBehaviour
                         Destroy(currentInstantiatedObject);
                     }
                     //currentInstantiatedObject = ObjectLoader.ImportObj(boothCustomizeData.boothObjectPath);
-                    ObjectLoader.StartImporting(boothCustomizeData.boothObjectPath, OnBoothObjectLoad);
+                    ObjectLoader.ImportGLTFAsync(boothCustomizeData.boothObjectPath, OnBoothObjectLoad);
                 }
 
             }
@@ -101,10 +101,11 @@ public class BoothCustomizingManager : MonoBehaviour
         }
     }
 
-    void OnBoothObjectLoad(AssetLoaderContext context)
+    private void OnBoothObjectLoad(GameObject arg1, AnimationClip[] arg2)
     {
-        currentInstantiatedObject = context.RootGameObject;
+        currentInstantiatedObject = arg1;
     }
+
 
     void LoadGamePrefab(GameObject[] prefab)
     {
@@ -363,15 +364,15 @@ public class BoothCustomizeData
     [FirestoreProperty]
     public string brochureImagePath { get; set; }
 
-    public bool hasLogoImage => string.IsNullOrEmpty(logoImagePath);
+    public bool hasLogoImage => !string.IsNullOrEmpty(logoImagePath);
 
-    public bool hasBannerImage => string.IsNullOrEmpty(bannerImagePath);
+    public bool hasBannerImage => !string.IsNullOrEmpty(bannerImagePath);
 
-    public bool hasBrochureImage => string.IsNullOrEmpty(brochureImagePath);
+    public bool hasBrochureImage => !string.IsNullOrEmpty(brochureImagePath);
 
-    public bool hasVideoUrl => string.IsNullOrEmpty(videoURL);
+    public bool hasVideoUrl => !string.IsNullOrEmpty(videoURL);
 
-    public bool hasModelingPath => string.IsNullOrEmpty(modelingPath);
+    public bool hasModelingPath => !string.IsNullOrEmpty(modelingPath);
 }
 
 public class BoothExtraData

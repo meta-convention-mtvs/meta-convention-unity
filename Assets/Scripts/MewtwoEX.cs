@@ -16,6 +16,8 @@ public class MewtwoEX : MonoBehaviour
     public string[] companyUuidList;
     public Transform[] boothPositionList;
 
+    //Debug
+    public Renderer renderer;
     private void Start()
     {
         //GameObject[] playerList = GameObject.FindGameObjectsWithTag("Player");
@@ -97,19 +99,17 @@ public class MewtwoEX : MonoBehaviour
         {
             BoothExtraData extraData = new BoothExtraData(data);
             //logo image
-            if (data.hasLogoImage)
-            {
-                extraData.logoImage = await AsyncDatabase.GetTextureFromDatabaseWithUid(uidComponent.uuid, data.logoImagePath);
-                Debug.Log(extraData.logoImage);
-            }
-            //// banner image
-            //if (data.hasBannerImage) extraData.bannerImage = await AsyncDatabase.GetTextureFromDatabaseWithUid(uidComponent.uuid, data.bannerImagePath);
-            //// brochure image
-            //if (data.hasBrochureImage) extraData.brochureImage = await AsyncDatabase.GetTextureFromDatabaseWithUid(uidComponent.uuid, data.brochureImagePath);
-            //// tv video url
-            //if (data.hasVideoUrl) extraData.videoURL = (await AsyncDatabase.GetVideoDownloadUrl(uidComponent.uuid, data.videoURL)).ToString();
-            //// object file
-            //if (data.hasModelingPath) extraData.modelingPath = await AsyncDatabase.GetObjectFileLocalPathFromDatabaseWithUid(uidComponent.uuid, data.modelingPath);
+            if (data.hasLogoImage)  extraData.logoImage = await AsyncDatabase.GetTextureFromDatabaseWithUid(uidComponent.uuid, data.logoImagePath);
+            // banner image
+            if (data.hasBannerImage) extraData.bannerImage = await AsyncDatabase.GetTextureFromDatabaseWithUid(uidComponent.uuid, data.bannerImagePath);
+            // brochure image
+            if (data.hasBrochureImage) extraData.brochureImage = await AsyncDatabase.GetTextureFromDatabaseWithUid(uidComponent.uuid, data.brochureImagePath);
+            Debug.Log(data.hasModelingPath);
+            Debug.Log(data.hasVideoUrl);
+            //tv video url
+            if (data.hasVideoUrl) extraData.videoURL = (await AsyncDatabase.GetVideoDownloadUrl(uidComponent.uuid, data.videoURL)).ToString();
+            //object file
+            if (data.hasModelingPath) extraData.modelingPath = await AsyncDatabase.GetObjectFileLocalPathFromDatabaseWithUid(uidComponent.uuid, data.modelingPath);
 
             renderBoothData.RenderBoothDataWith(extraData);
             renderBoothData.RenderBoothModeling(extraData);

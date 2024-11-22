@@ -49,7 +49,6 @@ namespace CHJ
             {
                 Debug.Log("회원 정보 불러오기 성공!");
                 T loadInfo = task.Result.ConvertTo<T>();
-                Debug.Log(loadInfo);
                 return loadInfo;
             }
             else

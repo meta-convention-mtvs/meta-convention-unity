@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using TriLibCore;
 using UnityEngine;
 using UnityEngine.Video;
 
@@ -68,13 +67,13 @@ public class RenderBoothData : MonoBehaviour
             Destroy(currentInstantiatedObject);
         }
         if(extraData.modelingPath != null)
-            ObjectLoader.StartImporting(extraData.modelingPath, OnModelLoad);
+            ObjectLoader.ImportGLTFAsync(extraData.modelingPath, OnLoadFinish);
 
     }
 
-    private void OnModelLoad(AssetLoaderContext context)
+    private void OnLoadFinish(GameObject arg1, AnimationClip[] arg2)
     {
-        ShowBoothModeling(context.RootGameObject, extraData);
+        ShowBoothModeling(arg1, extraData);
     }
 
     void ShowBoothModeling(GameObject modeling, BoothExtraData extraData)
