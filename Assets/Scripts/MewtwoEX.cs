@@ -85,16 +85,24 @@ public class MewtwoEX : MonoBehaviour
 
         var successCount = uidList.Zip(boothExtraDatas, (uid, data) => RenderBoothDataWithExtraData(uid.GetComponent<RenderBoothData>(), data)).Count(r => r);
 
+        uidList.Zip(boothExtraDatas, (uid, data) => RenderEmployeeWithExtraData(uid.GetComponent<CreateAIEmployee>(), data)).Count(r => r);
         Debug.Log(successCount);
         
     }
 
 
 
-    private bool RenderBoothDataWithExtraData(RenderBoothData renderBoothData, BoothExtraData datas)
+    private bool RenderBoothDataWithExtraData(RenderBoothData renderBoothData, BoothExtraData data)
     {
-        renderBoothData.RenderBoothDataWith(datas);
-        renderBoothData.RenderBoothModeling(datas);
+        renderBoothData.RenderBoothDataWith(data);
+        renderBoothData.RenderBoothModeling(data);
+        return true;
+    }
+
+    private bool RenderEmployeeWithExtraData(CreateAIEmployee createAIEmployee, BoothExtraData data)
+    {
+        Debug.Log("Hello");
+        createAIEmployee.RenderAiEmployee(data.logoImage);
         return true;
     }
 

@@ -11,11 +11,12 @@ public class GLFTTest : MonoBehaviour
 
     private void Start()
     {
-        ImportGLTFAsync(filepath);
+        FileUploadManager.Instance.ShowDialog(ImportGLTFAsync);
         instantiatedObject = null;
     }
-    void ImportGLTFAsync(string filepath)
+    void ImportGLTFAsync(string[] filepaths)
     {
+        string filepath = filepaths[0];
         Importer.ImportGLTFAsync(filepath, new ImportSettings(), OnFinishAsync);
     }
 

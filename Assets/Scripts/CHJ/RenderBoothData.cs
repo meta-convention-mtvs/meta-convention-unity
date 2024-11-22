@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Video;
 
@@ -11,10 +12,10 @@ public class RenderBoothData : MonoBehaviour
     public GameObject boothVideoWall;
     public GameObject banner;
     public GameObject brochure;
+    public Renderer[] boothRenderers;
 
     private Renderer boothLogoRenderer;
     private Renderer boothVideoRenderer;
-    private Renderer boothRenderer;
     private Renderer bannerRenderer;
     private Renderer brochureRenderer;
 
@@ -28,7 +29,6 @@ public class RenderBoothData : MonoBehaviour
 
     private void Awake()
     {
-        boothRenderer = GetComponent<Renderer>();
         bannerRenderer = banner.GetComponent<Renderer>();
         brochureRenderer = brochure.GetComponent<Renderer>();
         boothLogoRenderer = boothLogo.GetComponent<Renderer>();
@@ -73,6 +73,7 @@ public class RenderBoothData : MonoBehaviour
 
     private void OnLoadFinish(GameObject arg1, AnimationClip[] arg2)
     {
+        Debug.Log("Load gltf file finished");
         ShowBoothModeling(arg1, extraData);
     }
 
@@ -94,7 +95,10 @@ public class RenderBoothData : MonoBehaviour
 
     void SetColor(Color color)
     {
-        boothRenderer.material.color = color;
+        foreach(Renderer renderer in boothRenderers)
+        {
+            renderer.material.color = color;
+        }
     }
 
     /// <summary>

@@ -246,18 +246,12 @@ public class BoothCustomizingManager : MonoBehaviour
 
     BoothExtraData GetBoothExtraData(BoothCustomizeData data)
     {
-        BoothExtraData extraData = new BoothExtraData();
-        extraData.boothType = data.boothType;
-        extraData.color = data.color.GetColor();
+        BoothExtraData extraData = new BoothExtraData(data);
         extraData.logoImage = ImageUtility.LoadTexture(data.logoImagePath);
-        extraData.modelingScale = data.modelingScale;
-        extraData.modelingPath = data.modelingPath;
-        extraData.videoURL = data.videoURL;
-        extraData.hasBanner = data.hasBanner;
         extraData.bannerImage = ImageUtility.LoadTexture(data.bannerImagePath);
-        extraData.hasBrochure = data.hasBrochure;
         extraData.brochureImage = ImageUtility.LoadTexture(data.brochureImagePath);
-        extraData.homepageLink = data.homepageLink;
+        extraData.videoURL = data.videoURL;
+        extraData.modelingPath = data.modelingPath;
         return extraData;
     }
 
@@ -304,7 +298,7 @@ public class BoothCustomizingManager : MonoBehaviour
             boothCustomizeData.videoURL = Path.GetFileName(boothCustomizeData.videoURL.Substring("file://".Length));
         }
 
-        // 데이터 베이스에 저장하는 코드 (수정 필요)
+        // 데이터 베이스에 저장하는 코드 (수정 필요) : 경로를 Company로 바꿔야 함
         DatabaseManager.Instance.SaveData<BoothCustomizeData>(boothCustomizeData);
 
     }

@@ -36,12 +36,12 @@ public class BoothRuntimeCreate : MonoBehaviourPun
         renderBoothData = GetComponent<RenderBoothData>();
         ownerUID = GetComponent<UID>();
 
-        LoadBoothCustomizeData(ownerUID);
+        ownerUID.OnUIDChanged += LoadBoothCustomizeData;
     }
 
-    void LoadBoothCustomizeData(UID myUid)
+    void LoadBoothCustomizeData(string uid)
     {
-        DatabaseManager.Instance.GetDataFrom<BoothCustomizeData>(myUid.uid, OnLoadBoothCustomizeData);
+        DatabaseManager.Instance.GetDataFrom<BoothCustomizeData>(uid, OnLoadBoothCustomizeData);
     }
 
     void OnLoadBoothCustomizeData(BoothCustomizeData data)

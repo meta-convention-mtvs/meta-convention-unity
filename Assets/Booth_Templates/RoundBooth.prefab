@@ -269,6 +269,12 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 4025719877879987884}
   m_PrefabAsset: {fileID: 0}
+--- !u!23 &2314761455198626344 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: -7511558181221131132, guid: 9ff939fa50a7f044386aced725766037,
+    type: 3}
+  m_PrefabInstance: {fileID: 4025719877879987884}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &3482553114295179591 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 9ff939fa50a7f044386aced725766037,
@@ -333,6 +339,8 @@ MonoBehaviour:
   boothVideoWall: {fileID: 1465980554761773419}
   banner: {fileID: 3859454301154951049}
   brochure: {fileID: 6069744579600443747}
+  boothRenderers:
+  - {fileID: 2314761455198626344}
 --- !u!82 &1067427240284132137
 AudioSource:
   m_ObjectHideFlags: 0
