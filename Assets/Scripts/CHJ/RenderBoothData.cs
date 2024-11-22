@@ -67,7 +67,8 @@ public class RenderBoothData : MonoBehaviour
         {
             Destroy(currentInstantiatedObject);
         }
-        ObjectLoader.StartImporting(extraData.modelingPath, OnModelLoad);
+        if(extraData.modelingPath != null)
+            ObjectLoader.StartImporting(extraData.modelingPath, OnModelLoad);
 
     }
 
@@ -131,8 +132,11 @@ public class RenderBoothData : MonoBehaviour
         if (hasBanner)
         {
             banner.SetActive(true);
-            bannerRenderer.material.mainTexture = bannerImage;
-            SetEmissionInImage(bannerRenderer, bannerImage);
+            if (bannerImage != null)
+            {
+                bannerRenderer.material.mainTexture = bannerImage;
+                SetEmissionInImage(bannerRenderer, bannerImage);
+            }
             banner.GetComponent<InteractableBannerObject>().homepageURL = homepageURL;
         }
         else
@@ -146,8 +150,11 @@ public class RenderBoothData : MonoBehaviour
         if (hasBrochure)
         {
             brochure.SetActive(true);
-            brochureRenderer.material.mainTexture = brochureImage;
-            SetEmissionInImage(brochureRenderer, brochureImage);
+            if (brochureImage != null)
+            {
+                brochureRenderer.material.mainTexture = brochureImage;
+                SetEmissionInImage(brochureRenderer, brochureImage);
+            }
         }
         else
         {

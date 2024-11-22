@@ -3,28 +3,33 @@ using Firebase.Storage;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Networking;
+using CHJ;
 
 public class MewtwoEX : MonoBehaviour
 {
-    GameObject[] loadedPlayerList;
+    public GameObject boothFactory;
+    public string[] companyUuidList;
+    public Transform[] boothPositionList;
 
     private void Start()
     {
-        GameObject[] playerList = GameObject.FindGameObjectsWithTag("Player");
-        UpdateData(playerList);
-    }
+        //GameObject[] playerList = GameObject.FindGameObjectsWithTag("Player");
+        //psycowave(playerList);
 
-    public async Task UpdateData(GameObject[] newPlayerList)
-    {
-        if (loadedPlayerList != null)
-            await psycowave(newPlayerList.Except(loadedPlayerList).ToArray());
-        else
-            await psycowave(newPlayerList);
-        loadedPlayerList = newPlayerList;
+        GameObject[] boothList = new GameObject[companyUuidList.Length];
+        for(int i = 0; i < companyUuidList.Length; i++)
+        {
+            GameObject go = Instantiate(boothFactory, boothPositionList[i]);
+            go.GetComponent<UID>().SetUUID(companyUuidList[i]);
+            boothList[i] = go;
+        }
+        psychicSphere(boothList);
+
     }
 
     private async Task psycowave(GameObject[] playerList)
@@ -33,30 +38,110 @@ public class MewtwoEX : MonoBehaviour
 
         var characterTopBottomCustomizeDatas = await LoadAllDatasWithUID<CharacterTopBottomCustomizeData>(uidList);
 
-        var dictonary = uidList.Zip(characterTopBottomCustomizeDatas, (key, value) => new { key, value }).ToDictionary(pair => pair.key, pair => pair.value);
+        var dictionary = uidList.Zip(characterTopBottomCustomizeDatas, (key, value) => new { key, value }).ToDictionary(pair => pair.key, pair => pair.value);
 
-        foreach(UID uidComponent in dictonary.Keys)
+        var tasks = dictionary.Keys.Select(uid => CreateAvatarsWithCharacterCustomizeDataAsync(uid, dictionary[uid]));
+        var results = await Task.WhenAll(tasks);
+
+        // 성공 여부 집계
+        int successCount = results.Count(r => r);
+        int failureCount = results.Length - successCount;
+
+        Debug.Log($"성공: {successCount}, 실패: {failureCount}");
+
+    }
+
+    private async Task<bool> CreateAvatarsWithCharacterCustomizeDataAsync(UID uidComponent, CharacterTopBottomCustomizeData data)
+    {
+        try
         {
-            CharacterTopBottomCustomizeData data = dictonary[uidComponent];
-            ModelingRuntimeCreate runtimeCreate = uidComponent.gameObject.GetComponent<ModelingRuntimeCreate>();
+            var runtimeCreate = uidComponent.gameObject.GetComponent<ModelingRuntimeCreate>();
             runtimeCreate.CreateAvatar(data);
+
             if (data.isCustomTop)
             {
-                var url = await GetImageDownloadUrl(uidComponent.uid, data.customImageFileName);
-                var texture = await GetTextureFromDatabase(url.ToString());
+                var texture = await AsyncDatabase.GetTextureFromDatabaseWithUid(uidComponent.uid, data.customImageFileName);
                 runtimeCreate.OnLoadTexture(texture);
             }
-            
+
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"UID {uidComponent.uid}에서 아바타 생성 중 오류 발생: {ex.Message}");
+            return false;
         }
     }
 
+    private async Task psychicSphere(GameObject[] boothList)
+    {
+        List<UID> uidList = GetUidCompontentsIn(boothList);
+
+        var boothCustomizeDatas = await LoadAllDatasWithUUID<BoothCustomizeData>(uidList);
+
+        var dictionary = uidList.Zip(boothCustomizeDatas, (key, value) => new { key, value }).ToDictionary(pair => pair.key, pair => pair.value);
+
+        var tasks = dictionary.Keys.Select(uid =>  CreateBoothsWithBoothCustomizeDataAsync(uid.gameObject.GetComponent<RenderBoothData>(), uid, dictionary[uid]));
+        var results = await Task.WhenAll(tasks);
+
+        // 성공 여부 집계
+        int successCount = results.Count(r => r);
+        int failureCount = results.Length - successCount;
+
+        Debug.Log($"성공: {successCount}, 실패: {failureCount}");
+    }
+
+    private async Task<bool> CreateBoothsWithBoothCustomizeDataAsync(RenderBoothData renderBoothData, UID uidComponent, BoothCustomizeData data)
+    {
+        try
+        {
+            BoothExtraData extraData = new BoothExtraData(data);
+            //logo image
+            if (data.hasLogoImage)
+            {
+                extraData.logoImage = await AsyncDatabase.GetTextureFromDatabaseWithUid(uidComponent.uuid, data.logoImagePath);
+                Debug.Log(extraData.logoImage);
+            }
+            //// banner image
+            //if (data.hasBannerImage) extraData.bannerImage = await AsyncDatabase.GetTextureFromDatabaseWithUid(uidComponent.uuid, data.bannerImagePath);
+            //// brochure image
+            //if (data.hasBrochureImage) extraData.brochureImage = await AsyncDatabase.GetTextureFromDatabaseWithUid(uidComponent.uuid, data.brochureImagePath);
+            //// tv video url
+            //if (data.hasVideoUrl) extraData.videoURL = (await AsyncDatabase.GetVideoDownloadUrl(uidComponent.uuid, data.videoURL)).ToString();
+            //// object file
+            //if (data.hasModelingPath) extraData.modelingPath = await AsyncDatabase.GetObjectFileLocalPathFromDatabaseWithUid(uidComponent.uuid, data.modelingPath);
+
+            renderBoothData.RenderBoothDataWith(extraData);
+            renderBoothData.RenderBoothModeling(extraData);
+
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"UID {uidComponent.uuid}에서 부스 생성 중 오류 발생: {ex.Message}");
+            return false;
+        }
+    }
 
     async Task<T[]> LoadAllDatasWithUID<T>(List<UID> uidList) where T:class
     {
         var databaseTasks = new Task<T>[uidList.Count];
         for (int i = 0; i < uidList.Count; i++)
         {
-            databaseTasks[i] = GetDataFromDatabase<T>(uidList[i].uid);
+            databaseTasks[i] = AsyncDatabase.GetDataFromDatabaseWithUrl<T>(DatabasePath.GetUserDataPath(uidList[i].uid, typeof(T).ToString()));
+        }
+
+        var datas = await Task.WhenAll(databaseTasks);
+
+        return datas;
+    }
+
+    async Task<T[]> LoadAllDatasWithUUID<T>(List<UID> uidList) where T : class
+    {
+        var databaseTasks = new Task<T>[uidList.Count];
+        for (int i = 0; i < uidList.Count; i++)
+        {
+            databaseTasks[i] = AsyncDatabase.GetDataFromDatabaseWithUrl<T>(DatabasePath.GetCompanyDataPath(uidList[i].uuid, typeof(T).ToString()));
         }
 
         var datas = await Task.WhenAll(databaseTasks);
@@ -74,67 +159,5 @@ public class MewtwoEX : MonoBehaviour
                 newUidList.Add(uidComponent);
         }
         return newUidList;
-    }
-
-    async Task<T> GetDataFromDatabase<T>(string uid) where T : class
-    {
-        string path = "USER/" + uid + "/" + "Data/" + typeof(T).ToString();
-
-        Task<DocumentSnapshot> task = FirebaseFirestore.DefaultInstance.Document(path).GetSnapshotAsync();
-        await task;
-
-        if (task.Exception == null)
-        {
-            print("회원 정보 불러오기 성공!");
-            T loadInfo = task.Result.ConvertTo<T>();
-            return loadInfo;
-        }
-        else
-        {
-            print("Exception in Database loading: " + typeof(T) + " " + task.Exception);
-            return null;
-        }
-    }
-
-    async Task<Uri> GetImageDownloadUrl(string uid, string imageFileName)
-    {
-        var storageRef = FirebaseStorage.DefaultInstance.GetReferenceFromUrl("gs://metaconvention.appspot.com");
-        var fileRef = storageRef.Child("images/" + uid + "/" + imageFileName);
-
-        Task<Uri> task = fileRef.GetDownloadUrlAsync();
-        await task;
-
-        if(task.Exception == null)
-        {
-            print("이미지 url 불러오기 성공");
-            return task.Result;
-        }
-        else
-        {
-            print("Exception in Image Url loading: " + uid + ", " + imageFileName + " " + task.Exception);
-            return null;
-        }
-    }
-
-    async Task<Texture2D> GetTextureFromDatabase(string url)
-    {
-        using UnityWebRequest request = UnityWebRequestTexture.GetTexture(url);
-        // 비동기 요청 보내기
-        var operation = request.SendWebRequest();
-
-        // 요청이 완료될 때까지 대기
-        while (!operation.isDone)
-        {
-            await Task.Yield();
-        }
-
-        // 요청 결과 확인
-        if (request.result == UnityWebRequest.Result.ConnectionError || request.result == UnityWebRequest.Result.ProtocolError)
-        {
-            Debug.LogError($"Error: {request.error}");
-            return null;
-        }
-
-        return ((DownloadHandlerTexture)request.downloadHandler).texture;
     }
 }

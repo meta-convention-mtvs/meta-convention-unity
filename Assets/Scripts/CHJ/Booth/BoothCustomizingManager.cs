@@ -362,6 +362,16 @@ public class BoothCustomizeData
     public bool hasBrochure { get; set; }
     [FirestoreProperty]
     public string brochureImagePath { get; set; }
+
+    public bool hasLogoImage => string.IsNullOrEmpty(logoImagePath);
+
+    public bool hasBannerImage => string.IsNullOrEmpty(bannerImagePath);
+
+    public bool hasBrochureImage => string.IsNullOrEmpty(brochureImagePath);
+
+    public bool hasVideoUrl => string.IsNullOrEmpty(videoURL);
+
+    public bool hasModelingPath => string.IsNullOrEmpty(modelingPath);
 }
 
 public class BoothExtraData
@@ -377,6 +387,21 @@ public class BoothExtraData
     public Texture2D bannerImage;
     public bool hasBrochure;
     public Texture2D brochureImage;
+
+    public BoothExtraData(BoothCustomizeData data)
+    {
+        this.boothType = data.boothType;
+        this.homepageLink = data.homepageLink;
+        this.color = data.color.GetColor();
+        this.modelingScale = data.modelingScale;
+        this.hasBanner = data.hasBanner;
+        this.hasBrochure = data.hasBrochure;
+    }
+
+    public BoothExtraData()
+    {
+
+    }
 }
 
 public enum BoothCategory

@@ -6,6 +6,7 @@ using UnityEngine;
 public class UID : MonoBehaviourPun
 {
     public string uid;
+    public string uuid;
 
     public UID(string id)
     {
@@ -19,6 +20,11 @@ public class UID : MonoBehaviourPun
     public void SetUID(string id)
     {
         uid = id;
+    }
+
+    public void SetUUID(string id)
+    {
+        uuid = id;
     }
 
     private void Awake()
