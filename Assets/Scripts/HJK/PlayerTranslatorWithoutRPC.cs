@@ -331,42 +331,59 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
 
     public void OnOtherInputAudioDone(int order, string text, string speakerId)
     {
-        // 상대방의 메시지 처리
-        MessageData messageData = new MessageData();
-        messageData.isMine = (speakerId == FireAuthManager.Instance.GetCurrentUser().UserId);
-        messageData.order = order;
-        messageData.userid = speakerId;
-
-        // 발화자에 따라 적절한 프리팹 선택
-        if (messageData.isMine)
+        // 기존 메시지를 찾거나 새로 생성
+        MessageData messageData = messages.FirstOrDefault(m => m.order == order);
+        if (messageData == null)
         {
-            messageData.userMessagePrefab = Instantiate(MessageBubble_Original_Mine, translationScrollView.content);
+            messageData = new MessageData
+            {
+                isMine = (speakerId == FireAuthManager.Instance.GetCurrentUser().UserId),
+                order = order,
+                userid = speakerId
+            };
+            messages.Add(messageData);
+            Debug.Log($"Created new MessageData for order: {order}");
+        }
+
+        // 중복되는 부분이라 주석 처리함
+        // // 발화자에 따라 적절한 프리팹 선택
+        // if (messageData.isMine)
+        // {
+        //     if (messageData.userMessagePrefab == null)
+        //     {
+        //         messageData.userMessagePrefab = Instantiate(MessageBubble_Original_Mine, translationScrollView.content);
+        //     }
+        // }
+        // else
+        // {
+        //     if (messageData.userMessagePrefab == null)
+        //     {
+        //         messageData.userMessagePrefab = Instantiate(MessageBubble_Original_Yours, translationScrollView.content);
+        //     }
+        // }
+
+        // 원본 텍스트 표시
+        Transform contentTransform = messageData.userMessagePrefab.transform.Find("OriginalContent");
+        if (contentTransform != null)
+        {
+            TextMeshProUGUI contentTMP = contentTransform.GetComponent<TextMeshProUGUI>();
+            if (contentTMP != null)
+            {
+                contentTMP.text = text;
+                if (translationScrollView != null)
+                {
+                    StartCoroutine(ScrollToBottomNextFrame());
+                }
+            }
+            else
+            {
+                Debug.LogError("OriginalContent TMP component not found");
+            }
         }
         else
         {
-            messageData.userMessagePrefab = Instantiate(MessageBubble_Original_Yours, translationScrollView.content);
+            Debug.LogError($"MessageData not found for order: {order}");
         }
-
-        // 텍스트 업데이트
-        string contentName = messageData.isMine ? "Content_Mine" : "Content_Yours";
-        TextMeshProUGUI contentText = messageData.userMessagePrefab.transform.Find(contentName)?.GetComponent<TextMeshProUGUI>();
-        if (contentText != null)
-        {
-            contentText.text = text;
-        }
-        else
-        {
-            Debug.LogError($"{contentName} TMP component not found");
-        }
-
-        // 번역 메시지 프리팹 생성
-        messageData.translationPrefab = Instantiate(MessageBubble_Translated, translationScrollView.content);
-
-        // translationPrefab을 userMessagePrefab 아래에 위치시킴
-        int index = messageData.userMessagePrefab.transform.GetSiblingIndex();
-        messageData.translationPrefab.transform.SetSiblingIndex(index + 1);
-
-        messages.Add(messageData);
     }
 
 
@@ -770,41 +787,6 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
         if (speakButton != null)
             speakButton.SetActive(true);
     }
-
-    // 부분 번역된 텍스트를 업데이트하는 메서드
-    // 이전의 것
-    /*
-    public void UpdatePartialTranslatedText(int order, string partialText)
-    {
-        if (translationScrollView == null || translationTextPrefab == null)
-        {
-            Debug.LogError("필수 UI 컴포넌트가 할당되지 않았습니다!");
-            return;
-        }
-
-        try
-        {
-            if (!translationTexts.ContainsKey(order))
-            {
-                // 새로운 order이므로 프리팹 생성
-                CreateNewTranslationText(order);
-            }
-
-            if (translationTexts.TryGetValue(order, out TextMeshProUGUI textComponent))
-            {
-                // 텍스트 업데이트
-                textComponent.text = partialText;
-                
-                // UI 업데이트를 다음 프레임에서 실행
-                StartCoroutine(ScrollToBottomNextFrame());
-            }
-        }
-        catch (Exception e)
-        {
-            Debug.LogError($"텍스트 업데이트 중 오류 발생: {e.Message}");
-        }
-    }
-    */
 
     //private void CreateNewTranslationText(int order)
     //{
