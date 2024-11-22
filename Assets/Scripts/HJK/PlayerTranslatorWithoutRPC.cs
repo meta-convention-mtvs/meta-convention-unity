@@ -208,6 +208,7 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
         messageData.userid = FireAuthManager.Instance.GetCurrentUser().UserId;
 
         // 내 메시지 프리팹 생성
+        Debug.Log("StartRecording()에서 MessageBubble_Original_Mine 생성");
         messageData.userMessagePrefab = Instantiate(MessageBubble_Original_Mine, translationScrollView.content);
         messages.Add(messageData);
 
@@ -347,30 +348,6 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
             messages.Add(messageData);
             Debug.Log($"Created new MessageData for order: {order}");
         }
-
-        // 미사용코드 주석처리
-        // // 원본 텍스트 표시
-        // Transform contentTransform = messageData.userMessagePrefab.transform.Find("OriginalContent");
-        // if (contentTransform != null)
-        // {
-        //     TextMeshProUGUI contentTMP = contentTransform.GetComponent<TextMeshProUGUI>();
-        //     if (contentTMP != null)
-        //     {
-        //         contentTMP.text = text;
-        //         if (translationScrollView != null)
-        //         {
-        //             StartCoroutine(ScrollToBottomNextFrame());
-        //         }
-        //     }
-        //     else
-        //     {
-        //         Debug.LogError("OriginalContent TMP component not found");
-        //     }
-        // }
-        // else
-        // {
-        //     Debug.LogError($"MessageData not found for order: {order}");
-        // }
     }
 
 
@@ -394,6 +371,7 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
             // 발화자에 따라 적절한 프리팹 선택
             if (isMine)
             {
+                Debug.Log("UpdatePartialTranslatedText 내부에서 MessageBubble_Original_Mine 생성");
                 messageData.userMessagePrefab = Instantiate(MessageBubble_Original_Mine, translationScrollView.content);
             }
             else
