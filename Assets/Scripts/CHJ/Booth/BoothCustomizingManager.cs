@@ -1,7 +1,9 @@
-﻿using Firebase.Firestore;
+﻿using CHJ;
+using Firebase.Firestore;
+using System;
 using System.Collections.Generic;
 using System.IO;
-using TriLibCore;
+using System.Threading.Tasks;
 using UnityEngine;
 
 public class BoothCustomizingManager : MonoBehaviour
@@ -70,7 +72,7 @@ public class BoothCustomizingManager : MonoBehaviour
                         Destroy(currentInstantiatedObject);
                     }
                     //currentInstantiatedObject = ObjectLoader.ImportObj(boothCustomizeData.boothObjectPath);
-                    ObjectLoader.StartImporting(boothCustomizeData.boothObjectPath, OnBoothObjectLoad);
+                    ObjectLoader.ImportGLTFAsync(boothCustomizeData.boothObjectPath, OnBoothObjectLoad);
                 }
 
             }
@@ -101,10 +103,11 @@ public class BoothCustomizingManager : MonoBehaviour
         }
     }
 
-    void OnBoothObjectLoad(AssetLoaderContext context)
+    private void OnBoothObjectLoad(GameObject arg1, AnimationClip[] arg2)
     {
-        currentInstantiatedObject = context.RootGameObject;
+        currentInstantiatedObject = arg1;
     }
+
 
     void LoadGamePrefab(GameObject[] prefab)
     {
@@ -362,6 +365,16 @@ public class BoothCustomizeData
     public bool hasBrochure { get; set; }
     [FirestoreProperty]
     public string brochureImagePath { get; set; }
+
+    public bool hasLogoImage => !string.IsNullOrEmpty(logoImagePath);
+
+    public bool hasBannerImage => !string.IsNullOrEmpty(bannerImagePath);
+
+    public bool hasBrochureImage => !string.IsNullOrEmpty(brochureImagePath);
+
+    public bool hasVideoUrl => !string.IsNullOrEmpty(videoURL);
+
+    public bool hasModelingPath => !string.IsNullOrEmpty(modelingPath);
 }
 
 public class BoothExtraData
@@ -377,6 +390,46 @@ public class BoothExtraData
     public Texture2D bannerImage;
     public bool hasBrochure;
     public Texture2D brochureImage;
+
+    public BoothExtraData(BoothCustomizeData data)
+    {
+        this.boothType = data.boothType;
+        this.homepageLink = data.homepageLink;
+        this.color = data.color.GetColor();
+        this.modelingScale = data.modelingScale;
+        this.hasBanner = data.hasBanner;
+        this.hasBrochure = data.hasBrochure;
+    }
+
+    public BoothExtraData()
+    {
+
+    }
+
+    public static async Task<BoothExtraData> LoadBoothExtraDataInDatabase(UID uidComponent, BoothCustomizeData data)
+    {
+        try
+        {
+            BoothExtraData extraData = new BoothExtraData(data);
+            //logo image
+            if (data.hasLogoImage) extraData.logoImage = await AsyncDatabase.GetTextureFromDatabaseWithUid(uidComponent.uuid, data.logoImagePath);
+            // banner image
+            if (data.hasBannerImage) extraData.bannerImage = await AsyncDatabase.GetTextureFromDatabaseWithUid(uidComponent.uuid, data.bannerImagePath);
+            // brochure image
+            if (data.hasBrochureImage) extraData.brochureImage = await AsyncDatabase.GetTextureFromDatabaseWithUid(uidComponent.uuid, data.brochureImagePath);
+            //tv video url
+            if (data.hasVideoUrl) extraData.videoURL = (await AsyncDatabase.GetVideoDownloadUrl(uidComponent.uuid, data.videoURL)).ToString();
+            //object file
+            if (data.hasModelingPath) extraData.modelingPath = await AsyncDatabase.GetObjectFileLocalPathFromDatabaseWithUid(uidComponent.uuid, data.modelingPath);
+
+            return extraData;
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"UID {uidComponent.uuid}에서 부스 생성 중 오류 발생: {ex.Message}");
+            return null;
+        }
+    }
 }
 
 public enum BoothCategory
