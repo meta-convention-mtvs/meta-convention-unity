@@ -332,7 +332,6 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
         }
     }
 
-
     public void OnOtherInputAudioDone(int order, string text, string speakerId)
     {
         // 기존 메시지를 찾거나 새로 생성
@@ -349,28 +348,29 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
             Debug.Log($"Created new MessageData for order: {order}");
         }
 
-        // 원본 텍스트 표시
-        Transform contentTransform = messageData.userMessagePrefab.transform.Find("OriginalContent");
-        if (contentTransform != null)
-        {
-            TextMeshProUGUI contentTMP = contentTransform.GetComponent<TextMeshProUGUI>();
-            if (contentTMP != null)
-            {
-                contentTMP.text = text;
-                if (translationScrollView != null)
-                {
-                    StartCoroutine(ScrollToBottomNextFrame());
-                }
-            }
-            else
-            {
-                Debug.LogError("OriginalContent TMP component not found");
-            }
-        }
-        else
-        {
-            Debug.LogError($"MessageData not found for order: {order}");
-        }
+        // 미사용코드 주석처리
+        // // 원본 텍스트 표시
+        // Transform contentTransform = messageData.userMessagePrefab.transform.Find("OriginalContent");
+        // if (contentTransform != null)
+        // {
+        //     TextMeshProUGUI contentTMP = contentTransform.GetComponent<TextMeshProUGUI>();
+        //     if (contentTMP != null)
+        //     {
+        //         contentTMP.text = text;
+        //         if (translationScrollView != null)
+        //         {
+        //             StartCoroutine(ScrollToBottomNextFrame());
+        //         }
+        //     }
+        //     else
+        //     {
+        //         Debug.LogError("OriginalContent TMP component not found");
+        //     }
+        // }
+        // else
+        // {
+        //     Debug.LogError($"MessageData not found for order: {order}");
+        // }
     }
 
 
