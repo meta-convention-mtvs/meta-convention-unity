@@ -318,6 +318,7 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
                 contentText.text = text;
                 if (translationScrollView != null)
                 {
+                    Debug.Log("ScrollToBottomNextFrame()가 OnInputAudioDone()에서 실행됨");
                     StartCoroutine(ScrollToBottomNextFrame());
                 }
                 Debug.Log($"Updated original text for order: {order}");
@@ -398,6 +399,7 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
 
             if (translationScrollView != null)
             {
+                Debug.Log("ScrollToBottomNextFrame()가 UpdatePartialTranslatedText()에서 실행됨");
                 StartCoroutine(ScrollToBottomNextFrame());
             }
         }
