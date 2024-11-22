@@ -33,6 +33,7 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
     [SerializeField] private KeyCode speakKey = KeyCode.M;      // 발언 시작/종료 키
     [SerializeField] private float maxRecordingTime = 60f;      // 최대 녹음 시간(초)
     [SerializeField] private KeyCode cancelKey = KeyCode.Escape; // 발언 취소 키
+    [SerializeField] private KeyCode resetKey = KeyCode.R;      // 리셋 키 추가
     
     // 스크롤 관련
     [Header("Scroll Animation Settings")]
@@ -135,6 +136,21 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
         else if (Input.GetKeyDown(cancelKey))
         {
             CancelRecording();
+        }
+        // 리셋 키(R) 눌렀을 때
+        if (Input.GetKeyDown(resetKey))
+        {
+            string userId = FireAuthManager.Instance.GetCurrentUser().UserId;
+            // TranslationRoomIDSynchronizer를 찾아서 리셋 요청
+            var synchronizer = FindObjectOfType<TranslationRoomIDSynchronizer>();
+            if (synchronizer != null)
+            {
+                synchronizer.photonView.RPC("RequestReset", RpcTarget.All, userId);
+            }
+            else
+            {
+                Debug.LogError("TranslationRoomIDSynchronizer not found!");
+            }
         }
     }
 

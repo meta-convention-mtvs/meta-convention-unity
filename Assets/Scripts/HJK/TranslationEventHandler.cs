@@ -181,8 +181,9 @@ public class TranslationEventHandler : Singleton<TranslationEventHandler>
     // }
 
 
-    private void HandleError(string errorMessage)
+    public void HandleError(string errorMessage)
     {
+        Debug.LogError($"[TranslationEventHandler] Error: {errorMessage}");
         OnError?.Invoke(errorMessage);
         if (playerTranslator != null)
         {
@@ -229,5 +230,12 @@ public class TranslationEventHandler : Singleton<TranslationEventHandler>
     {
         currentSpeakerId = "";
         OnSpeakerChanged?.Invoke("");
+    }
+
+    // Room Ready 상태를 설정하는 public 메서드 추가
+    public void SetRoomReadyState(bool state)
+    {
+        isRoomReady = state;
+        OnRoomReadyStateChanged?.Invoke(state);
     }
 }

@@ -38,23 +38,66 @@ public class TranslationManager : Singleton<TranslationManager>
     // 클래스 상단에 추가
     private Dictionary<int, string> accumulatedText = new Dictionary<int, string>();
 
-    
+    // 연결 상태 확인을 위한 프로퍼티 추가
+    public bool IsConnected => ws != null && ws.IsAlive;
 
+    // 모든 코루틴 중지
+    public void StopAllCoroutines()
+    {
+        if (dispatcher != null)
+        {
+            dispatcher.StopAllCoroutines();
+        }
+        base.StopAllCoroutines();
+    }
 
+    // 재연결 메서드
+    public void Reconnect()
+    {
+        Debug.Log("[TranslationManager] Reconnecting...");
+        
+        // 1. 기존 연결 종료
+        if (ws != null)
+        {
+            ws.Close();
+            ws = null;
+        }
+
+        // 2. 상태 초기화
+        isConnecting = false;
+        CurrentRoomID = string.Empty;
+
+        // 3. 새로운 연결 시도
+        Connect();
+    }
+
+    // 기존의 Connect 메서드 수정
     public void Connect()
     {
         Debug.Log("[TranslationManager] Connect method called");
         if (ws != null && ws.IsAlive || isConnecting)
+        {
+            Debug.Log("[TranslationManager] Already connected or connecting");
             return;
+        }
 
-        isConnecting = true;
-        ws = new WebSocket(Endpoint);
-        ws.OnOpen += Ws_OnOpen;
-        ws.OnMessage += OnMessageReceived;
-        ws.OnError += Ws_OnError;
-        ws.OnClose += Ws_OnClose;
-        ws.Connect();
-        print("connecting...");
+        try 
+        {
+            isConnecting = true;
+            ws = new WebSocket(Endpoint);
+            ws.OnOpen += Ws_OnOpen;
+            ws.OnMessage += OnMessageReceived;
+            ws.OnError += Ws_OnError;
+            ws.OnClose += Ws_OnClose;
+            ws.Connect();
+            Debug.Log("[TranslationManager] Connecting...");
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"[TranslationManager] Connection error: {e.Message}");
+            isConnecting = false;
+            throw;
+        }
     }
 
     private void Ws_OnError(object sender, ErrorEventArgs e)
@@ -272,7 +315,7 @@ public class TranslationManager : Singleton<TranslationManager>
                 isCritical = true;
                 break;
             case 2:
-                errorMessage = "방 생성에 실패했습니다.";
+                errorMessage = "방 ���성에 실패했습니다.";
                 break;
             case 3:
                 errorMessage = "방 참여에 실패했습니다.";
@@ -331,21 +374,29 @@ public class TranslationManager : Singleton<TranslationManager>
         }
     }
 
+    // Ws_OnClose 메서드 수정
     private void Ws_OnClose(object sender, CloseEventArgs e)
     {
         isConnecting = false;
-        Debug.Log($"WebSocket 연결 종료: {e.Reason}");
+        Debug.Log($"[TranslationManager] WebSocket connection closed: {e.Reason}");
         
-        // 필요한 경우 재연결 로직 구현
-        if (e.Code != 1000) // 정상 종료가 아닌 경우
+        // 정상 종료가 아닌 경우에만 재연결 시도
+        if (e.Code != 1000 && e.Code != 1001) // 1000: 정상 종료, 1001: 진행 중 종료
         {
+            Debug.Log("[TranslationManager] Abnormal closure. Starting reconnection...");
             StartCoroutine(ReconnectCoroutine());
         }
     }
 
+    // ReconnectCoroutine 수정
     private IEnumerator ReconnectCoroutine()
     {
-        yield return new WaitForSeconds(5f); // 5초 후 재연결 시도
-        Connect();
+        yield return new WaitForSeconds(5f); // 5초 대기
+        
+        if (!IsConnected && !isConnecting)
+        {
+            Debug.Log("[TranslationManager] Attempting reconnection...");
+            Connect();
+        }
     }
 }

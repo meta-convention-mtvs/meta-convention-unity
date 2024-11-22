@@ -1,11 +1,16 @@
 ﻿using Photon.Pun;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(PhotonView))]
-public class TranslationRoomIDSynchronizer : MonoBehaviourPun
+public class TranslationRoomIDSynchronizer : MonoBehaviourPunCallbacks
 {
+    private bool isResetting = false;
+    private const float RESET_TIMEOUT = 10f;
+    private Coroutine resetCoroutine;
+
     private void Start()
     {
         TranslationManager.Instance.OnConnect += CreateRoom;
@@ -44,5 +49,92 @@ public class TranslationRoomIDSynchronizer : MonoBehaviourPun
     {
         string userID = FireAuthManager.Instance.GetCurrentUser().UserId;
         TranslationManager.Instance.JoinRoom(newRoomID, userID, CashedDataFromDatabase.Instance.playerLanguage.language);
+    }
+
+    // 리셋 요청 처리
+    [PunRPC]
+    private void RequestReset(string requesterId)
+    {
+        if (isResetting) return;
+        
+        isResetting = true;
+        if (resetCoroutine != null) StopCoroutine(resetCoroutine);
+        resetCoroutine = StartCoroutine(ResetProcess(requesterId));
+    }
+
+    private IEnumerator ResetProcess(string requesterId)
+    {
+        isResetting = true;
+        
+        // 1. 모든 진행 중인 작업 중단
+        TranslationManager.Instance.StopAllCoroutines();
+        
+        // TranslationEventHandler 리셋
+        var handler = TranslationEventHandler.Instance;
+        handler.ResetSpeaker();
+        
+        // 방 준비 상태 초기화
+        handler.SetRoomReadyState(false);
+        
+        // 2. 웹소켓 재연결 (방장만 수행)
+        if (photonView.Owner.UserId == requesterId)
+        {
+            TranslationManager.Instance.Reconnect();
+            
+            // 연결 대기
+            float waitTime = 0;
+            bool connectionSuccess = false;
+            
+            while (waitTime < RESET_TIMEOUT)
+            {
+                if (TranslationManager.Instance.IsConnected)
+                {
+                    connectionSuccess = true;
+                    break;
+                }
+                waitTime += Time.deltaTime;
+                yield return null;
+            }
+
+            if (!connectionSuccess)
+            {
+                Debug.LogError("재연결 시간 초과. 다시 시도해주세요.");
+                handler.HandleError("재연결 시간 초과. 다시 시도해주세요.");
+                isResetting = false;
+                yield break;
+            }
+
+            try
+            {
+                // 새 방 생성
+                TranslationManager.Instance.CreateRoom(requesterId, 
+                    CashedDataFromDatabase.Instance.playerLanguage.language);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"리셋 실패: {e.Message}");
+                handler.HandleError("리셋 실패. 다시 시도해주세요.");
+                isResetting = false;
+                yield break;
+            }
+        }
+        
+        isResetting = false;
+    }
+
+    private class TranslationState
+    {
+        public string RoomId;
+        public bool IsConnected;
+        // 필요한 상태 정보 추가
+    }
+
+    private TranslationState SaveCurrentState()
+    {
+        return new TranslationState
+        {
+            RoomId = TranslationManager.Instance.CurrentRoomID,
+            IsConnected = TranslationManager.Instance.IsConnected
+        };
     }
 }
