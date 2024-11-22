@@ -25,6 +25,21 @@ namespace CHJ
 
     public static class AsyncDatabase
     {
+        public static async Task<bool> SetDataToDatabase<T>(string path, T data) where T : class
+        {
+            Task task = FirebaseFirestore.DefaultInstance.Document(path).SetAsync(data);
+            await task;
+
+            if (task.Exception == null)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
         public static async Task<Texture2D> GetTextureFromDatabaseWithUid(string uid, string fileName)
         {
             var url = await GetLogoDownloadUrl(uid, fileName);
