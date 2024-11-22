@@ -29,6 +29,8 @@ public class UserTypeSelecter : MonoBehaviour
 
     void OnCompanyButtonClick()
     {
+        UuidMgr.Instance.FindClosestCompanyUUID();
+        UuidMgr.Instance.PrintUserInfo();
         UserTypeData userType = new UserTypeData();
         userType.userType = UserTypeData.UserType.company;
         DatabaseManager.Instance.SaveData<UserTypeData>(userType);

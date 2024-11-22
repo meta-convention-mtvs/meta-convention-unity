@@ -2,33 +2,23 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Security.Permissions;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
 
-public class PlayerInfo
-{
-    public string uid { get; set; }
-    public string userName { get; set; }
-    public string companyName { get; set; }
-    public string companyUuid { get; set; }
 
-    public PlayerInfo(string uid, string userName, string companyName, string companyUuid)
-    {
-        this.uid = uid;
-        this.userName = userName;
-        this.companyName = companyName;
-        this.companyUuid = companyUuid;
-    }
-}
-public class UuidMgr : MonoBehaviour
+public class UuidMgrtest : MonoBehaviour
 {
-    public static UuidMgr Instance;
-
-    string url = "http://ec2-3-36-111-173.ap-northeast-2.compute.amazonaws.com:6576/translation/uuid";
     
-    public PlayerInfo currentUserInfo = new PlayerInfo("방","구","뿡","뿡");
+    string url = "http://ec2-3-36-111-173.ap-northeast-2.compute.amazonaws.com:6576/translation/uuid";
+    public Text genUuid;
+
+    public InputField companyName;
+    public Text findedUuid;
+
+    public string myCompanyName;
+
+
     
 
     [System.Serializable]
@@ -46,19 +36,7 @@ public class UuidMgr : MonoBehaviour
 
     private UuidCompanyList companyData;
 
-    private void Awake()
-    {
-        if (Instance == null)
-        {
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
-    }
-
+    
     void Start()
     {
         string filePath = Path.Combine(Application.streamingAssetsPath, "uuidb.json");
@@ -67,13 +45,13 @@ public class UuidMgr : MonoBehaviour
         companyData = JsonUtility.FromJson<UuidCompanyList>($"{{\"companies\":{jsonData}}}");
     }
 
-    public void FindClosestCompanyUUID()
+    public void OnClickFindClosestCompanyUUID()
     {
-        UuidCompany closestCompany = companyData.companies.OrderBy(c => LevenshteinDistance(currentUserInfo.companyName, c.company_name)).First();
+        UuidCompany closestCompany = companyData.companies.OrderBy(c => LevenshteinDistance(companyName.text, c.company_name)).First();
 
         Debug.Log($"Closest Company UUID: {closestCompany.uuid}");
 
-        currentUserInfo.companyUuid = closestCompany.uuid;
+        findedUuid.text = closestCompany.uuid;
     }
 
     private int LevenshteinDistance(string a, string b)
@@ -96,7 +74,7 @@ public class UuidMgr : MonoBehaviour
         return dp[a.Length, b.Length];
     }
 
-    public void GenerateUuid()
+    public void OnClickGenerateUuid()
     {
         StartCoroutine(IGetUuid(url));
     }
@@ -116,17 +94,21 @@ public class UuidMgr : MonoBehaviour
         else
         {
             Debug.Log("response: " + www.downloadHandler.text);
-            currentUserInfo.companyUuid = www.downloadHandler.text;
+            genUuid.text = www.downloadHandler.text;
         }
     }
 
 
-    public void PrintUserInfo()
+    public void OnClickMyCompanySet()
     {
-        Debug.Log($"User ID: {currentUserInfo.uid}");
-        Debug.Log($"User Name: {currentUserInfo.userName}");
-        Debug.Log($"Company Name: {currentUserInfo.companyName}");
-        Debug.Log($"Company UUID: {currentUserInfo.companyUuid}");
+
+    // 현재 유저의 정보에서 "소속 기업" 이름을 가져오고
+    // 기업 이름의 uuid 를 받아서 uuid에 저장 한다.
+    // 자신 소속의 기업이 없다면 uuid 를 생성해서 저장 한다.
+
+    // fireAuth CurrentUser 를 이용 할 것
+    // 유저의 정보를 모두 가져와서 캐싱 해 두는게 좋을까...? 
+    
     }
 
 
