@@ -207,10 +207,10 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
         messageData.order = currentOrder;
         messageData.userid = FireAuthManager.Instance.GetCurrentUser().UserId;
 
-        // 내 메시지 프리팹 생성
-        Debug.Log("StartRecording()에서 MessageBubble_Original_Mine 생성");
-        messageData.userMessagePrefab = Instantiate(MessageBubble_Original_Mine, translationScrollView.content);
-        messages.Add(messageData);
+        // // 내 메시지 프리팹 생성
+        // Debug.Log("StartRecording()에서 MessageBubble_Original_Mine 생성");
+        // messageData.userMessagePrefab = Instantiate(MessageBubble_Original_Mine, translationScrollView.content);
+        // messages.Add(messageData);
 
         // 사용 가능한 마이크 확인
         string[] devices = Microphone.devices;
@@ -368,13 +368,19 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
             messageData.isMine = isMine;
             messageData.userid = speakerId;
 
-            // isMine이 false일 때만 (상대방 메시지일 때만) 프리팹 생성
-            if (!isMine)
+            // 발화자에 따라 적절한 프리팹 선택
+            if (isMine)
+            {
+                Debug.Log("UpdatePartialTranslatedText 내부에서 MessageBubble_Original_Mine 생성");
+                messageData.userMessagePrefab = Instantiate(MessageBubble_Original_Mine, translationScrollView.content);
+            }
+            else
             {
                 messageData.userMessagePrefab = Instantiate(MessageBubble_Original_Yours, translationScrollView.content);
-                messages.Add(messageData);
-                Debug.Log($"Created new MessageData for order: {order}, isMine: {isMine}");
             }
+
+            messages.Add(messageData);
+            Debug.Log($"Created new MessageData for order: {order}, isMine: {isMine}");
         }
 
         // 번역 프리팹이 없는 경우에만 생성
@@ -403,7 +409,7 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
         }
         else
         {
-            Debug.LogError("[Translation Debug] TranslatedContent TMP component not found");
+            Debug.LogError("[Translation Debug] Failed to find TranslatedContent component");
         }
     }
 
