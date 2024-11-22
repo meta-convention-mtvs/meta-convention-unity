@@ -20,7 +20,7 @@ public class TranslationRoomIDSynchronizer : MonoBehaviourPun
         {
             string userID = FireAuthManager.Instance.GetCurrentUser().UserId;
             // 내가 owner이다 room create를 요청하자
-            TranslationManager.Instance.CreateRoom(userID, CashedDataFromDatabase.Instance.playerLanguage.language); ;
+            TranslationManager.Instance.CreateRoom(userID, CashedDataFromDatabase.Instance.playerLanguage.language);
         }
     }
     void JoinRoom(string roomID)

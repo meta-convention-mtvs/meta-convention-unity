@@ -315,6 +315,10 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
             if (contentText != null)
             {
                 contentText.text = text;
+                if (translationScrollView != null)
+                {
+                    StartCoroutine(ScrollToBottomNextFrame());
+                }
                 Debug.Log($"Updated original text for order: {order}");
             }
             else
@@ -344,23 +348,6 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
             messages.Add(messageData);
             Debug.Log($"Created new MessageData for order: {order}");
         }
-
-        // 중복되는 부분이라 주석 처리함
-        // // 발화자에 따라 적절한 프리팹 선택
-        // if (messageData.isMine)
-        // {
-        //     if (messageData.userMessagePrefab == null)
-        //     {
-        //         messageData.userMessagePrefab = Instantiate(MessageBubble_Original_Mine, translationScrollView.content);
-        //     }
-        // }
-        // else
-        // {
-        //     if (messageData.userMessagePrefab == null)
-        //     {
-        //         messageData.userMessagePrefab = Instantiate(MessageBubble_Original_Yours, translationScrollView.content);
-        //     }
-        // }
 
         // 원본 텍스트 표시
         Transform contentTransform = messageData.userMessagePrefab.transform.Find("OriginalContent");
