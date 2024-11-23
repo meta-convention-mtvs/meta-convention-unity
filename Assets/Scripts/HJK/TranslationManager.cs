@@ -39,7 +39,8 @@ public class TranslationManager : Singleton<TranslationManager>
     private Dictionary<int, string> accumulatedText = new Dictionary<int, string>();
 
     // 연결 상태 확인을 위한 프로퍼티 추가
-    public bool IsConnected => ws != null && ws.IsAlive;
+    private bool _isConnected = false;
+    public bool IsConnected => _isConnected;
 
     // 모든 코루틴 중지
     public void StopAllCoroutines()
@@ -120,8 +121,15 @@ public class TranslationManager : Singleton<TranslationManager>
     private void Ws_OnOpen(object sender, EventArgs e)
     {
         Debug.Log("WebSocket - Translation 연결 성공");
-        OnConnect?.Invoke();
-        OnConnect = null;
+        isConnecting = false;
+        _isConnected = true;
+        
+        // OnConnect 이벤트 호출 추가
+        if (OnConnect != null)
+        {
+            Debug.Log("[TranslationManager] OnConnect 이벤트 발생");
+            OnConnect.Invoke();
+        }
     }
 
     public void CreateRoom(string userId, string language)
@@ -374,11 +382,24 @@ public class TranslationManager : Singleton<TranslationManager>
 
     private void OnDestroy()
     {
+        Debug.Log("[TranslationManager] OnDestroy - 리소스 정리");
+        
         if (ws != null)
         {
-            ws.Close();
+            ws.OnOpen -= Ws_OnOpen;
+            ws.OnClose -= Ws_OnClose;
+            ws.OnMessage -= OnMessageReceived;  // OnWebSocketMessage에서 OnMessageReceived로 수정
+            ws.OnError -= Ws_OnError;
+            
+            if (ws.IsAlive)
+            {
+                ws.Close();
+            }
+            
             ws = null;
         }
+        
+        _isConnected = false;
     }
 
     // Ws_OnClose 메서드 수정

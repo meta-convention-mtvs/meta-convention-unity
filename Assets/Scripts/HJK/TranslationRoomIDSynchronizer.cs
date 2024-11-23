@@ -92,17 +92,11 @@ public class TranslationRoomIDSynchronizer : MonoBehaviourPunCallbacks
         yield return new WaitUntil(() => TranslationManager.Instance.IsConnected);
         Debug.Log("[ResetProcess] 웹소켓 재연결 완료");
         
-        // 방장의 경우 새로운 방 생성
-        bool roomCreated = false;
-        TranslationManager.Instance.OnConnect += () => {
-            Debug.Log("[ResetProcess] 방 생성 시작");
-            CreateRoom();
-            roomCreated = true;
-            TranslationManager.Instance.OnConnect -= CreateRoom;
-        };
+        // 잠시 대기
+        yield return new WaitForSeconds(0.5f);
         
-        // 방 생성 완료 대기
-        yield return new WaitUntil(() => roomCreated);
+        Debug.Log("[ResetProcess] 방 생성/참여 시작");
+        CreateRoom();  // 일단 모든 클라이언트가 방을 생성 시도
         
         isResetting = false;
         Debug.Log("[ResetProcess] 완료");
