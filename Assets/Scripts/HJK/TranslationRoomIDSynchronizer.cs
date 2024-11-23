@@ -70,18 +70,17 @@ public class TranslationRoomIDSynchronizer : MonoBehaviourPunCallbacks
     [PunRPC]
     public void RequestReset(string requesterId)
     {
-        Debug.Log($"[TranslationRoomIDSynchronizer] RequestReset RPC 수신됨 - RequesterId: {requesterId}");
+        Debug.Log($"[TranslationRoomIDSynchronizer] RequestReset RPC 수신됨 - RequesterId: {requesterId}, IsMasterClient: {PhotonNetwork.IsMasterClient}");
         
-        // 리셋을 요청한 사용자가 리셋 프로세스를 실행
-        if (PhotonNetwork.LocalPlayer.UserId == requesterId)
+        // 마스터 클라이언트만 리셋 프로세스를 실행
+        if (PhotonNetwork.IsMasterClient)
         {
-            Debug.Log("[TranslationRoomIDSynchronizer] 리셋 프로세스 시작");
+            Debug.Log("[TranslationRoomIDSynchronizer] 마스터 클라이언트가 리셋 프로세스 시작");
             StartCoroutine(ResetProcess(requesterId));
         }
         else
         {
-            Debug.Log("[TranslationRoomIDSynchronizer] 다른 사용자의 리셋 요청 대기");
-            // 다른 사용자들은 대기
+            Debug.Log("[TranslationRoomIDSynchronizer] 마스터 클라이언트의 리셋 프로세스 대기");
         }
     }
 
@@ -93,35 +92,16 @@ public class TranslationRoomIDSynchronizer : MonoBehaviourPunCallbacks
         // 1. 현재 방에서 나가기
         if (!string.IsNullOrEmpty(TranslationManager.Instance.CurrentRoomID))
         {
-            Debug.Log("[ResetProcess] 기존 방에서 나가기 요청");
-            bool byeReceived = false;
-            
-            // room.bye 이벤트 구독
-            void OnRoomByeHandler(string roomId)
-            {
-                byeReceived = true;
-                TranslationManager.Instance.OnRoomBye -= OnRoomByeHandler;
-            }
-            TranslationManager.Instance.OnRoomBye += OnRoomByeHandler;
-            
-            // room.leave 메시지 전송
-            TranslationManager.Instance.LeaveRoom();
+            // 모든 클라이언트에게 방 나가기 알림
+            photonView.RPC("LeaveCurrentRoom", RpcTarget.All);
             
             // room.bye 이벤트를 기다림 (최대 5초)
             float waitTime = 0f;
-            while (waitTime < 5f && !byeReceived)
+            while (waitTime < 5f && !string.IsNullOrEmpty(TranslationManager.Instance.CurrentRoomID))
             {
                 yield return new WaitForSeconds(0.1f);
                 waitTime += 0.1f;
             }
-            
-            // 타임아웃시 이벤트 구독 해제
-            if (!byeReceived)
-            {
-                TranslationManager.Instance.OnRoomBye -= OnRoomByeHandler;
-            }
-            
-            Debug.Log($"[ResetProcess] 방 나가기 {(byeReceived ? "완료" : "타임아웃")}");
         }
         
         // 2. 웹소켓 재연결
@@ -141,6 +121,13 @@ public class TranslationRoomIDSynchronizer : MonoBehaviourPunCallbacks
         
         isResetting = false;
         Debug.Log("[ResetProcess] 완료");
+    }
+
+    [PunRPC]
+    private void LeaveCurrentRoom()
+    {
+        Debug.Log("[TranslationRoomIDSynchronizer] 현재 방 나가기 실행");
+        TranslationManager.Instance.LeaveRoom();
     }
 
     private class TranslationState
