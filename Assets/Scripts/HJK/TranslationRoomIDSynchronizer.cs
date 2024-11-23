@@ -16,6 +16,9 @@ public class TranslationRoomIDSynchronizer : MonoBehaviourPunCallbacks
         TranslationManager.Instance.OnConnect += CreateRoom;
         TranslationManager.Instance.OnRoomJoined += JoinRoom;
         TranslationManager.Instance.Connect();
+
+        // 가장 중요한 초기 상태 확인
+        Debug.Log($"[TranslationRoomIDSynchronizer] 초기화 상태 - IsMine: {photonView.IsMine}, Owner: {photonView.Owner?.UserId ?? "null"}");
     }
     void CreateRoom()
     {
@@ -55,7 +58,7 @@ public class TranslationRoomIDSynchronizer : MonoBehaviourPunCallbacks
     [PunRPC]
     private void RequestReset(string requesterId)
     {
-        Debug.Log($"[TranslationRoomIDSynchronizer] RequestReset 호출됨 - RequesterId: {requesterId}");
+        Debug.Log($"[TranslationRoomIDSynchronizer] 리셋 요청 - RequesterId: {requesterId}, IsMine: {photonView.IsMine}, Owner: {photonView.Owner?.UserId ?? "null"}");
         
         if (isResetting)
         {
@@ -171,5 +174,11 @@ public class TranslationRoomIDSynchronizer : MonoBehaviourPunCallbacks
             RoomId = TranslationManager.Instance.CurrentRoomID,
             IsConnected = TranslationManager.Instance.IsConnected
         };
+    }
+
+    public override void OnJoinedRoom()
+    {
+        base.OnJoinedRoom();
+        Debug.Log($"[TranslationRoomIDSynchronizer] 방 입장 완료 - IsMasterClient: {PhotonNetwork.IsMasterClient}, Owner: {photonView.Owner?.UserId ?? "null"}");
     }
 }
