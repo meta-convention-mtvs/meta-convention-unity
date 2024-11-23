@@ -13,26 +13,14 @@ public class TranslationRoomIDSynchronizer : MonoBehaviourPunCallbacks
 
     private void Start()
     {
-        // Photon View 초기화
-        if (!PhotonNetwork.IsConnected)
-        {
-            Debug.LogError("[TranslationRoomIDSynchronizer] Photon이 연결되지 않았습니다.");
-            return;
-        }
-
-        // 소유권 설정
-        if (photonView.Owner == null)
-        {
-            photonView.RequestOwnership();
-            Debug.Log("[TranslationRoomIDSynchronizer] PhotonView 소유권 요청");
-        }
-
+        // 웹소켓 연결 설정
         TranslationManager.Instance.OnConnect += CreateRoom;
         TranslationManager.Instance.OnRoomJoined += JoinRoom;
         TranslationManager.Instance.Connect();
 
         Debug.Log($"[TranslationRoomIDSynchronizer] 초기화 상태 - IsMine: {photonView.IsMine}, Owner: {photonView.Owner?.UserId ?? "null"}, IsMasterClient: {PhotonNetwork.IsMasterClient}");
     }
+
     void CreateRoom()
     {
         // 이 스크립트는 공용 오브젝트에 붙을 것이다 => owner이면 isMine은 true, 아니면 false
@@ -43,6 +31,7 @@ public class TranslationRoomIDSynchronizer : MonoBehaviourPunCallbacks
             TranslationManager.Instance.CreateRoom(userID, CashedDataFromDatabase.Instance.playerLanguage.language);
         }
     }
+
     void JoinRoom(string roomID)
     {
         // 내가 방장이면..
@@ -192,6 +181,14 @@ public class TranslationRoomIDSynchronizer : MonoBehaviourPunCallbacks
     public override void OnJoinedRoom()
     {
         base.OnJoinedRoom();
+        
+        // Photon Room 입장 후 소유권 설정
+        if (photonView.Owner == null && PhotonNetwork.IsMasterClient)
+        {
+            photonView.RequestOwnership();
+            Debug.Log("[TranslationRoomIDSynchronizer] PhotonView 소유권 요청");
+        }
+        
         Debug.Log($"[TranslationRoomIDSynchronizer] 방 입장 완료 - IsMasterClient: {PhotonNetwork.IsMasterClient}, Owner: {photonView.Owner?.UserId ?? "null"}");
     }
 }
