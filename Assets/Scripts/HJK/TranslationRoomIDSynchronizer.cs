@@ -13,12 +13,25 @@ public class TranslationRoomIDSynchronizer : MonoBehaviourPunCallbacks
 
     private void Start()
     {
+        // Photon View 초기화
+        if (!PhotonNetwork.IsConnected)
+        {
+            Debug.LogError("[TranslationRoomIDSynchronizer] Photon이 연결되지 않았습니다.");
+            return;
+        }
+
+        // 소유권 설정
+        if (photonView.Owner == null)
+        {
+            photonView.RequestOwnership();
+            Debug.Log("[TranslationRoomIDSynchronizer] PhotonView 소유권 요청");
+        }
+
         TranslationManager.Instance.OnConnect += CreateRoom;
         TranslationManager.Instance.OnRoomJoined += JoinRoom;
         TranslationManager.Instance.Connect();
 
-        // 가장 중요한 초기 상태 확인
-        Debug.Log($"[TranslationRoomIDSynchronizer] 초기화 상태 - IsMine: {photonView.IsMine}, Owner: {photonView.Owner?.UserId ?? "null"}");
+        Debug.Log($"[TranslationRoomIDSynchronizer] 초기화 상태 - IsMine: {photonView.IsMine}, Owner: {photonView.Owner?.UserId ?? "null"}, IsMasterClient: {PhotonNetwork.IsMasterClient}");
     }
     void CreateRoom()
     {
