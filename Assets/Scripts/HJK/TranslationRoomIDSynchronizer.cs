@@ -89,16 +89,12 @@ public class TranslationRoomIDSynchronizer : MonoBehaviourPunCallbacks
         // 1. 현재 방에서 나가기
         if (!string.IsNullOrEmpty(TranslationManager.Instance.CurrentRoomID))
         {
-            // 모든 클라이언트에게 방 나가기 알림
+            Debug.Log("[ResetProcess] 기존 방에서 나가기");
             photonView.RPC("LeaveCurrentRoom", RpcTarget.All);
             
-            // room.bye 이벤트를 기다림 (최대 5초)
-            float waitTime = 0f;
-            while (waitTime < 5f && !string.IsNullOrEmpty(TranslationManager.Instance.CurrentRoomID))
-            {
-                yield return new WaitForSeconds(0.1f);
-                waitTime += 0.1f;
-            }
+            // room.bye 이벤트를 기다림
+            yield return new WaitUntil(() => string.IsNullOrEmpty(TranslationManager.Instance.CurrentRoomID));
+            Debug.Log("[ResetProcess] 방 나가기 완료");
         }
         
         // 2. 웹소켓 재연결
@@ -109,12 +105,19 @@ public class TranslationRoomIDSynchronizer : MonoBehaviourPunCallbacks
         yield return new WaitUntil(() => TranslationManager.Instance.IsConnected);
         Debug.Log("[ResetProcess] 웹소켓 재연결 완료");
         
-        // 3. 잠시 대기
-        yield return new WaitForSeconds(0.5f);
+        // 3. 잠시 대기 (서버 상태 안정화)
+        yield return new WaitForSeconds(1.0f);
         
-        // 4. 새로운 방 생성
-        Debug.Log("[ResetProcess] 새로운 방 생성 시작");
-        CreateRoom();
+        // 4. 새로운 방 생성 (이미 방에 들어가 있지 않은 경우에만)
+        if (string.IsNullOrEmpty(TranslationManager.Instance.CurrentRoomID))
+        {
+            Debug.Log("[ResetProcess] 새로운 방 생성 시작");
+            CreateRoom();
+        }
+        else
+        {
+            Debug.Log("[ResetProcess] 이미 방에 참여한 상태, 방 생성 건너뜀");
+        }
         
         isResetting = false;
         Debug.Log("[ResetProcess] 완료");
