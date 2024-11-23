@@ -151,7 +151,7 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
             if (synchronizer != null)
             {
                 Debug.Log("[PlayerTranslator] TranslationRoomIDSynchronizer 찾음");
-                // 마스터 클라이언트에게만 RPC 전송
+                // RpcTarget.All 대신 RpcTarget.MasterClient 사용
                 synchronizer.photonView.RPC("RequestReset", RpcTarget.MasterClient, userId);
             }
             else

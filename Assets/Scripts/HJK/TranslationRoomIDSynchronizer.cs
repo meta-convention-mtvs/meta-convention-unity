@@ -70,18 +70,15 @@ public class TranslationRoomIDSynchronizer : MonoBehaviourPunCallbacks
     [PunRPC]
     public void RequestReset(string requesterId)
     {
-        Debug.Log($"[TranslationRoomIDSynchronizer] RequestReset RPC 수신됨 - RequesterId: {requesterId}, IsMasterClient: {PhotonNetwork.IsMasterClient}");
-        
-        // 마스터 클라이언트만 리셋 프로세스를 실행
-        if (PhotonNetwork.IsMasterClient)
+        // 마스터 클라이언트만 처리하도록
+        if (!PhotonNetwork.IsMasterClient)
         {
-            Debug.Log("[TranslationRoomIDSynchronizer] 마스터 클라이언트가 리셋 프로세스 시작");
-            StartCoroutine(ResetProcess(requesterId));
+            Debug.Log("[TranslationRoomIDSynchronizer] 마스터 클라이언트가 아님, 리셋 요청 무시");
+            return;
         }
-        else
-        {
-            Debug.Log("[TranslationRoomIDSynchronizer] 마스터 클라이언트의 리셋 프로세스 대기");
-        }
+
+        Debug.Log($"[TranslationRoomIDSynchronizer] 마스터 클라이언트가 리셋 프로세스 시작");
+        StartCoroutine(ResetProcess(requesterId));
     }
 
     private IEnumerator ResetProcess(string requesterId)
