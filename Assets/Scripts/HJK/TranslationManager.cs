@@ -406,4 +406,9 @@ public class TranslationManager : Singleton<TranslationManager>
             Connect();
         }
     }
+
+    public List<Dictionary<string, object>> GetCurrentUsers()
+    {
+        return currentUsers;
+    }
 }

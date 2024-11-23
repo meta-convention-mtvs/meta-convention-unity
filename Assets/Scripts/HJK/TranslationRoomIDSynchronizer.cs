@@ -81,82 +81,27 @@ public class TranslationRoomIDSynchronizer : MonoBehaviourPunCallbacks
 
     private IEnumerator ResetProcess(string requesterId)
     {
-        Debug.Log("[ResetProcess] 시작");
-        isResetting = true;
-
-        // 1. 진행 중인 작업 중단
-        Debug.Log("[ResetProcess] 코루틴 중지 시도");
-        TranslationManager.Instance.StopAllCoroutines();
+        Debug.Log($"[ResetProcess] 시작 - RequesterId: {requesterId}");
         
-        // 2. TranslationEventHandler 리셋
-        var handler = TranslationEventHandler.Instance;
-        if (handler == null)
+        // 방장 체크를 PhotonView.Owner 대신 Translation 서버의 유저 정보로 판단
+        var users = TranslationManager.Instance.GetCurrentUsers();
+        if (users != null && users.Count > 0)
         {
-            Debug.LogError("[ResetProcess] TranslationEventHandler가 null입니다.");
-            isResetting = false;
-            yield break;
-        }
-        
-        Debug.Log("[ResetProcess] 스피커 및 방 상태 리셋");
-        handler.ResetSpeaker();
-        handler.SetRoomReadyState(false);
-        
-        // 3. 방장 체크 및 재연결
-        Debug.Log($"[ResetProcess] 방장 체크 - RequesterId: {requesterId}, OwnerId: {photonView.Owner.UserId}");
-        if (photonView.Owner.UserId == requesterId)
-        {
-            try
-            {
-                Debug.Log("[ResetProcess] 방장이 재연결 시도");
-                TranslationManager.Instance.Reconnect();
-            }
-            catch (Exception e)
-            {
-                Debug.LogError($"[ResetProcess] 재연결 중 예외 발생: {e.Message}");
-                handler.HandleError("재연결 실패. 다시 시도해주세요.");
-                isResetting = false;
-                yield break;
-            }
-
-            // 연결 대기 로직을 try-catch 밖으로 이동
-            float waitTime = 0;
-            bool connectionSuccess = false;
+            // 첫 번째 유저를 방장으로 간주
+            var firstUser = users[0];
+            string firstUserId = firstUser["userid"].ToString();
             
-            while (waitTime < RESET_TIMEOUT)
+            Debug.Log($"[ResetProcess] 방장 체크 - RequesterId: {requesterId}, FirstUser: {firstUserId}");
+            
+            if (string.Equals(requesterId, firstUserId))
             {
-                Debug.Log($"[ResetProcess] 연결 대기 중... ({waitTime}/{RESET_TIMEOUT})");
-                if (TranslationManager.Instance.IsConnected)
-                {
-                    connectionSuccess = true;
-                    Debug.Log("[ResetProcess] 연결 성공");
-                    break;
-                }
-                waitTime += Time.deltaTime;
-                yield return null;
-            }
-
-            if (!connectionSuccess)
-            {
-                Debug.LogError("[ResetProcess] 재연결 시간 초과");
-                handler.HandleError("재연결 시간 초과. 다시 시도해주세요.");
-                isResetting = false;
-                yield break;
-            }
-
-            try
-            {
-                // 새 방 생성
-                TranslationManager.Instance.CreateRoom(requesterId, 
-                    CashedDataFromDatabase.Instance.playerLanguage.language);
-            }
-            catch (Exception e)
-            {
-                Debug.LogError($"[ResetProcess] 방 생성 중 예외 발생: {e.Message}");
-                handler.HandleError("방 생성 실패. 다시 시도해주세요.");
-                isResetting = false;
+                Debug.Log("[ResetProcess] 방장이 리셋 요청함");
+                TranslationManager.Instance.Reconnect();
                 yield break;
             }
         }
+        
+        Debug.Log("[ResetProcess] 방장이 아닌 사용자의 리셋 요청");
         
         Debug.Log("[ResetProcess] 완료");
         isResetting = false;
