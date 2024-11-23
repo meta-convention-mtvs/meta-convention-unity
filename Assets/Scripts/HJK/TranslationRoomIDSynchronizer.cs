@@ -88,24 +88,24 @@ public class TranslationRoomIDSynchronizer : MonoBehaviourPunCallbacks
         Debug.Log("[ResetProcess] 시작 - 웹소켓 재연결");
         TranslationManager.Instance.Reconnect();
         
-        // 재연결 대기
-        yield return new WaitForSeconds(1f);
+        // 웹소켓이 다시 연결될 때까지 대기
+        yield return new WaitUntil(() => TranslationManager.Instance.IsConnected);
+        Debug.Log("[ResetProcess] 웹소켓 재연결 완료");
         
         // 방장의 경우 새로운 방 생성
+        bool roomCreated = false;
         TranslationManager.Instance.OnConnect += () => {
+            Debug.Log("[ResetProcess] 방 생성 시작");
             CreateRoom();
+            roomCreated = true;
             TranslationManager.Instance.OnConnect -= CreateRoom;
         };
         
-        // 다른 멤버들은 방장의 새로운 방 생성 대기 후 참여
-        TranslationManager.Instance.OnRoomJoined += (roomId) => {
-            JoinRoom(roomId);
-            TranslationManager.Instance.OnRoomJoined -= JoinRoom;
-        };
+        // 방 생성 완료 대기
+        yield return new WaitUntil(() => roomCreated);
         
         isResetting = false;
         Debug.Log("[ResetProcess] 완료");
-        yield break;
     }
 
     private class TranslationState
