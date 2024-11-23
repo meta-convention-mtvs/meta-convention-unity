@@ -33,7 +33,7 @@ public class TranslationRoomIDSynchronizer : MonoBehaviourPunCallbacks
 
     void CreateRoom()
     {
-        // 이 스크립트는 공용 오브젝트에 붙을 것이다 => owner이면 isMine은 true, 아니면 false
+        // 이 스크립트는 공용 오브젝트에 붙을 것이다 => owner이면 isMine�� true, 아니면 false
         if (photonView.IsMine)
         {
             string userID = FireAuthManager.Instance.GetCurrentUser().UserId;
@@ -72,7 +72,7 @@ public class TranslationRoomIDSynchronizer : MonoBehaviourPunCallbacks
     {
         Debug.Log($"[TranslationRoomIDSynchronizer] RequestReset RPC 수신됨 - RequesterId: {requesterId}");
         
-        // 리셋을 요청한 사용자만 리셋 프로세스 실행
+        // 리셋을 요청한 사용자가 리셋 프로세스를 실행
         if (PhotonNetwork.LocalPlayer.UserId == requesterId)
         {
             Debug.Log("[TranslationRoomIDSynchronizer] 리셋 프로세스 시작");
@@ -81,7 +81,7 @@ public class TranslationRoomIDSynchronizer : MonoBehaviourPunCallbacks
         else
         {
             Debug.Log("[TranslationRoomIDSynchronizer] 다른 사용자의 리셋 요청 대기");
-            // 필요한 경우 다른 사용자들은 여기서 대기 상태로 진입
+            // 다른 사용자들은 대기
         }
     }
 
