@@ -54,21 +54,28 @@ public class TranslationManager : Singleton<TranslationManager>
     // 재연결 메서드
     public void Reconnect()
     {
-        Debug.Log("[TranslationManager] Reconnecting...");
+        Debug.Log("[TranslationManager] Reconnect 시작");
         
-        // 1. 기존 연결 종료
-        if (ws != null)
+        try
         {
-            ws.Close();
-            ws = null;
+            if (ws != null)
+            {
+                Debug.Log("[TranslationManager] 기존 웹소켓 연결 종료");
+                ws.Close();
+                ws = null;
+            }
+
+            isConnecting = false;
+            CurrentRoomID = string.Empty;
+            
+            Debug.Log("[TranslationManager] 새 연결 시도");
+            Connect();
         }
-
-        // 2. 상태 초기화
-        isConnecting = false;
-        CurrentRoomID = string.Empty;
-
-        // 3. 새로운 연결 시도
-        Connect();
+        catch (Exception e)
+        {
+            Debug.LogError($"[TranslationManager] Reconnect 실패: {e.Message}\n{e.StackTrace}");
+            throw;
+        }
     }
 
     // 기존의 Connect 메서드 수정
@@ -315,7 +322,7 @@ public class TranslationManager : Singleton<TranslationManager>
                 isCritical = true;
                 break;
             case 2:
-                errorMessage = "방 ���성에 실패했습니다.";
+                errorMessage = "방 성에 실패했습니다.";
                 break;
             case 3:
                 errorMessage = "방 참여에 실패했습니다.";

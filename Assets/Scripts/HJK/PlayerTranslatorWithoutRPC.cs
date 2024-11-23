@@ -87,7 +87,7 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
     public void UpdateSpeakUI(bool canSpeak)
     {
         float currentTime = Time.time;
-        Debug.Log($"이벤트 발생 간경: {currentTime - lastEventTime}");
+        //Debug.Log($"이벤트 발생 간격: {currentTime - lastEventTime}");
         lastEventTime = currentTime;
         if (speakButton != null)
         {
@@ -140,17 +140,18 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
         // 리셋 키(R) 눌렀을 때
         if (Input.GetKeyDown(resetKey))
         {
+            Debug.Log("[PlayerTranslator] R키 입력 감지");
             string userId = FireAuthManager.Instance.GetCurrentUser().UserId;
-            // TranslationRoomIDSynchronizer를 찾아서 리셋 요청
             var synchronizer = FindObjectOfType<TranslationRoomIDSynchronizer>();
-            if (synchronizer != null)
+            
+            if (synchronizer == null)
             {
-                synchronizer.photonView.RPC("RequestReset", RpcTarget.All, userId);
+                Debug.LogError("[PlayerTranslator] TranslationRoomIDSynchronizer를 찾을 수 없습니다.");
+                return;
             }
-            else
-            {
-                Debug.LogError("TranslationRoomIDSynchronizer not found!");
-            }
+            
+            Debug.Log($"[PlayerTranslator] Reset 요청 전송 - UserId: {userId}");
+            synchronizer.photonView.RPC("RequestReset", RpcTarget.All, userId);
         }
     }
 

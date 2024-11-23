@@ -55,41 +55,75 @@ public class TranslationRoomIDSynchronizer : MonoBehaviourPunCallbacks
     [PunRPC]
     private void RequestReset(string requesterId)
     {
-        if (isResetting) return;
+        Debug.Log($"[TranslationRoomIDSynchronizer] RequestReset 호출됨 - RequesterId: {requesterId}");
+        
+        if (isResetting)
+        {
+            Debug.Log("[TranslationRoomIDSynchronizer] 이미 리셋 중입니다.");
+            return;
+        }
         
         isResetting = true;
-        if (resetCoroutine != null) StopCoroutine(resetCoroutine);
+        if (resetCoroutine != null)
+        {
+            Debug.Log("[TranslationRoomIDSynchronizer] 기존 리셋 코루틴 중지");
+            StopCoroutine(resetCoroutine);
+        }
+        
+        Debug.Log("[TranslationRoomIDSynchronizer] 새 리셋 프로세스 시작");
         resetCoroutine = StartCoroutine(ResetProcess(requesterId));
     }
 
     private IEnumerator ResetProcess(string requesterId)
     {
+        Debug.Log("[ResetProcess] 시작");
         isResetting = true;
-        
-        // 1. 모든 진행 중인 작업 중단
+
+        // 1. 진행 중인 작업 중단
+        Debug.Log("[ResetProcess] 코루틴 중지 시도");
         TranslationManager.Instance.StopAllCoroutines();
         
-        // TranslationEventHandler 리셋
+        // 2. TranslationEventHandler 리셋
         var handler = TranslationEventHandler.Instance;
-        handler.ResetSpeaker();
+        if (handler == null)
+        {
+            Debug.LogError("[ResetProcess] TranslationEventHandler가 null입니다.");
+            isResetting = false;
+            yield break;
+        }
         
-        // 방 준비 상태 초기화
+        Debug.Log("[ResetProcess] 스피커 및 방 상태 리셋");
+        handler.ResetSpeaker();
         handler.SetRoomReadyState(false);
         
-        // 2. 웹소켓 재연결 (방장만 수행)
+        // 3. 방장 체크 및 재연결
+        Debug.Log($"[ResetProcess] 방장 체크 - RequesterId: {requesterId}, OwnerId: {photonView.Owner.UserId}");
         if (photonView.Owner.UserId == requesterId)
         {
-            TranslationManager.Instance.Reconnect();
-            
-            // 연결 대기
+            try
+            {
+                Debug.Log("[ResetProcess] 방장이 재연결 시도");
+                TranslationManager.Instance.Reconnect();
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"[ResetProcess] 재연결 중 예외 발생: {e.Message}");
+                handler.HandleError("재연결 실패. 다시 시도해주세요.");
+                isResetting = false;
+                yield break;
+            }
+
+            // 연결 대기 로직을 try-catch 밖으로 이동
             float waitTime = 0;
             bool connectionSuccess = false;
             
             while (waitTime < RESET_TIMEOUT)
             {
+                Debug.Log($"[ResetProcess] 연결 대기 중... ({waitTime}/{RESET_TIMEOUT})");
                 if (TranslationManager.Instance.IsConnected)
                 {
                     connectionSuccess = true;
+                    Debug.Log("[ResetProcess] 연결 성공");
                     break;
                 }
                 waitTime += Time.deltaTime;
@@ -98,7 +132,7 @@ public class TranslationRoomIDSynchronizer : MonoBehaviourPunCallbacks
 
             if (!connectionSuccess)
             {
-                Debug.LogError("재연결 시간 초과. 다시 시도해주세요.");
+                Debug.LogError("[ResetProcess] 재연결 시간 초과");
                 handler.HandleError("재연결 시간 초과. 다시 시도해주세요.");
                 isResetting = false;
                 yield break;
@@ -112,13 +146,14 @@ public class TranslationRoomIDSynchronizer : MonoBehaviourPunCallbacks
             }
             catch (Exception e)
             {
-                Debug.LogError($"리셋 실패: {e.Message}");
-                handler.HandleError("리셋 실패. 다시 시도해주세요.");
+                Debug.LogError($"[ResetProcess] 방 생성 중 예외 발생: {e.Message}");
+                handler.HandleError("방 생성 실패. 다시 시도해주세요.");
                 isResetting = false;
                 yield break;
             }
         }
         
+        Debug.Log("[ResetProcess] 완료");
         isResetting = false;
     }
 
