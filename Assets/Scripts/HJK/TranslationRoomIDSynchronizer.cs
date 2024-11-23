@@ -11,14 +11,28 @@ public class TranslationRoomIDSynchronizer : MonoBehaviourPunCallbacks
     private const float RESET_TIMEOUT = 10f;
     private Coroutine resetCoroutine;
 
+    private void Awake()
+    {
+        photonView = GetComponent<PhotonView>();
+    }
+
     private void Start()
     {
-        // 웹소켓 연결 설정
+        // PhotonView 소유권 설정
+        if (photonView.IsMine && photonView.Owner == null)
+        {
+            photonView.RequestOwnership();
+            Debug.Log("[TranslationRoomIDSynchronizer] PhotonView 소유권 요청");
+        }
+
         TranslationManager.Instance.OnConnect += CreateRoom;
         TranslationManager.Instance.OnRoomJoined += JoinRoom;
         TranslationManager.Instance.Connect();
+    }
 
-        Debug.Log($"[TranslationRoomIDSynchronizer] 초기화 상태 - IsMine: {photonView.IsMine}, Owner: {photonView.Owner?.UserId ?? "null"}, IsMasterClient: {PhotonNetwork.IsMasterClient}");
+    public override void OnOwnershipTransfered(PhotonView targetView, Player previousOwner)
+    {
+        base.OnOwnershipTransfered(targetView, previousOwner);
     }
 
     void CreateRoom()
@@ -59,52 +73,50 @@ public class TranslationRoomIDSynchronizer : MonoBehaviourPunCallbacks
     // 리셋 요청 처리
     [PunRPC]
     private void RequestReset(string requesterId)
-    {
-        Debug.Log($"[TranslationRoomIDSynchronizer] 리셋 요청 - RequesterId: {requesterId}, IsMine: {photonView.IsMine}, Owner: {photonView.Owner?.UserId ?? "null"}");
-        
+    {        
         if (isResetting)
         {
-            Debug.Log("[TranslationRoomIDSynchronizer] 이미 리셋 중입니다.");
             return;
         }
-        
+
         isResetting = true;
-        if (resetCoroutine != null)
-        {
-            Debug.Log("[TranslationRoomIDSynchronizer] 기존 리셋 코루틴 중지");
-            StopCoroutine(resetCoroutine);
-        }
-        
-        Debug.Log("[TranslationRoomIDSynchronizer] 새 리셋 프로세스 시작");
-        resetCoroutine = StartCoroutine(ResetProcess(requesterId));
+        StartCoroutine(ResetProcess(requesterId));
     }
 
     private IEnumerator ResetProcess(string requesterId)
     {
-        Debug.Log($"[ResetProcess] 시작 - RequesterId: {requesterId}");
-        
         var users = TranslationManager.Instance.GetCurrentUsers();
         if (users != null && users.Count > 0)
         {
             var firstUser = users[0];
-            if (firstUser.ContainsKey("userid"))
+            string firstUserId = firstUser["userid"].ToString();
+            
+            // 방장인 경우: 직접 리셋 수행
+            if (string.Equals(firstUserId, TranslationManager.Instance.UserId))
             {
-                string firstUserId = firstUser["userid"].ToString();
-                Debug.Log($"[ResetProcess] 방장 체크 - RequesterId: {requesterId}, FirstUser: {firstUserId}");
-                
-                if (string.Equals(requesterId, firstUserId))
-                {
-                    Debug.Log("[ResetProcess] 방장이 리셋 요청함");
-                    TranslationManager.Instance.Reconnect();
-                    yield break;
-                }
+                Debug.Log("[ResetProcess] 방장이 리셋 실행");
+                yield return new WaitForSeconds(0.5f);
+                TranslationManager.Instance.Reconnect();
+                // 새로운 방 생성
+                TranslationManager.Instance.OnConnect += () => {
+                    CreateRoom();
+                    TranslationManager.Instance.OnConnect -= CreateRoom;
+                };
+            }
+            // 방장이 아닌 경우: 방장의 리셋 완료 대기
+            else
+            {
+                Debug.Log("[ResetProcess] 방장의 리셋 대기 중");
+                yield return new WaitForSeconds(2f);  // 방장의 리셋 및 새 방 생성 대기
+                TranslationManager.Instance.OnRoomJoined += (roomId) => {
+                    JoinRoom(roomId);
+                    TranslationManager.Instance.OnRoomJoined -= JoinRoom;
+                };
             }
         }
         
-        Debug.Log("[ResetProcess] 방장이 아닌 사용자의 리셋 요청");
-        
-        Debug.Log("[ResetProcess] 완료");
         isResetting = false;
+        Debug.Log("[ResetProcess] 완료");
     }
 
     private class TranslationState

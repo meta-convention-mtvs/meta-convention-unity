@@ -140,18 +140,24 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
         // 리셋 키(R) 눌렀을 때
         if (Input.GetKeyDown(resetKey))
         {
-            Debug.Log("[PlayerTranslator] R키 입력 감지");
-            string userId = FireAuthManager.Instance.GetCurrentUser().UserId;
-            var synchronizer = FindObjectOfType<TranslationRoomIDSynchronizer>();
-            
-            if (synchronizer == null)
+            var users = TranslationManager.Instance.GetCurrentUsers();
+            if (users != null && users.Count > 0)
             {
-                Debug.LogError("[PlayerTranslator] TranslationRoomIDSynchronizer를 찾을 수 없습니다.");
-                return;
+                var firstUser = users[0];
+                string firstUserId = firstUser["userid"].ToString();
+                
+                // 현재 유저가 첫 번째 유저인 경우에만 리셋 요청
+                if (string.Equals(userId, firstUserId))
+                {
+                    Debug.Log("[PlayerTranslator] R키 입력 감지");
+                    Debug.Log($"[PlayerTranslator] Reset 요청 전송 - UserId: {userId}");
+                    photonView.RPC("RequestReset", RpcTarget.All, userId);
+                }
+                else
+                {
+                    Debug.Log("[PlayerTranslator] 방장만 리셋할 수 있습니다.");
+                }
             }
-            
-            Debug.Log($"[PlayerTranslator] Reset 요청 전송 - UserId: {userId}");
-            synchronizer.photonView.RPC("RequestReset", RpcTarget.All, userId);
         }
     }
 
@@ -239,7 +245,7 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
         string[] devices = Microphone.devices;
         if (devices.Length == 0)
         {
-            Debug.LogError("사용 가능한 마이크가 없습니다!");
+            Debug.LogError("사용 가능한 마이크�� 없습니다!");
             return;
         }
 
