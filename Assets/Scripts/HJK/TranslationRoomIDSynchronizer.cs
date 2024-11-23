@@ -83,21 +83,21 @@ public class TranslationRoomIDSynchronizer : MonoBehaviourPunCallbacks
     {
         Debug.Log($"[ResetProcess] 시작 - RequesterId: {requesterId}");
         
-        // 방장 체크를 PhotonView.Owner 대신 Translation 서버의 유저 정보로 판단
         var users = TranslationManager.Instance.GetCurrentUsers();
         if (users != null && users.Count > 0)
         {
-            // 첫 번째 유저를 방장으로 간주
             var firstUser = users[0];
-            string firstUserId = firstUser["userid"].ToString();
-            
-            Debug.Log($"[ResetProcess] 방장 체크 - RequesterId: {requesterId}, FirstUser: {firstUserId}");
-            
-            if (string.Equals(requesterId, firstUserId))
+            if (firstUser.ContainsKey("userid"))
             {
-                Debug.Log("[ResetProcess] 방장이 리셋 요청함");
-                TranslationManager.Instance.Reconnect();
-                yield break;
+                string firstUserId = firstUser["userid"].ToString();
+                Debug.Log($"[ResetProcess] 방장 체크 - RequesterId: {requesterId}, FirstUser: {firstUserId}");
+                
+                if (string.Equals(requesterId, firstUserId))
+                {
+                    Debug.Log("[ResetProcess] 방장이 리셋 요청함");
+                    TranslationManager.Instance.Reconnect();
+                    yield break;
+                }
             }
         }
         

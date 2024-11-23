@@ -407,8 +407,10 @@ public class TranslationManager : Singleton<TranslationManager>
         }
     }
 
+    private List<Dictionary<string, object>> _currentUsers = new List<Dictionary<string, object>>();
+
     public List<Dictionary<string, object>> GetCurrentUsers()
     {
-        return currentUsers;
+        return _currentUsers;
     }
 }
