@@ -85,50 +85,27 @@ public class TranslationRoomIDSynchronizer : MonoBehaviourPunCallbacks
 
     private IEnumerator ResetProcess(string requesterId)
     {
-        Debug.Log($"[ResetProcess] 시작 - RequesterId: {requesterId}");
+        Debug.Log("[ResetProcess] 시작 - 웹소켓 재연결");
+        TranslationManager.Instance.Reconnect();
         
-        var users = TranslationManager.Instance.GetCurrentUsers();
-        Debug.Log($"[ResetProcess] users null 체크: {users == null}");
-        Debug.Log($"[ResetProcess] users count: {users?.Count ?? 0}");
-        Debug.Log($"[ResetProcess] TranslationManager.Instance.IsConnected: {TranslationManager.Instance.IsConnected}");
+        // 재연결 대기
+        yield return new WaitForSeconds(1f);
         
-        if (users != null && users.Count > 0)
-        {
-            Debug.Log($"[ResetProcess] users count: {users.Count}");
-            
-            var firstUser = users[0];
-            string firstUserId = firstUser["userid"].ToString();
-            string currentUserId = FireAuthManager.Instance.GetCurrentUser().UserId;
-            
-            Debug.Log($"[ResetProcess] 방장 체크 - FirstUserId: {firstUserId}, CurrentUserId: {currentUserId}");
-            
-            if (string.Equals(firstUserId, currentUserId))
-            {
-                Debug.Log("[ResetProcess] 방장이 리셋 실행");
-                yield return new WaitForSeconds(0.5f);
-                TranslationManager.Instance.Reconnect();
-                TranslationManager.Instance.OnConnect += () => {
-                    CreateRoom();
-                    TranslationManager.Instance.OnConnect -= CreateRoom;
-                };
-            }
-            else
-            {
-                Debug.Log("[ResetProcess] 방장의 리셋 대기 중");
-                yield return new WaitForSeconds(2f);
-                TranslationManager.Instance.OnRoomJoined += (roomId) => {
-                    JoinRoom(roomId);
-                    TranslationManager.Instance.OnRoomJoined -= JoinRoom;
-                };
-            }
-        }
-        else
-        {
-            Debug.Log("[ResetProcess] users가 null이거나 비어있음");
-        }
+        // 방장의 경우 새로운 방 생성
+        TranslationManager.Instance.OnConnect += () => {
+            CreateRoom();
+            TranslationManager.Instance.OnConnect -= CreateRoom;
+        };
+        
+        // 다른 멤버들은 방장의 새로운 방 생성 대기 후 참여
+        TranslationManager.Instance.OnRoomJoined += (roomId) => {
+            JoinRoom(roomId);
+            TranslationManager.Instance.OnRoomJoined -= JoinRoom;
+        };
         
         isResetting = false;
         Debug.Log("[ResetProcess] 완료");
+        yield break;
     }
 
     private class TranslationState
