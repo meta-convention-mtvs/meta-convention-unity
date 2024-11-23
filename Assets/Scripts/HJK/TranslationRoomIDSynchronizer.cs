@@ -89,6 +89,8 @@ public class TranslationRoomIDSynchronizer : MonoBehaviourPunCallbacks
         
         var users = TranslationManager.Instance.GetCurrentUsers();
         Debug.Log($"[ResetProcess] users null 체크: {users == null}");
+        Debug.Log($"[ResetProcess] users count: {users?.Count ?? 0}");
+        Debug.Log($"[ResetProcess] TranslationManager.Instance.IsConnected: {TranslationManager.Instance.IsConnected}");
         
         if (users != null && users.Count > 0)
         {
