@@ -70,24 +70,30 @@ public class TranslationRoomIDSynchronizer : MonoBehaviourPunCallbacks
     [PunRPC]
     private void RequestReset(string requesterId)
     {        
+        Debug.Log($"[TranslationRoomIDSynchronizer] RequestReset RPC 수신됨 - RequesterId: {requesterId}");
+        
         if (isResetting)
         {
+            Debug.Log("[TranslationRoomIDSynchronizer] 이미 리셋 중입니다");
             return;
         }
 
+        Debug.Log("[TranslationRoomIDSynchronizer] 리셋 프로세스 시작");
         isResetting = true;
         StartCoroutine(ResetProcess(requesterId));
     }
 
     private IEnumerator ResetProcess(string requesterId)
     {
+        Debug.Log($"[ResetProcess] 시작 - RequesterId: {requesterId}");
+        
         var users = TranslationManager.Instance.GetCurrentUsers();
         if (users != null && users.Count > 0)
         {
             var firstUser = users[0];
             string firstUserId = firstUser["userid"].ToString();
+            Debug.Log($"[ResetProcess] 첫 번째 유저: {firstUserId}");
             
-            // 방장인 경우: 직접 리셋 수행
             if (string.Equals(firstUserId, FireAuthManager.Instance.GetCurrentUser().UserId))
             {
                 Debug.Log("[ResetProcess] 방장이 리셋 실행");
@@ -98,7 +104,6 @@ public class TranslationRoomIDSynchronizer : MonoBehaviourPunCallbacks
                     TranslationManager.Instance.OnConnect -= CreateRoom;
                 };
             }
-            // 방장이 아닌 경우: 방장의 리셋 완료 대기
             else
             {
                 Debug.Log("[ResetProcess] 방장의 리셋 대기 중");
@@ -111,6 +116,7 @@ public class TranslationRoomIDSynchronizer : MonoBehaviourPunCallbacks
         }
         
         isResetting = false;
+        Debug.Log("[ResetProcess] 완료");
     }
 
     private class TranslationState
