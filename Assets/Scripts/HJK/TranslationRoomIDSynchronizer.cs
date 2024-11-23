@@ -85,18 +85,57 @@ public class TranslationRoomIDSynchronizer : MonoBehaviourPunCallbacks
 
     private IEnumerator ResetProcess(string requesterId)
     {
-        Debug.Log("[ResetProcess] 시작 - 웹소켓 재연결");
+        Debug.Log("[ResetProcess] 시작");
+        isResetting = true;
+        
+        // 1. 현재 방에서 나가기
+        if (!string.IsNullOrEmpty(TranslationManager.Instance.CurrentRoomID))
+        {
+            Debug.Log("[ResetProcess] 기존 방에서 나가기 요청");
+            bool byeReceived = false;
+            
+            // room.bye 이벤트 구독
+            void OnRoomByeHandler(string roomId)
+            {
+                byeReceived = true;
+                TranslationManager.Instance.OnRoomBye -= OnRoomByeHandler;
+            }
+            TranslationManager.Instance.OnRoomBye += OnRoomByeHandler;
+            
+            // room.leave 메시지 전송
+            TranslationManager.Instance.LeaveRoom();
+            
+            // room.bye 이벤트를 기다림 (최대 5초)
+            float waitTime = 0f;
+            while (waitTime < 5f && !byeReceived)
+            {
+                yield return new WaitForSeconds(0.1f);
+                waitTime += 0.1f;
+            }
+            
+            // 타임아웃시 이벤트 구독 해제
+            if (!byeReceived)
+            {
+                TranslationManager.Instance.OnRoomBye -= OnRoomByeHandler;
+            }
+            
+            Debug.Log($"[ResetProcess] 방 나가기 {(byeReceived ? "완료" : "타임아웃")}");
+        }
+        
+        // 2. 웹소켓 재연결
+        Debug.Log("[ResetProcess] 웹소켓 재연결");
         TranslationManager.Instance.Reconnect();
         
         // 웹소켓이 다시 연결될 때까지 대기
         yield return new WaitUntil(() => TranslationManager.Instance.IsConnected);
         Debug.Log("[ResetProcess] 웹소켓 재연결 완료");
         
-        // 잠시 대기
+        // 3. 잠시 대기
         yield return new WaitForSeconds(0.5f);
         
-        Debug.Log("[ResetProcess] 방 생성/참여 시작");
-        CreateRoom();  // 일단 모든 클라이언트가 방을 생성 시도
+        // 4. 새로운 방 생성
+        Debug.Log("[ResetProcess] 새로운 방 생성 시작");
+        CreateRoom();
         
         isResetting = false;
         Debug.Log("[ResetProcess] 완료");

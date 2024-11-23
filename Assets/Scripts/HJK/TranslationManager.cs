@@ -229,20 +229,20 @@ public class TranslationManager : Singleton<TranslationManager>
     public event Action<int, string, string> OnApprovedSpeech; // order, userid, lang 전달 // 새로 추가
     public event Action<int, string> OnInputAudioDone; // order와 text를 전달
     public event Action<int> OnInputAudioFailed; // order만 전달
+    public event Action<string> OnRoomBye;  // roomId를 파라미터로 전달
     
 
 
     private void OnMessageReceived(object sender, MessageEventArgs e)
     {
-        // UnityMainThread에서 실행되도록 래핑
-        dispatcher.Enqueue(() => {
-            var data = JsonConvert.DeserializeObject<Dictionary<string, object>>(e.Data);
-            Debug.Log($"[TranslationManager] Received message: {e.Data}");
-            
-            int order;
-            string userid;
-            
-            switch (data["type"] as string)
+        var message = e.Data;
+        dispatcher.Enqueue(() =>
+        {
+            Debug.Log($"[TranslationManager] Received message: {message}");
+            var data = JsonConvert.DeserializeObject<Dictionary<string, object>>(message);
+            string type = data["type"].ToString();
+
+            switch (type)
             {
                 case "server.error":
                     HandleServerError(Convert.ToInt32(data["code"]));
@@ -255,8 +255,10 @@ public class TranslationManager : Singleton<TranslationManager>
                     break;
                     
                 case "room.bye":
+                    string roomId = data["roomid"].ToString();
+                    Debug.Log($"[TranslationManager] Left room: {roomId}");
                     CurrentRoomID = string.Empty;
-                    OnRoomLeft?.Invoke();
+                    OnRoomBye?.Invoke(roomId);
                     break;
                     
                 case "room.updated":
@@ -268,9 +270,9 @@ public class TranslationManager : Singleton<TranslationManager>
                     break;
                     
                 case "conversation.text.delta":
-                    order = Convert.ToInt32(data["order"]);
+                    int order = Convert.ToInt32(data["order"]);
                     string delta = data["delta"] as string;
-                    userid = data.ContainsKey("userid") ? data["userid"] as string : string.Empty;
+                    string userid = data.ContainsKey("userid") ? data["userid"] as string : string.Empty;
                     OnPartialTextReceived?.Invoke(order, delta, userid);
                     break;
                     
