@@ -68,19 +68,21 @@ public class TranslationRoomIDSynchronizer : MonoBehaviourPunCallbacks
 
     // 리셋 요청 처리
     [PunRPC]
-    private void RequestReset(string requesterId)
-    {        
+    public void RequestReset(string requesterId)
+    {
         Debug.Log($"[TranslationRoomIDSynchronizer] RequestReset RPC 수신됨 - RequesterId: {requesterId}");
         
-        if (isResetting)
+        // 리셋을 요청한 사용자만 리셋 프로세스 실행
+        if (PhotonNetwork.LocalPlayer.UserId == requesterId)
         {
-            Debug.Log("[TranslationRoomIDSynchronizer] 이미 리셋 중입니다");
-            return;
+            Debug.Log("[TranslationRoomIDSynchronizer] 리셋 프로세스 시작");
+            StartCoroutine(ResetProcess(requesterId));
         }
-
-        Debug.Log("[TranslationRoomIDSynchronizer] 리셋 프로세스 시작");
-        isResetting = true;
-        StartCoroutine(ResetProcess(requesterId));
+        else
+        {
+            Debug.Log("[TranslationRoomIDSynchronizer] 다른 사용자의 리셋 요청 대기");
+            // 필요한 경우 다른 사용자들은 여기서 대기 상태로 진입
+        }
     }
 
     private IEnumerator ResetProcess(string requesterId)
