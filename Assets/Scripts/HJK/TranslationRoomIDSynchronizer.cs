@@ -1,4 +1,5 @@
 ﻿using Photon.Pun;
+using Photon.Realtime;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -10,11 +11,6 @@ public class TranslationRoomIDSynchronizer : MonoBehaviourPunCallbacks
     private bool isResetting = false;
     private const float RESET_TIMEOUT = 10f;
     private Coroutine resetCoroutine;
-
-    private void Awake()
-    {
-        photonView = GetComponent<PhotonView>();
-    }
 
     private void Start()
     {
@@ -30,10 +26,10 @@ public class TranslationRoomIDSynchronizer : MonoBehaviourPunCallbacks
         TranslationManager.Instance.Connect();
     }
 
-    public override void OnOwnershipTransfered(PhotonView targetView, Player previousOwner)
-    {
-        base.OnOwnershipTransfered(targetView, previousOwner);
-    }
+    // public override void OnOwnershipTransferred(PhotonView targetView, Player previousOwner)
+    // {
+    //     base.OnOwnershipTransferred(targetView, previousOwner);
+    // }
 
     void CreateRoom()
     {
@@ -92,12 +88,11 @@ public class TranslationRoomIDSynchronizer : MonoBehaviourPunCallbacks
             string firstUserId = firstUser["userid"].ToString();
             
             // 방장인 경우: 직접 리셋 수행
-            if (string.Equals(firstUserId, TranslationManager.Instance.UserId))
+            if (string.Equals(firstUserId, FireAuthManager.Instance.GetCurrentUser().UserId))
             {
                 Debug.Log("[ResetProcess] 방장이 리셋 실행");
                 yield return new WaitForSeconds(0.5f);
                 TranslationManager.Instance.Reconnect();
-                // 새로운 방 생성
                 TranslationManager.Instance.OnConnect += () => {
                     CreateRoom();
                     TranslationManager.Instance.OnConnect -= CreateRoom;
@@ -107,7 +102,7 @@ public class TranslationRoomIDSynchronizer : MonoBehaviourPunCallbacks
             else
             {
                 Debug.Log("[ResetProcess] 방장의 리셋 대기 중");
-                yield return new WaitForSeconds(2f);  // 방장의 리셋 및 새 방 생성 대기
+                yield return new WaitForSeconds(2f);
                 TranslationManager.Instance.OnRoomJoined += (roomId) => {
                     JoinRoom(roomId);
                     TranslationManager.Instance.OnRoomJoined -= JoinRoom;
@@ -116,7 +111,6 @@ public class TranslationRoomIDSynchronizer : MonoBehaviourPunCallbacks
         }
         
         isResetting = false;
-        Debug.Log("[ResetProcess] 완료");
     }
 
     private class TranslationState
