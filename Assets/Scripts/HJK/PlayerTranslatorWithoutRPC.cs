@@ -81,6 +81,9 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
 
     private int currentOrder = -1; // 현재 발언 순번
 
+    [SerializeField]
+    private TranslationRoomIDSynchronizer translationRoomIDSynchronizer;  // Inspector에서 할당
+
     /// <summary>
     /// 발언 가능 상태에 따라 UI를 업데이트
     /// </summary>
@@ -143,7 +146,7 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
             string userId = FireAuthManager.Instance.GetCurrentUser().UserId;
             Debug.Log("[PlayerTranslator] R키 입력 감지");
             Debug.Log($"[PlayerTranslator] Reset 요청 전송 - UserId: {userId}");
-            photonView.RPC("RequestReset", RpcTarget.All, userId);
+            translationRoomIDSynchronizer.photonView.RPC("RequestReset", RpcTarget.All, userId);
         }
     }
 

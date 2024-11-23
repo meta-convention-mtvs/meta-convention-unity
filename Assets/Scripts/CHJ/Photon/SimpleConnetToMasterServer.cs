@@ -38,16 +38,25 @@ public class SimpleConnetToMasterServer : MonoBehaviourPunCallbacks
         canvasGroup.alpha = 1f;
         yield return null;
 
+        // 기존 코드 - 마스터 서버 연결 전 방 생성 시도 (문제 발생)
+        /*
         RoomOptions roomOptions = new RoomOptions();
         roomOptions.MaxPlayers = 20;
         roomOptions.PublishUserId = true;
         PhotonNetwork.JoinOrCreateRoom("MainHall", roomOptions, TypedLobby.Default);
+        */
     }
     #region 메인서버에 연결
 
     public override void OnConnectedToMaster()
     {
-        print("Connected to Master");       
+        print("Connected to Master");
+
+        // 1123 추가 - 마스터 서버 연결 완료 후 방 생성 시도
+        RoomOptions roomOptions = new RoomOptions();
+        roomOptions.MaxPlayers = 20;
+        roomOptions.PublishUserId = true;
+        PhotonNetwork.JoinOrCreateRoom("MainHall", roomOptions, TypedLobby.Default);
     }
 
     public override void OnJoinedRoom()
