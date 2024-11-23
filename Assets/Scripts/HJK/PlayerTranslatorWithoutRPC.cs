@@ -146,7 +146,18 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
             string userId = FireAuthManager.Instance.GetCurrentUser().UserId;
             Debug.Log("[PlayerTranslator] R키 입력 감지");
             Debug.Log($"[PlayerTranslator] Reset 요청 전송 - UserId: {userId}");
-            translationRoomIDSynchronizer.photonView.RPC("RequestReset", RpcTarget.All, userId);
+            
+            // TranslationRoomIDSynchronizer 찾기
+            var synchronizer = FindObjectOfType<TranslationRoomIDSynchronizer>();
+            if (synchronizer != null)
+            {
+                Debug.Log("[PlayerTranslator] TranslationRoomIDSynchronizer 찾음");
+                synchronizer.photonView.RPC("RequestReset", RpcTarget.All, userId);
+            }
+            else
+            {
+                Debug.LogError("[PlayerTranslator] TranslationRoomIDSynchronizer를 찾을 수 없습니다!");
+            }
         }
     }
 
