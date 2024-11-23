@@ -147,12 +147,12 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
             Debug.Log("[PlayerTranslator] R키 입력 감지");
             Debug.Log($"[PlayerTranslator] Reset 요청 전송 - UserId: {userId}");
             
-            // TranslationRoomIDSynchronizer 찾기
             var synchronizer = FindObjectOfType<TranslationRoomIDSynchronizer>();
             if (synchronizer != null)
             {
                 Debug.Log("[PlayerTranslator] TranslationRoomIDSynchronizer 찾음");
-                synchronizer.photonView.RPC("RequestReset", RpcTarget.All, userId);
+                // 마스터 클라이언트에게만 RPC 전송
+                synchronizer.photonView.RPC("RequestReset", RpcTarget.MasterClient, userId);
             }
             else
             {
