@@ -88,13 +88,19 @@ public class TranslationRoomIDSynchronizer : MonoBehaviourPunCallbacks
         Debug.Log($"[ResetProcess] 시작 - RequesterId: {requesterId}");
         
         var users = TranslationManager.Instance.GetCurrentUsers();
+        Debug.Log($"[ResetProcess] users null 체크: {users == null}");
+        
         if (users != null && users.Count > 0)
         {
+            Debug.Log($"[ResetProcess] users count: {users.Count}");
+            
             var firstUser = users[0];
             string firstUserId = firstUser["userid"].ToString();
-            Debug.Log($"[ResetProcess] 첫 번째 유저: {firstUserId}");
+            string currentUserId = FireAuthManager.Instance.GetCurrentUser().UserId;
             
-            if (string.Equals(firstUserId, FireAuthManager.Instance.GetCurrentUser().UserId))
+            Debug.Log($"[ResetProcess] 방장 체크 - FirstUserId: {firstUserId}, CurrentUserId: {currentUserId}");
+            
+            if (string.Equals(firstUserId, currentUserId))
             {
                 Debug.Log("[ResetProcess] 방장이 리셋 실행");
                 yield return new WaitForSeconds(0.5f);
@@ -113,6 +119,10 @@ public class TranslationRoomIDSynchronizer : MonoBehaviourPunCallbacks
                     TranslationManager.Instance.OnRoomJoined -= JoinRoom;
                 };
             }
+        }
+        else
+        {
+            Debug.Log("[ResetProcess] users가 null이거나 비어있음");
         }
         
         isResetting = false;
