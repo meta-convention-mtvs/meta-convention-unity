@@ -155,12 +155,16 @@ public class TranslationManager : Singleton<TranslationManager>
     public event Action<string> OnRoomJoined;        // 방 입장 성공
     public event Action OnRoomLeft;                  // 방 퇴장
     public event Action<bool, List<Dictionary<string, object>>> OnRoomUpdated;  // 방 상태 업데이트
-    public event Action<string> OnPartialTextReceived;    // 부분 텍스트 수신
+    public event Action<int, string, string> OnPartialTextReceived;
     public event Action<string> OnCompleteTextReceived;   // 완성된 텍스트 수신
     public event Action<string> OnPartialAudioReceived;   // 부분 오디오 수신
     public event Action OnCompleteAudioReceived;  // 완성된 오디오 수신
-    public event Action<string> OnSpeechApproved;         // 발언권 승인 (userId 전달)
+    // public event Action<string> OnSpeechApproved;         // 발언권 승인 (userId 전달) // 기존의 것
     public event Action<string> OnError;                  // 에러 발생
+    public event Action<int, string, string> OnApprovedSpeech; // order, userid, lang 전달 // 새로 추가
+    public event Action<int, string> OnInputAudioDone; // order와 text를 전달
+    public event Action<int> OnInputAudioFailed; // order만 전달
+
 
     private void OnMessageReceived(object sender, MessageEventArgs e)
     {
@@ -168,6 +172,9 @@ public class TranslationManager : Singleton<TranslationManager>
         dispatcher.Enqueue(() => {
             var data = JsonConvert.DeserializeObject<Dictionary<string, object>>(e.Data);
             Debug.Log($"[TranslationManager] Received message: {e.Data}");
+            
+            int order;
+            string userid;
             
             switch (data["type"] as string)
             {
@@ -195,7 +202,10 @@ public class TranslationManager : Singleton<TranslationManager>
                     break;
                     
                 case "conversation.text.delta":
-                    OnPartialTextReceived?.Invoke(data["text"] as string);
+                    order = Convert.ToInt32(data["order"]);
+                    string delta = data["delta"] as string;
+                    userid = data.ContainsKey("userid") ? data["userid"] as string : string.Empty;
+                    OnPartialTextReceived?.Invoke(order, delta, userid);
                     break;
                     
                 case "conversation.text.done":
@@ -211,11 +221,18 @@ public class TranslationManager : Singleton<TranslationManager>
                     break;
                     
                 case "conversation.approved_speech":
-                    string approvedUserId = data["userid"] as string;
-                    Debug.Log($"[TranslationManager] Speech approved for user: {approvedUserId}");
-                    OnSpeechApproved?.Invoke(approvedUserId);  // 올바른 이벤트 사용
+                    order = Convert.ToInt32(data["order"]);
+                    userid = data.ContainsKey("userid") ? data["userid"] as string : string.Empty;
+                    string lang = data.ContainsKey("lang") ? data["lang"] as string : string.Empty;
+                    OnApprovedSpeech?.Invoke(order, userid, lang);
                     break;
                     
+                case "conversation.input_audio.done":
+                    int inputOrder = Convert.ToInt32(data["order"]);
+                    string text = data["text"] as string;
+                    OnInputAudioDone?.Invoke(inputOrder, text);
+                    break;
+
                 default:
                     Debug.LogWarning($"Unknown message type: {data["type"]}");
                     break;

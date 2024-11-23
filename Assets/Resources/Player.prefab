@@ -52,6 +52,8 @@ GameObject:
   - component: {fileID: 7565915155276298646}
   - component: {fileID: -4895892325606732436}
   - component: {fileID: 482820505274672015}
+  - component: {fileID: 7860172934546485773}
+  - component: {fileID: 248349508910300428}
   m_Layer: 6
   m_Name: Player
   m_TagString: Player
@@ -199,7 +201,7 @@ MonoBehaviour:
   move: {x: 0, y: 0}
   look: {x: 0, y: 0}
   jump: 0
-  sprint: 0
+  sprint: 1
   analogMovement: 0
   cursorLocked: 0
   cursorInputForLook: 1
@@ -317,7 +319,7 @@ MonoBehaviour:
   interactionDistance: 3.5
   interactionMask:
     serializedVersion: 2
-    m_Bits: 448
+    m_Bits: 960
 --- !u!114 &5314692284667752275
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -375,7 +377,6 @@ MonoBehaviour:
   femaleAvatar: {fileID: 9000000, guid: e3f26e14f277c6d4c97ab6487552b69b, type: 3}
   customTShirts: {fileID: 1949119677455146609, guid: e95e37fd90ff3c647a9b2c807e05a0c6,
     type: 3}
-  OwnerUID: 
 --- !u!114 &-4895892325606732436
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -419,6 +420,32 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5b51c2d356886e4409d9d16683254d4d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &7860172934546485773
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5829460551445718063}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 16d6b2a5507983b45aaee3dc181f7529, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  uid: 
+  uuid: 
+--- !u!114 &248349508910300428
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5829460551445718063}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ae8959c876de59a4cbd4bb68d61a83be, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &7715952276264333579

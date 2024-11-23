@@ -1,13 +1,11 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Photon.Pun;
 using Firebase.Auth;
 
 public class CardMaker : MonoBehaviour
 {
     public UICardMaker uiCardMaker;
-
 
     private void Start()
     {

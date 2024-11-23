@@ -4,6 +4,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.UI;
+using TMPro;
 using System.Linq;  // Text 컴포넌트 사용을 위해 추가
 
 /// <summary>
@@ -13,6 +14,7 @@ using System.Linq;  // Text 컴포넌트 사용을 위해 추가
 /// - 발화 상태 UI 관리
 /// - 다중 사용자 간 발화 제어
 /// </summary>
+
 [RequireComponent(typeof(PhotonView))]
 public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
 {
@@ -43,12 +45,31 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
     [SerializeField] private GameObject cantSpeakUI;            // 발언 불가 시 표시할 UI
     [SerializeField] private GameObject speakButton;            // 발언 가능 상태 표시 UI
     [SerializeField] private GameObject waitingText;            // 대기 상태 표시 UI
-    [SerializeField] private Text errorMessageUI;               // 에러 메시지 UI (TMP -> Text)
+    [SerializeField] private Text errorMessageUI;              // 에러 메시지 UI (TMP -> Text)
+    [SerializeField] private ScrollRect translationScrollView;              // Scroll View
+    //[SerializeField] private GameObject translationTextPrefab;              // 프리팹
+    [SerializeField] private GameObject MessageBubble_Original_Mine;   // 내가 말한 메시지 프리팹 (흰색)
+    [SerializeField] private GameObject MessageBubble_Original_Yours;  // 상대방이 말한 메시지 프리팹 (파란색)
+    [SerializeField] private GameObject MessageBubble_Translated;      // 번역된 메시지 프리팹
+    private Dictionary<int, TextMeshProUGUI> translationTexts = new Dictionary<int, TextMeshProUGUI>();                 // order별로 저장
 
     // 에러 메시지 관련
     private float errorMessageDisplayTime = 3f;                // 에러 메시지 표시 시간
     private Coroutine errorMessageCoroutine;                  // 에러 메시지 표시 코루틴
     private float lastEventTime = 0f;
+
+    private class MessageData
+    {
+        public GameObject userMessagePrefab;
+        public GameObject translationPrefab;
+        public int order;
+        public string userid;
+        public bool isMine;
+    }
+
+    private List<MessageData> messages = new List<MessageData>();
+
+    private int currentOrder = -1; // 현재 발언 순번
 
     /// <summary>
     /// 발언 가능 상태에 따라 UI를 업데이트
@@ -87,16 +108,18 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
     /// <summary>
     /// 매 프레임마다 입력 체크
     /// </summary>
-    private void FixedUpdate()
+    private void Update()
     {
         // 발언 키(M) 눌렀을 때
         if (Input.GetKeyDown(speakKey))
         {
+            Debug.Log("M키가 눌렸습니다.");
             TryStartRecording();
         }
         // 발언 키(M)에서 손을 뗐을 때
         else if (Input.GetKeyUp(speakKey))
         {
+            Debug.Log("M키에서 손을 뗐습니다.");
             StopRecording();
         }
         // 취소 키(ESC)를 눌렀을 때
@@ -124,6 +147,7 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
     private void TryStartRecording()
     {
         string userId = FireAuthManager.Instance.GetCurrentUser().UserId;
+
         if (!TranslationEventHandler.Instance.IsRoomReady)
         {
             ShowWaitingUI("통역을 시작하려면 다른 언어 사용자가 필요합니다");
@@ -141,6 +165,25 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
         TranslationManager.Instance.RequestSpeech();
     }
 
+    public void OnApprovedSpeech(int order, string userid, string lang)
+    {
+        currentOrder = order;
+
+        if (userid == FireAuthManager.Instance.GetCurrentUser().UserId)
+        {
+            // 내가 발언권을 얻은 경우
+            ShowCanSpeakUI();
+            Debug.Log("UI 표시됨: ShowCanSpeakUI() 실행 in OnApprovedSpeech()");
+            StartRecording();
+            Debug.Log("녹음 시작됨: StartRecording() 실행 in OnApprovedSpeech()");
+        }
+        else
+        {
+            // 다른 사용자가 발언권을 얻은 경우
+            // 필요에 따라 처리
+        }
+    }
+
     /// <summary>
     /// 실제 녹음 시작
     /// </summary>
@@ -154,6 +197,16 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
         isRecording = true;
         recordingPosition = 0;
         
+        // MessageData 생성
+        MessageData messageData = new MessageData();
+        messageData.isMine = true;
+        messageData.order = currentOrder;
+        messageData.userid = FireAuthManager.Instance.GetCurrentUser().UserId;
+
+        // 내 메시지 프리팹 생성
+        messageData.userMessagePrefab = Instantiate(MessageBubble_Original_Mine, translationScrollView.content);
+        messages.Add(messageData);
+
         // 사용 가능한 마이크 확인
         string[] devices = Microphone.devices;
         if (devices.Length == 0)
@@ -218,6 +271,143 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
         TranslationEventHandler.Instance.ResetSpeaker();
     }
 
+    public void OnInputAudioDone(int order, string text)
+    {
+        // order로 메시지 데이터를 찾음
+        MessageData messageData = messages.FirstOrDefault(m => m.order == order);
+
+        if (messageData != null)
+        {
+            // 발화자가 나인지 상대방인지에 따라 적절한 컴포넌트를 찾습니다.
+            string contentName = messageData.isMine ? "Content_Mine" : "Content_Yours";
+            TextMeshProUGUI contentText = messageData.userMessagePrefab.transform.Find(contentName)?.GetComponent<TextMeshProUGUI>();
+            if (contentText != null)
+            {
+                contentText.text = text;
+                Debug.Log($"Updated original text for order: {order}");
+            }
+            else
+            {
+                Debug.LogError($"{contentName} TMP component not found");
+            }
+        }
+        else
+        {
+            Debug.LogError($"MessageData not found for order: {order}");
+        }
+    }
+
+
+    public void OnOtherInputAudioDone(int order, string text, string speakerId)
+    {
+        // 상대방의 메시지 처리
+        MessageData messageData = new MessageData();
+        messageData.isMine = (speakerId == FireAuthManager.Instance.GetCurrentUser().UserId);
+        messageData.order = order;
+        messageData.userid = speakerId;
+
+        // 발화자에 따라 적절한 프리팹 선택
+        if (messageData.isMine)
+        {
+            messageData.userMessagePrefab = Instantiate(MessageBubble_Original_Mine, translationScrollView.content);
+        }
+        else
+        {
+            messageData.userMessagePrefab = Instantiate(MessageBubble_Original_Yours, translationScrollView.content);
+        }
+
+        // 텍스트 업데이트
+        string contentName = messageData.isMine ? "Content_Mine" : "Content_Yours";
+        TextMeshProUGUI contentText = messageData.userMessagePrefab.transform.Find(contentName)?.GetComponent<TextMeshProUGUI>();
+        if (contentText != null)
+        {
+            contentText.text = text;
+        }
+        else
+        {
+            Debug.LogError($"{contentName} TMP component not found");
+        }
+
+        // 번역 메시지 프리팹 생성
+        messageData.translationPrefab = Instantiate(MessageBubble_Translated, translationScrollView.content);
+
+        // translationPrefab을 userMessagePrefab 아래에 위치시킴
+        int index = messageData.userMessagePrefab.transform.GetSiblingIndex();
+        messageData.translationPrefab.transform.SetSiblingIndex(index + 1);
+
+        messages.Add(messageData);
+    }
+
+
+    public void UpdatePartialTranslatedText(int order, string partialText, string speakerId)
+    {
+        Debug.Log($"[Translation Debug] Starting UpdatePartialTranslatedText for order: {order}");
+
+        // order로 메시지 데이터를 찾음
+        MessageData messageData = messages.FirstOrDefault(m => m.order == order);
+
+        // 메시지 데이터가 없는 경우 새로 생성
+        if (messageData == null)
+        {
+            bool isMine = (speakerId == FireAuthManager.Instance.GetCurrentUser().UserId);
+
+            messageData = new MessageData();
+            messageData.order = order;
+            messageData.isMine = isMine;
+            messageData.userid = speakerId;
+
+            // 발화자에 따라 적절한 프리팹 선택
+            if (isMine)
+            {
+                messageData.userMessagePrefab = Instantiate(MessageBubble_Original_Mine, translationScrollView.content);
+            }
+            else
+            {
+                messageData.userMessagePrefab = Instantiate(MessageBubble_Original_Yours, translationScrollView.content);
+            }
+
+            messages.Add(messageData);
+            Debug.Log($"Created new MessageData for order: {order}, isMine: {isMine}");
+        }
+
+        // 번역 프리팹이 없는 경우에만 생성
+        if (messageData.translationPrefab == null)
+        {
+            Debug.Log("[Translation Debug] Creating new translation prefab");
+            messageData.translationPrefab = Instantiate(MessageBubble_Translated, translationScrollView.content);
+            int index = messageData.userMessagePrefab.transform.GetSiblingIndex();
+            messageData.translationPrefab.transform.SetSiblingIndex(index + 1);
+            Debug.Log($"[Translation Debug] Translation prefab created and positioned at index: {index + 1}");
+        }
+
+        // 번역된 내용을 표시하는 TextMeshProUGUI 컴포넌트를 찾습니다.
+        TextMeshProUGUI textComponent = messageData.translationPrefab.transform.Find("TranslatedContent")?.GetComponent<TextMeshProUGUI>();
+        if (textComponent != null)
+        {
+            // 기존 텍스트에 partialText를 추가합니다.
+            textComponent.text += partialText;
+
+            Debug.Log($"[Translation Debug] Updated accumulated text: {textComponent.text}");
+
+            if (translationScrollView != null)
+            {
+                StartCoroutine(ScrollToBottomNextFrame());
+            }
+        }
+        else
+        {
+            Debug.LogError("[Translation Debug] Failed to find TranslatedContent component");
+        }
+    }
+
+
+    private IEnumerator ScrollToBottomNextFrame()
+    {
+        yield return null;
+        Canvas.ForceUpdateCanvases();
+        translationScrollView.verticalNormalizedPosition = 0f;
+    }
+
     /// <summary>
     /// 녹음된 오디오 데이터를 base64 문자열로 변환
     /// </summary>
@@ -229,7 +419,7 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
             return string.Empty;
         }
         
-        Debug.Log($"[Debug] 샘플 배열 크기: {samples.Length}");
+        // Debug.Log($"[Debug] 샘플 배열 크기: {samples.Length}");
         
         // float[] to byte[] 변환
         short[] intData = new short[samples.Length];
@@ -250,11 +440,11 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
             intData[i] = (short)(sample * rescaleFactor);
         }
         
-        Debug.Log($"[Debug] 0이 아닌 샘플 수: {nonZeroSamples}");
+        // Debug.Log($"[Debug] 0이 아닌 샘플 수: {nonZeroSamples}");
 
         Buffer.BlockCopy(intData, 0, bytesData, 0, bytesData.Length);
         string result = Convert.ToBase64String(bytesData);
-        Debug.Log($"[Debug] 최종 base64 문자열 길이: {result.Length}");
+        // Debug.Log($"[Debug] 최종 base64 문자열 길이: {result.Length}");
         
         return result;
     }
@@ -269,36 +459,36 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
         try
         {
             // base64 디코딩 과정 로깅
-            Debug.Log($"[Audio] Received base64 length: {base64AudioData.Length}");
+            // Debug.Log($"[Audio] Received base64 length: {base64AudioData.Length}");
             
             byte[] audioData = Convert.FromBase64String(base64AudioData);
-            Debug.Log($"[Audio] Converted to bytes length: {audioData.Length}");
+            // Debug.Log($"[Audio] Converted to bytes length: {audioData.Length}");
             
             short[] shortArray = new short[audioData.Length / 2];
             Buffer.BlockCopy(audioData, 0, shortArray, 0, audioData.Length);
-            Debug.Log($"[Audio] Converted to shorts length: {shortArray.Length}");
+            // Debug.Log($"[Audio] Converted to shorts length: {shortArray.Length}");
             
             float[] samples = new float[shortArray.Length];
             for (int i = 0; i < shortArray.Length; i++)
             {
                 samples[i] = shortArray[i] / 32768f;
             }
-            Debug.Log($"[Audio] Final samples length: {samples.Length}");
+            // Debug.Log($"[Audio] Final samples length: {samples.Length}");
 
             // 현재 청크의 길이를 초 단위로 계산
             float currentChunkSeconds = (float)samples.Length / RECORDING_FREQUENCY;
-            Debug.Log($"[Audio] 현재 청크 duration: {currentChunkSeconds:F2} seconds");
+            // Debug.Log($"[Audio] 현재 청크 duration: {currentChunkSeconds:F2} seconds");
 
             // 유효한 오디오 데이터 체크
             bool hasValidAudio = samples.Any(s => Mathf.Abs(s) > 0.0001f);
-            Debug.Log($"[Audio] Contains valid audio data: {hasValidAudio}");
+            // Debug.Log($"[Audio] Contains valid audio data: {hasValidAudio}");
 
             if (hasValidAudio)
             {
                 audioBuffer.AddRange(samples);
                 // 전체 버퍼의 길이를 초 단위로 계산
                 float totalBufferSeconds = (float)audioBuffer.Count / RECORDING_FREQUENCY;
-                Debug.Log($"[Audio] 전체 버퍼 duration: {totalBufferSeconds:F2} seconds");
+                // Debug.Log($"[Audio] 전체 버퍼 duration: {totalBufferSeconds:F2} seconds");
                 StartAudioBuffer();
             }
             else
@@ -317,9 +507,9 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
     /// </summary>
     private void StartAudioBuffer()
     {
-        Debug.Log($"[Audio] Buffer status - Size: {audioBuffer.Count}, IsPlaying: {isPlaying}");
+        // Debug.Log($"[Audio] Buffer status - Size: {audioBuffer.Count}, IsPlaying: {isPlaying}");
         float bufferDuration = (float)audioBuffer.Count / RECORDING_FREQUENCY;
-        Debug.Log($"[Audio] Buffer duration: {bufferDuration:F2} seconds");
+        // Debug.Log($"[Audio] Buffer duration: {bufferDuration:F2} seconds");
         
         // 최소 버퍼 크기를 0.1초로 설정 (2400 샘플)
         const int MIN_BUFFER_SIZE = RECORDING_FREQUENCY / 10;  // 2400 = 0.1초
@@ -349,7 +539,7 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
         {
             // 현재 버퍼의 전체 길이를 초 단위로 계산
             float bufferDuration = (float)audioBuffer.Count / RECORDING_FREQUENCY;
-            Debug.Log($"[Audio] Current buffer duration: {bufferDuration:F2} seconds");
+            // Debug.Log($"[Audio] Current buffer duration: {bufferDuration:F2} seconds");
             
             // 버퍼의 모든 데이터를 한 번에 재생
             int sampleCount = audioBuffer.Count;
@@ -367,7 +557,7 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
                 translatedAudioSource.clip = clip;
                 translatedAudioSource.Play();
                 float duration = (float)sampleCount / RECORDING_FREQUENCY;
-                Debug.Log($"[Audio] Playing clip of length: {duration:F2} seconds");
+                // Debug.Log($"[Audio] Playing clip of length: {duration:F2} seconds");
                 
                 // 클립이 완전히 재생될 때까지 대기
                 yield return new WaitForSeconds(duration);
@@ -470,18 +660,18 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
     /// <summary>
     /// 발언권 승인 처리
     /// </summary>
-    public void OnSpeechApproved(string approvedUserId)
-    {
-        print("OnSpeechApproved(발언권 승인됨)");
-        if (FireAuthManager.Instance.GetCurrentUser().UserId == approvedUserId)
-        {
-            ShowCanSpeakUI();
-            Debug.Log("UI 표시됨: ShowCanSpeakUI() 실행");
-            StartRecording();
-            Debug.Log("녹음 시작됨: StartRecording() 실행");
+    // public void OnSpeechApproved(string approvedUserId)
+    // {
+    //     print("OnSpeechApproved(발언권 승인됨)");
+    //     if (FireAuthManager.Instance.GetCurrentUser().UserId == approvedUserId)
+    //     {
+    //         ShowCanSpeakUI();
+    //         Debug.Log("UI 표시됨: ShowCanSpeakUI() 실행");
+    //         StartRecording();
+    //         Debug.Log("녹음 시작됨: StartRecording() 실행");
 
-        }
-    }
+    //     }
+    // }
 
     /// <summary>
     /// 에러 처리
@@ -549,4 +739,72 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
         if (speakButton != null)
             speakButton.SetActive(true);
     }
+
+    // 부분 번역된 텍스트를 업데이트하는 메서드
+    // 이전의 것
+    /*
+    public void UpdatePartialTranslatedText(int order, string partialText)
+    {
+        if (translationScrollView == null || translationTextPrefab == null)
+        {
+            Debug.LogError("필수 UI 컴포넌트가 할당되지 않았습니다!");
+            return;
+        }
+
+        try
+        {
+            if (!translationTexts.ContainsKey(order))
+            {
+                // 새로운 order이므로 프리팹 생성
+                CreateNewTranslationText(order);
+            }
+
+            if (translationTexts.TryGetValue(order, out TextMeshProUGUI textComponent))
+            {
+                // 텍스트 업데이트
+                textComponent.text = partialText;
+                
+                // UI 업데이트를 다음 프레임에서 실행
+                StartCoroutine(ScrollToBottomNextFrame());
+            }
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"텍스트 업데이트 중 오류 발생: {e.Message}");
+        }
+    }
+    */
+
+    //private void CreateNewTranslationText(int order)
+    //{
+    //    if (translationScrollView.content == null)
+    //    {
+    //        Debug.LogError("ScrollView의 content가 없습니다!");
+    //        return;
+    //    }
+
+    //    // 프리팹 인스턴스 생성
+    //    GameObject newTextObj = Instantiate(translationTextPrefab, translationScrollView.content);
+    //    TextMeshProUGUI newText = newTextObj.GetComponent<TextMeshProUGUI>();
+
+    //    if (newText != null)
+    //    {
+    //        translationTexts.Add(order, newText);
+    //    }
+    //    else
+    //    {
+    //        Debug.LogError("프리팹에 TextMeshProUGUI 컴포넌트가 없습니다!");
+    //    }
+    //}
+
+    // 발화가 완료되었을 때 호출되는 메서드
+    public void OnCompleteAudioReceived()
+    {
+        // ... 기존 코드 ...
+
+        // 발화 완료 시 처리할 내용이 있다면 여기에 추가
+        // 예를 들어 오래된 텍스트를 정리하는 등
+    }
+
+    
 }
