@@ -41,10 +41,11 @@ public class SummaryMgr : MonoBehaviourPun
                 if (player != null)
                 {
                     // TODO: uid -> uuid
-                    RequestSummary((string)player.CustomProperties["id"], (string)PhotonNetwork.LocalPlayer.CustomProperties["id"], CashedDataFromDatabase.Instance.playerLanguage.language, OnDataLoaded);
+                    RequestSummary((string)player.CustomProperties["id"], CashedDataFromDatabase.Instance.playerInfo.uuid, CashedDataFromDatabase.Instance.playerLanguage.language, OnDataLoaded);
                 }
             }
-            RequestSummary(FireAuthManager.Instance.GetCurrentUser().UserId, "cf79ea17-a487-4b27-a20d-bbd11ff885da", CashedDataFromDatabase.Instance.playerLanguage.language, OnDataLoaded);
+            if(OtherPlayers.Count == 0)
+                RequestSummary(FireAuthManager.Instance.GetCurrentUser().UserId, CashedDataFromDatabase.Instance.playerInfo.uuid, CashedDataFromDatabase.Instance.playerLanguage.language, OnDataLoaded);
         }
             //GetRequestJson(PhotonNetwork.CurrentRoom., PhotonNetwork.CurrentRoom.Players[PhotonNetwork.CurrentRoom.MasterClientId].CustomProperties["id"]);
     }

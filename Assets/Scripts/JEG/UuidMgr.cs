@@ -21,7 +21,7 @@ public class PlayerInfo
         this.userName = userName;
         this.companyName = companyName;
         this.companyUuid = companyUuid;
-        this.language = "KO";
+        this.language = "ko";
     }
 }
 public class UuidMgr : MonoBehaviour

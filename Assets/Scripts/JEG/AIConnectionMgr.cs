@@ -167,7 +167,7 @@ public class AIConnectionMgr : MonoBehaviour
         //string jsonData = JsonUtility.ToJson(userInfo);
 
 
-        string jsonData = JsonConvert.SerializeObject(GetTestUserInfo(situationText, CashedDataFromDatabase.Instance.playerLanguage.language), Formatting.None);
+        string jsonData = JsonConvert.SerializeObject(GetTestUserInfo(situationText, LanguageSingleton.Instance.language), Formatting.None);
         print(jsonData);
         using (UnityWebRequest www = UnityWebRequest.PostWwwForm(url, ""))
         {
