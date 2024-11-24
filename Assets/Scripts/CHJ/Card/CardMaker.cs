@@ -27,6 +27,7 @@ public class CardMaker : MonoBehaviour
         print("company saved uuid: " + uuid);
 
         DatabaseManager.Instance.SaveData<Card>(myCard);
+        UuidMgr.Instance.cashedCard = myCard;
         print("Save data in database");
     }
 }

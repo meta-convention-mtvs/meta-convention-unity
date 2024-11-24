@@ -35,7 +35,7 @@ public class CreateBooth : MonoBehaviourPun
         {
             if (data.userType == UserTypeData.UserType.company)
             {
-                DatabaseManager.Instance.GetData<BoothCustomizeData>(OnLoadBoothData);
+                DatabaseManager.Instance.GetCompanyData<BoothCustomizeData>(CashedDataFromDatabase.Instance.playerInfo.uuid, OnLoadBoothData);
                 DatabaseManager.Instance.GetData<BoothPosition>(OnLoadBoothPosition);
             }
         }
