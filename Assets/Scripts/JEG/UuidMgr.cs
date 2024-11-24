@@ -21,7 +21,7 @@ public class PlayerInfo
         this.userName = userName;
         this.companyName = companyName;
         this.companyUuid = companyUuid;
-        this.language = "KO";
+        this.language = "ko";
     }
 }
 public class UuidMgr : MonoBehaviour
@@ -31,7 +31,7 @@ public class UuidMgr : MonoBehaviour
     string url = "http://ec2-3-36-111-173.ap-northeast-2.compute.amazonaws.com:6576/translation/uuid";
     
     public PlayerInfo currentUserInfo = new PlayerInfo("방","구","뿡","뿡");
-    
+    public Card cashedCard;
 
     [System.Serializable]
     public class UuidCompany
@@ -77,6 +77,8 @@ public class UuidMgr : MonoBehaviour
         Debug.Log($"Closest Company UUID: {closestCompany.uuid}");
 
         currentUserInfo.companyUuid = closestCompany.uuid;
+        cashedCard.uuid = currentUserInfo.companyUuid;
+        DatabaseManager.Instance.SaveData<Card>(cashedCard);
     }
 
     private int LevenshteinDistance(string a, string b)
@@ -120,6 +122,8 @@ public class UuidMgr : MonoBehaviour
         {
             Debug.Log("response: " + www.downloadHandler.text);
             currentUserInfo.companyUuid = www.downloadHandler.text;
+            cashedCard.uuid = currentUserInfo.companyUuid;
+            DatabaseManager.Instance.SaveData<Card>(cashedCard);
         }
     }
 

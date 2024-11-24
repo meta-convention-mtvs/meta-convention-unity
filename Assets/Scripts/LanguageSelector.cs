@@ -48,10 +48,16 @@ public class LanguageSelector : MonoBehaviour
         {
             Language languageData = new Language();
             languageData.language = languageDictionary[languageIndex].key;
+            LanguageSingleton.Instance.language = languageData.language;
             DatabaseManager.Instance.SaveData<Language>(languageData);
         }
     }
 
+}
+
+public class LanguageSingleton : Singleton<LanguageSingleton>
+{
+    public string language;
 }
 
 [FirestoreData]

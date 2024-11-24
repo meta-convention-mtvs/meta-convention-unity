@@ -41,7 +41,7 @@ public class BoothRuntimeCreate : MonoBehaviourPun
 
     void LoadBoothCustomizeData(string uid)
     {
-        DatabaseManager.Instance.GetDataFrom<BoothCustomizeData>(uid, OnLoadBoothCustomizeData);
+        DatabaseManager.Instance.GetCompanyData<BoothCustomizeData>(uid, OnLoadBoothCustomizeData);
     }
 
     void OnLoadBoothCustomizeData(BoothCustomizeData data)
