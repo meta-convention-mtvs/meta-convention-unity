@@ -79,6 +79,11 @@ public class InteractableAIEmployeeObject : MonoBehaviourPun, IKeyInteractableOb
         MainHallVirtualCameraMovement.Instance.SetActiveVirtualCamera(MainHallVirtualCameraMovement.Instance.playerFollowCamera);
     }
 
+    private void Awake()
+    {
+        ownerUID = GetComponent<UID>();
+        ownerUID.OnUUIDChanged += SetUUID;
+    }
     void Start()
     {
         voiceManager = GameObject.FindWithTag("VoiceManager").GetComponent<VoiceManager>();
@@ -90,8 +95,7 @@ public class InteractableAIEmployeeObject : MonoBehaviourPun, IKeyInteractableOb
             Debug.LogError("Can't find AISpeackUI, set tag");
         if (businessRoomReservator == null)
             Debug.LogError("Can't find BusinessRoomReservator, set tag");
-        ownerUID = GetComponent<UID>();
-        ownerUID.OnUUIDChanged += SetUUID;
+
     }
 
     void SetUUID(string id)
