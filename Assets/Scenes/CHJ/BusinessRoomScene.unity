@@ -1949,12 +1949,12 @@ GameObject:
   - component: {fileID: 911049896}
   - component: {fileID: 911049898}
   m_Layer: 0
-  m_Name: PlayerTranslaotr
+  m_Name: PlayerTranslator
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &911049896
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2007,6 +2007,7 @@ MonoBehaviour:
   speakKey: 109
   maxRecordingTime: 60
   cancelKey: 27
+  resetKey: 114
   scrollAnimationDuration: 0.5
   cantSpeakUI: {fileID: 772408038}
   speakButton: {fileID: 857600867}
@@ -2019,6 +2020,7 @@ MonoBehaviour:
     type: 3}
   MessageBubble_Translated: {fileID: 3919862047583343298, guid: 40c5ae8d761191b4dae5df81b6bf98f0,
     type: 3}
+  translationRoomIDSynchronizer: {fileID: 1293157917}
 --- !u!1 &959575106
 GameObject:
   m_ObjectHideFlags: 0
@@ -13868,6 +13870,21 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1184646038803004896, guid: a41ad0b139dc4554c90f739f9af87c18,
+        type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1184646038803004896, guid: a41ad0b139dc4554c90f739f9af87c18,
+        type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1184646038803004896, guid: a41ad0b139dc4554c90f739f9af87c18,
+        type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2312369400450377703, guid: a41ad0b139dc4554c90f739f9af87c18,
         type: 3}
       propertyPath: m_Value
@@ -28147,3 +28164,4 @@ SceneRoots:
   - {fileID: 419380236}
   - {fileID: 652563297}
   - {fileID: 3788673536866897971}
+  - {fileID: 1225886219}

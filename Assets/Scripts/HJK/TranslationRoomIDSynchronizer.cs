@@ -34,11 +34,11 @@ public class TranslationRoomIDSynchronizer : MonoBehaviourPunCallbacks
     void CreateRoom()
     {
         // 이 스크립트는 공용 오브젝트에 붙을 것이다 => owner이면 isMine은 true, 아니면 false
-        if (photonView.IsMine)
+        if (PhotonNetwork.CurrentRoom.Name == FireAuthManager.Instance.GetCurrentUser().UserId)
         {
             string userID = FireAuthManager.Instance.GetCurrentUser().UserId;
             // 내가 owner이다 room create를 요청하자
-            TranslationManager.Instance.CreateRoom(userID, CashedDataFromDatabase.Instance.playerLanguage.language);
+            TranslationManager.Instance.CreateRoom(userID, CashedDataFromDatabase.Instance.playerLanguage.language, CashedDataFromDatabase.Instance.playerInfo.uuid);
         }
     }
 

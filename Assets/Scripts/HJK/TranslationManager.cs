@@ -136,14 +136,14 @@ public class TranslationManager : Singleton<TranslationManager>
         }
     }
 
-    public void CreateRoom(string userId, string language)
+    public void CreateRoom(string userId, string language, string orgid)
     {
         var message = new Dictionary<string, object>
         {
             { "type", "room.create" },
             { "lang", language },
             { "userid", userId },
-            { "orgid", userId }
+            { "orgid", orgid }
         };
         Send(message);
     }
