@@ -86,6 +86,9 @@ public class TranslationRoomIDSynchronizer : MonoBehaviourPunCallbacks
         Debug.Log("[ResetProcess] 시작");
         isResetting = true;
         
+        // 메시지 큐 초기화 추가
+        TranslationEventHandler.Instance.ClearMessageQueue();
+        
         // 1. 현재 방에서 나가기
         if (!string.IsNullOrEmpty(TranslationManager.Instance.CurrentRoomID))
         {

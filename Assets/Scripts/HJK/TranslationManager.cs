@@ -82,10 +82,10 @@ public class TranslationManager : Singleton<TranslationManager>
     // 기존의 Connect 메서드 수정
     public void Connect()
     {
-        Debug.Log("[TranslationManager] Connect method called");
+        // Debug.Log("[TranslationManager] Connect method called");
         if (ws != null && ws.IsAlive || isConnecting)
         {
-            Debug.Log("[TranslationManager] Already connected or connecting");
+            // Debug.Log("[TranslationManager] Already connected or connecting");
             return;
         }
 
@@ -98,7 +98,7 @@ public class TranslationManager : Singleton<TranslationManager>
             ws.OnError += Ws_OnError;
             ws.OnClose += Ws_OnClose;
             ws.Connect();
-            Debug.Log("[TranslationManager] Connecting...");
+            // Debug.Log("[TranslationManager] Connecting...");
         }
         catch (Exception e)
         {
@@ -127,7 +127,7 @@ public class TranslationManager : Singleton<TranslationManager>
         // OnConnect 이벤트 호출 추가
         if (OnConnect != null)
         {
-            Debug.Log("[TranslationManager] OnConnect 이벤트 발생");
+            // Debug.Log("[TranslationManager] OnConnect 이벤트 발생");
             OnConnect.Invoke();
         }
     }
@@ -238,7 +238,7 @@ public class TranslationManager : Singleton<TranslationManager>
         var message = e.Data;
         dispatcher.Enqueue(() =>
         {
-            Debug.Log($"[TranslationManager] Received message: {message}");
+            // Debug.Log($"[TranslationManager] Received message: {message}");
             var data = JsonConvert.DeserializeObject<Dictionary<string, object>>(message);
             string type = data["type"].ToString();
 

@@ -144,13 +144,13 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
         if (Input.GetKeyDown(resetKey))
         {
             string userId = FireAuthManager.Instance.GetCurrentUser().UserId;
-            Debug.Log("[PlayerTranslator] R키 입력 감지");
+            // Debug.Log("[PlayerTranslator] R키 입력 감지");
             Debug.Log($"[PlayerTranslator] Reset 요청 전송 - UserId: {userId}");
             
             var synchronizer = FindObjectOfType<TranslationRoomIDSynchronizer>();
             if (synchronizer != null)
             {
-                Debug.Log("[PlayerTranslator] TranslationRoomIDSynchronizer 찾음");
+                // Debug.Log("[PlayerTranslator] TranslationRoomIDSynchronizer 찾음");
                 // RpcTarget.All 대신 RpcTarget.MasterClient 사용
                 synchronizer.photonView.RPC("RequestReset", RpcTarget.MasterClient, userId);
             }
@@ -205,9 +205,9 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
         {
             // 내가 발언권을 얻은 경우
             ShowCanSpeakUI();
-            Debug.Log("UI 표시됨: ShowCanSpeakUI() 실행 in OnApprovedSpeech()");
+            // Debug.Log("UI 표시됨: ShowCanSpeakUI() 실행 in OnApprovedSpeech()");
             StartRecording();
-            Debug.Log("녹음 시작됨: StartRecording() 실행 in OnApprovedSpeech()");
+            // Debug.Log("녹음 시작됨: StartRecording() 실행 in OnApprovedSpeech()");
         }
         else
         {
@@ -221,9 +221,9 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
     /// </summary>
     private void StartRecording()
     {
-        print("StartRecording(녹음 시작되는 함수에 진입)");
+        // print("StartRecording(녹음 시작되는 함수에 진입)");
         // currentSpeakerId 참조를 TranslationEventHandler로 변경
-        print("CurrentSpeakerId: " + TranslationEventHandler.Instance.CurrentSpeakerId);
+        // print("CurrentSpeakerId: " + TranslationEventHandler.Instance.CurrentSpeakerId);
         // if (!string.IsNullOrEmpty(TranslationEventHandler.Instance.CurrentSpeakerId)) return;
 
         isRecording = true;
@@ -250,7 +250,7 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
         }
 
         // 녹음 시작
-        Debug.Log("녹음을 진짜 시작하는 부분(recordingClip)");
+        // Debug.Log("녹음을 진짜 시작하는 부분(recordingClip)");
         recordingClip = Microphone.Start(null, true, (int)maxRecordingTime, RECORDING_FREQUENCY);
 
         // 실시간 스트리밍 코루틴 시작
@@ -347,7 +347,7 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
                 contentText.text = text;
                 if (translationScrollView != null)
                 {
-                    Debug.Log("ScrollToBottomNextFrame()가 OnInputAudioDone()에서 실행됨");
+                    // Debug.Log("ScrollToBottomNextFrame()가 OnInputAudioDone()에서 실행됨");
                     StartCoroutine(ScrollToBottomNextFrame());
                 }
                 Debug.Log($"Updated original text for order: {order}");
@@ -428,7 +428,6 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
 
             if (translationScrollView != null)
             {
-                Debug.Log("ScrollToBottomNextFrame()가 UpdatePartialTranslatedText()에서 실행됨");
                 StartCoroutine(ScrollToBottomNextFrame());
             }
         }
@@ -576,11 +575,11 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
         {
             if (playCoroutine != null)
             {
-                Debug.Log("[Audio] Stopping previous coroutine");
+                // Debug.Log("[Audio] Stopping previous coroutine");
                 StopCoroutine(playCoroutine);
             }
             
-            Debug.Log("[Audio] Starting new playback coroutine");
+            // Debug.Log("[Audio] Starting new playback coroutine");
             playCoroutine = StartCoroutine(PlayBufferedAudio());
         }
     }
@@ -591,7 +590,7 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
     private IEnumerator PlayBufferedAudio()
     {
         isPlaying = true;
-        Debug.Log("[Audio] Starting audio playback");
+        // Debug.Log("[Audio] Starting audio playback");
 
         while (audioBuffer.Count > 0 && !isAudioCancelled)
         {
@@ -601,7 +600,7 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
             
             // 버퍼의 모든 데이터를 한 번에 재생
             int sampleCount = audioBuffer.Count;
-            Debug.Log($"[Audio] Playing buffer of {sampleCount} samples");
+            // Debug.Log($"[Audio] Playing buffer of {sampleCount} samples");
             
             float[] playbackSamples = audioBuffer.ToArray();
             audioBuffer.Clear();
@@ -627,7 +626,7 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
             }
         }
 
-        Debug.Log("[Audio] Playback completed");
+        // Debug.Log("[Audio] Playback completed");
         isPlaying = false;
         playCoroutine = null;
     }

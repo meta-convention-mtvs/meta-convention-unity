@@ -238,4 +238,36 @@ public class TranslationEventHandler : Singleton<TranslationEventHandler>
         isRoomReady = state;
         OnRoomReadyStateChanged?.Invoke(state);
     }
+
+    public void ClearMessageQueue()
+    {
+        Debug.Log("[TranslationEventHandler] 메시지 큐 초기화 시작");
+        
+        // 메시지 큐 관련 모든 상태 초기화
+        if (messageQueue != null)
+        {
+            messageQueue.Clear();
+            Debug.Log("[TranslationEventHandler] 메시지 큐 클리어 완료");
+        }
+        
+        // 활성화된 메시지 버블들 정리
+        if (activeBubbles != null)
+        {
+            foreach (var bubble in activeBubbles.Values)
+            {
+                if (bubble != null)
+                {
+                    Destroy(bubble.gameObject);
+                }
+            }
+            activeBubbles.Clear();
+            Debug.Log("[TranslationEventHandler] 활성 메시지 버블 제거 완료");
+        }
+        
+        // 현재 메시지 관련 상태 초기화
+        currentMessageBubble = null;
+        currentSpeakerId = "";
+        
+        Debug.Log("[TranslationEventHandler] 메시지 큐 초기화 완료");
+    }
 }
