@@ -86,14 +86,7 @@ public class TranslationRoomIDSynchronizer : MonoBehaviourPunCallbacks
         Debug.Log("[ResetProcess] 시작");
         isResetting = true;
         
-        // 1. 메시지 초기화
-        var playerTranslator = FindObjectOfType<PlayerTranslatorWithoutRPC>();
-        if (playerTranslator != null)
-        {
-            playerTranslator.ClearMessages();
-        }
-        
-        // 2. 현재 방에서 나가기
+        // 1. 현재 방에서 나가기 (메시지 초기화는 LeaveCurrentRoom에서 처리)
         if (!string.IsNullOrEmpty(TranslationManager.Instance.CurrentRoomID))
         {
             Debug.Log("[ResetProcess] 기존 방에서 나가기");
@@ -103,18 +96,18 @@ public class TranslationRoomIDSynchronizer : MonoBehaviourPunCallbacks
             Debug.Log("[ResetProcess] 방 나가기 완료");
         }
         
-        // 3. 웹소켓 재연결
+        // 2. 웹소켓 재연결
         Debug.Log("[ResetProcess] 웹소켓 재연결");
         TranslationManager.Instance.Reconnect();
         
-        // 4. 웹소켓 재연결 대기
+        // 3. 웹소켓 재연결 대기
         yield return new WaitUntil(() => TranslationManager.Instance.IsConnected);
         Debug.Log("[ResetProcess] 웹소켓 재연결 완료");
         
-        // 5. 안정화 대기
+        // 4. 안정화 대기
         yield return new WaitForSeconds(1.0f);
         
-        // 6. 새로운 방 생성
+        // 5. 새로운 방 생성
         if (string.IsNullOrEmpty(TranslationManager.Instance.CurrentRoomID))
         {
             Debug.Log("[ResetProcess] 새로운 방 생성 시작");
@@ -129,7 +122,19 @@ public class TranslationRoomIDSynchronizer : MonoBehaviourPunCallbacks
     private void LeaveCurrentRoom()
     {
         Debug.Log("[TranslationRoomIDSynchronizer] 현재 방 나가기 실행");
+        
+        // 1. 메시지 버블 초기화
+        var playerTranslator = FindObjectOfType<PlayerTranslatorWithoutRPC>();
+        if (playerTranslator != null)
+        {
+            Debug.Log("[TranslationRoomIDSynchronizer] 메시지 초기화 시작");
+            playerTranslator.ClearMessages();
+        }
+        
+        // 2. 방 나가기
         TranslationManager.Instance.LeaveRoom();
+        
+        Debug.Log("[TranslationRoomIDSynchronizer] 방 나가기 및 메시지 초기화 완료");
     }
 
     private class TranslationState
