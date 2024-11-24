@@ -828,5 +828,37 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
         // 예를 들어 오래된 텍스트를 정리하는 등
     }
 
+    public void ClearMessages()
+    {
+        Debug.Log("[PlayerTranslator] 메시지 초기화 시작");
+        
+        // 1. UI 요소 정리
+        if (translationScrollView != null && translationScrollView.content != null)
+        {
+            foreach (var messageData in messages)
+            {
+                if (messageData.userMessagePrefab != null)
+                    Destroy(messageData.userMessagePrefab);
+                if (messageData.translationPrefab != null)
+                    Destroy(messageData.translationPrefab);
+            }
+        }
+        
+        // 2. 메시지 리스트 초기화
+        messages.Clear();
+        
+        // 3. 현재 진행중인 번역/음성 처리 중단
+        if (isRecording)
+        {
+            CancelRecording();
+        }
+        CancelAudioPlayback();
+        
+        // 4. 현재 순번 초기화
+        currentOrder = -1;
+        
+        Debug.Log("[PlayerTranslator] 메시지 초기화 완료");
+    }
+
     
 }

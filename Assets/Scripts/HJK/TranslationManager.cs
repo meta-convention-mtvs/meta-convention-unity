@@ -59,6 +59,10 @@ public class TranslationManager : Singleton<TranslationManager>
         
         try
         {
+            // 1. 누적 텍스트 초기화
+            accumulatedText.Clear();
+            
+            // 2. 기존 웹소켓 정리
             if (ws != null)
             {
                 Debug.Log("[TranslationManager] 기존 웹소켓 연결 종료");
