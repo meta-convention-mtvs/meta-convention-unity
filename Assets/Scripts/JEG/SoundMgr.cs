@@ -23,7 +23,12 @@ public class SoundMgr : Singleton<SoundMgr>
     // Update is called once per frame
     void Update()
     {
-        
+        if (Input.GetKeyDown(KeyCode.Alpha3))
+        {
+            idx++;
+        }
+
+
         // 씬 이동 이나 음악 변경이 필요할때 
         // idx 를 변경하면 idx가 변화를 감지하고 음악을 바꿔 줌
         if (idx != curidx) {

@@ -14,6 +14,7 @@ public class UICardMaker : MonoBehaviour
     public Button saveButton;
     public Text cardErrorText;
 
+
     public Action<string, string, string, string> OnSaveClick;
 
     private void Start()
@@ -28,6 +29,9 @@ public class UICardMaker : MonoBehaviour
             cardErrorText.text = "모든 필드를 채워주세요";
             return;
         }
+        UuidMgr.Instance.currentUserInfo.userName = nameInput.text;
+        UuidMgr.Instance.currentUserInfo.companyName = instituteInput.text;
+        UuidMgr.Instance.PrintUserInfo();
         OnSaveClick?.Invoke(nameInput.text, instituteInput.text, majorInput.text, phoneNumberInput.text);
         saveButton.gameObject.GetComponent<SceneTransition>().PerformTransition();
     }

@@ -2,11 +2,37 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Permissions;
 using UnityEngine;
+using UnityEngine.Networking;
+using UnityEngine.UI;
 
+public class PlayerInfo
+{
+    public string uid { get; set; }
+    public string userName { get; set; }
+    public string companyName { get; set; }
+    public string companyUuid { get; set; }
+    public string language { get; set; }
 
+    public PlayerInfo(string uid, string userName, string companyName, string companyUuid)
+    {
+        this.uid = uid;
+        this.userName = userName;
+        this.companyName = companyName;
+        this.companyUuid = companyUuid;
+        this.language = "KO";
+    }
+}
 public class UuidMgr : MonoBehaviour
 {
+    public static UuidMgr Instance;
+
+    string url = "http://ec2-3-36-111-173.ap-northeast-2.compute.amazonaws.com:6576/translation/uuid";
+    
+    public PlayerInfo currentUserInfo = new PlayerInfo("방","구","뿡","뿡");
+    
+
     [System.Serializable]
     public class UuidCompany
     {
@@ -22,23 +48,35 @@ public class UuidMgr : MonoBehaviour
 
     private UuidCompanyList companyData;
 
+    private void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
+
     void Start()
     {
+        // company name , uuid 연결하기 위해 json 파일 가져오기
         string filePath = Path.Combine(Application.streamingAssetsPath, "uuidb.json");
         string jsonData = File.ReadAllText(filePath);
 
         companyData = JsonUtility.FromJson<UuidCompanyList>($"{{\"companies\":{jsonData}}}");
-
-        string inputCompanyName = "Lockheed Martine Corporation";
-        string closestUUID = FindClosestCompanyUUID(inputCompanyName);
-
-        Debug.Log($"Closest Company UUID: {closestUUID}");
     }
 
-    public string FindClosestCompanyUUID(string inputCompanyName)
+    public void FindClosestCompanyUUID()
     {
-        UuidCompany closestCompany = companyData.companies.OrderBy(c => LevenshteinDistance(inputCompanyName, c.company_name)).First();
-        return closestCompany.uuid;
+        UuidCompany closestCompany = companyData.companies.OrderBy(c => LevenshteinDistance(currentUserInfo.companyName, c.company_name)).First();
+
+        Debug.Log($"Closest Company UUID: {closestCompany.uuid}");
+
+        currentUserInfo.companyUuid = closestCompany.uuid;
     }
 
     private int LevenshteinDistance(string a, string b)
@@ -50,7 +88,7 @@ public class UuidMgr : MonoBehaviour
 
         for (int i = 1; i <= a.Length; i++)
         {
-            for (int j = 1; j <= b.Length; j ++)
+            for (int j = 1; j <= b.Length; j++)
             {
                 int cost = (a[i - 1] == b[j - 1]) ? 0 : 1;
                 dp[i, j] = Mathf.Min(
@@ -61,34 +99,38 @@ public class UuidMgr : MonoBehaviour
         return dp[a.Length, b.Length];
     }
 
-
-
-    // Update is called once per frame
-    void Update()
+    public void GenerateUuid()
     {
-        
+        StartCoroutine(IGetUuid(url));
+    }
+
+    IEnumerator IGetUuid(string url)
+    {
+        UnityWebRequest www = new UnityWebRequest(url, "GET");
+        www.downloadHandler = new DownloadHandlerBuffer();
+        www.SetRequestHeader("Content-Type", "application/json");
+
+        yield return www.SendWebRequest();
+
+        if (www.result == UnityWebRequest.Result.ConnectionError || www.result == UnityWebRequest.Result.ProtocolError)
+        {
+            Debug.Log("Error: " + www.error);
+        }
+        else
+        {
+            Debug.Log("response: " + www.downloadHandler.text);
+            currentUserInfo.companyUuid = www.downloadHandler.text;
+        }
+    }
+
+    public void PrintUserInfo()
+    {
+        Debug.Log($"User ID: {currentUserInfo.uid}");
+        Debug.Log($"User Name: {currentUserInfo.userName}");
+        Debug.Log($"Company Name: {currentUserInfo.companyName}");
+        Debug.Log($"Company UUID: {currentUserInfo.companyUuid}");
     }
 }
-
-// 유저 데이터 저장
-// 유저 데이터에서 기업 이름으로 uuid 할당하기
-// .. 유저는 uuid 가지고만 있으면 될.. 듯?
-// TODO: user class, 데이터에  uuid 항목 만들기
-// TODO: uuid 할당하는 함수 만들기 (기업명 -> uuid)
-
-
-
-// 부스 셋팅 있다 없다 true false 
-// 기업 uuid 기반으로 기업 데이터 저장
-// 기업의 부스, 기업 정보 데이터가 있다면 사용하고..
-// 없으면 저장 시키기
-// 경로 변경만 잘하면.. 그대로 이용 할 수 있..는...ㄱ... 아님./. ? 
-// 일단 항목 잘 살리면서 유지 할 것
-
-
-// 트레이닝 정보도.. uuid 기반으로 저장, 접근 해야 함
-// 우리가 건드릴게 있나? 
-// 그냥 받은거 있으면 uuid 기반으로 경로 잘 정해서 저장 해주기
 
 
 
