@@ -31,7 +31,7 @@ public class MewtwoEX : MonoBehaviour
         ApplyBoothDatasFromDatabaseInList(boothList);
 
     }
-
+    #region 안씀
     private async Task ApplyAvatarDatasFromDatabaseInList(GameObject[] playerList)
     {
         List<UID> uidList = GetUidCompontentsIn(playerList);
@@ -60,7 +60,7 @@ public class MewtwoEX : MonoBehaviour
 
             if (data.isCustomTop)
             {
-                var texture = await AsyncDatabase.GetTextureFromDatabaseWithUid(uidComponent.uid, data.customImageFileName);
+                var texture = await AsyncDatabase.GetLogoFromDatabaseWithUid(uidComponent.uid, data.customImageFileName);
                 runtimeCreate.OnLoadTexture(texture);
             }
 
@@ -72,6 +72,7 @@ public class MewtwoEX : MonoBehaviour
             return false;
         }
     }
+    #endregion
 
     private async Task ApplyBoothDatasFromDatabaseInList(GameObject[] boothList)
     {
@@ -85,16 +86,24 @@ public class MewtwoEX : MonoBehaviour
 
         var successCount = uidList.Zip(boothExtraDatas, (uid, data) => RenderBoothDataWithExtraData(uid.GetComponent<RenderBoothData>(), data)).Count(r => r);
 
+        uidList.Zip(boothExtraDatas, (uid, data) => RenderEmployeeWithExtraData(uid.GetComponent<CreateAIEmployee>(), data)).Count(r => r);
         Debug.Log(successCount);
         
     }
 
 
 
-    private bool RenderBoothDataWithExtraData(RenderBoothData renderBoothData, BoothExtraData datas)
+    private bool RenderBoothDataWithExtraData(RenderBoothData renderBoothData, BoothExtraData data)
     {
-        renderBoothData.RenderBoothDataWith(datas);
-        renderBoothData.RenderBoothModeling(datas);
+        renderBoothData.RenderBoothDataWith(data);
+        renderBoothData.RenderBoothModeling(data);
+        return true;
+    }
+
+    private bool RenderEmployeeWithExtraData(CreateAIEmployee createAIEmployee, BoothExtraData data)
+    {
+        Debug.Log("Hello");
+        createAIEmployee.RenderAiEmployee(data.logoImage);
         return true;
     }
 

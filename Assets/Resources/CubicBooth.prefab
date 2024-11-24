@@ -336,6 +336,8 @@ MonoBehaviour:
   boothVideoWall: {fileID: 3490730110097014627}
   banner: {fileID: 55133711291860731}
   brochure: {fileID: 530650738321925594}
+  boothRenderers:
+  - {fileID: 6044205732230412321}
 --- !u!82 &6895866879035609001
 AudioSource:
   m_ObjectHideFlags: 0
@@ -494,9 +496,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   uid: 
+  uuid: 
 --- !u!1 &5420887746289627005 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -8135158879089079336, guid: efdec9f1e82240a41b21ee3188af200a,
+    type: 3}
+  m_PrefabInstance: {fileID: 4909135485246088357}
+  m_PrefabAsset: {fileID: 0}
+--- !u!23 &6044205732230412321 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: -7511558181221131132, guid: efdec9f1e82240a41b21ee3188af200a,
     type: 3}
   m_PrefabInstance: {fileID: 4909135485246088357}
   m_PrefabAsset: {fileID: 0}

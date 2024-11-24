@@ -15,7 +15,7 @@ public class UICardMaker : MonoBehaviour
     public Text cardErrorText;
 
 
-    public Action<string, string, string, string> OnSaveClick;
+    public Action<string, string, string, string, string> OnSaveClick;
 
     private void Start()
     {
@@ -32,7 +32,7 @@ public class UICardMaker : MonoBehaviour
         UuidMgr.Instance.currentUserInfo.userName = nameInput.text;
         UuidMgr.Instance.currentUserInfo.companyName = instituteInput.text;
         UuidMgr.Instance.PrintUserInfo();
-        OnSaveClick?.Invoke(nameInput.text, instituteInput.text, majorInput.text, phoneNumberInput.text);
+        OnSaveClick?.Invoke(nameInput.text, instituteInput.text, majorInput.text, phoneNumberInput.text, UuidMgr.Instance.currentUserInfo.companyUuid);
         saveButton.gameObject.GetComponent<SceneTransition>().PerformTransition();
     }
 

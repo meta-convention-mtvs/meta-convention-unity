@@ -3,6 +3,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using CHJ;
+using System.Threading.Tasks;
 
 public class CreateBooth : MonoBehaviourPun
 {
@@ -11,6 +13,7 @@ public class CreateBooth : MonoBehaviourPun
 
     BoothType boothType;
     int boothPositionIndex;
+    string boothFileName;
 
     bool isBoothDataLoaded;
     bool isBoothPositionLoaded;
@@ -41,6 +44,7 @@ public class CreateBooth : MonoBehaviourPun
     void OnLoadBoothData(BoothCustomizeData data)
     {
         boothType = data.boothType;
+        boothFileName = data.boothObjectPath;
         isBoothDataLoaded = true;
         CheckAllDataLoaded();
     }
@@ -59,15 +63,28 @@ public class CreateBooth : MonoBehaviourPun
             switch (boothType)
             {
                 case BoothType.Blank:
-                    //photonView.RPC(nameof(RPCInstantiateBlankBooth), )
+                    photonView.RPC(nameof(RPCInstantiateBlankBooth), RpcTarget.All, CashedDataFromDatabase.Instance.playerInfo.uuid, boothFileName);
+
                     break;
                 case BoothType.Cubic:
-                    PhotonNetwork.Instantiate("CubicBooth", BoothPosition[boothPositionIndex].position, Quaternion.identity);
+                    PhotonNetwork.Instantiate("New_Booth_BD", BoothPosition[boothPositionIndex].position, Quaternion.identity);
                     break;
                 case BoothType.Round:
                     PhotonNetwork.Instantiate("RoundBooth", BoothPosition[boothPositionIndex].position, Quaternion.identity);
                     break;
             }
         }
+    }
+
+    [PunRPC]
+    async Task RPCInstantiateBlankBooth(string uuid, string objectFileName)
+    {
+        string localPath = await AsyncDatabase.GetObjectFileLocalPathFromDatabaseWithUid(uuid, objectFileName);
+        ObjectLoader.ImportGLTFAsync(localPath, OnLoadFinish);
+    }
+
+    private void OnLoadFinish(GameObject obj, AnimationClip[] arg2)
+    {
+        obj.transform.position = BoothPosition[boothPositionIndex].position;
     }
 }

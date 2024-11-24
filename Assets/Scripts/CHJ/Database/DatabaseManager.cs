@@ -54,15 +54,18 @@ public class DatabaseManager : Singleton<DatabaseManager>
             print("정보 불러오기 실패 : " + task.Exception);
         }
     }
-
+    public void SaveDataTo<T>(string uid, T info) where T: class
+    {
+        StartCoroutine(CoSaveUserInfo<T>(uid, info));
+    }
     public void SaveData<T>(T info) where T : class
     {
-        StartCoroutine(CoSaveUserInfo<T>(info));
+        StartCoroutine(CoSaveUserInfo<T>(FireAuthManager.Instance.GetCurrentUser().UserId,info));
     }
-    IEnumerator CoSaveUserInfo<T>(T info) where T : class
+    IEnumerator CoSaveUserInfo<T>(string uid, T info) where T : class
     {
         // 저장 경로 USER/ID/내정보
-        string path = "USER/" + FireAuthManager.Instance.GetCurrentUser().UserId + "/" + "Data/" + typeof(T).ToString();
+        string path = "USER/" + uid + "/" + "Data/" + typeof(T).ToString();
         // 정보 저장 요청
         Task task = FirebaseFirestore.DefaultInstance.Document(path).SetAsync(info);
         // 통신이 완료 될 때 까지 기다린다.
@@ -75,6 +78,30 @@ public class DatabaseManager : Singleton<DatabaseManager>
         else
         {
             print("유저 정보 저장 실패 : " + task.Exception);
+        }
+    }
+
+    public void SaveCompanyDataTo<T>(string uuid, T info) where T: class
+    {
+        StartCoroutine(CoSaveCompanyInfo<T>(uuid, info));
+    }
+
+    IEnumerator CoSaveCompanyInfo<T>(string uid, T info) where T : class
+    {
+        // 저장 경로 USER/ID/내정보
+        string path = "COMPANY/" + uid + "/" + "Data/" + typeof(T).ToString();
+        // 정보 저장 요청
+        Task task = FirebaseFirestore.DefaultInstance.Document(path).SetAsync(info);
+        // 통신이 완료 될 때 까지 기다린다.
+        yield return new WaitUntil(() => task.IsCompleted);
+        // 만약에 예외가 없으면 
+        if (task.Exception == null)
+        {
+            print("회사 정보 저장 성공");
+        }
+        else
+        {
+            print("회사 정보 저장 실패 : " + task.Exception);
         }
     }
 
@@ -116,12 +143,100 @@ public class DatabaseManager : Singleton<DatabaseManager>
             print("유저 정보 불러오기 실패 : " + task.Exception);
         }
     }
-
     public void UploadImage(string localFilePath)
+    {
+        UploadImageTo(FireAuthManager.Instance.GetCurrentUser().UserId, localFilePath);
+    }
+
+    public void UploadImageTo(string uid, string localFilePath)
     {
         // Storage 참조 설정
         var storageRef = storage.GetReferenceFromUrl("gs://metaconvention.appspot.com");
-        var fileRef = storageRef.Child("images/" + FireAuthManager.Instance.GetCurrentUser().UserId + "/" + Path.GetFileName(localFilePath));
+        var fileRef = storageRef.Child("images/" + uid + "/" + Path.GetFileName(localFilePath));
+
+        // 파일 업로드
+        fileRef.PutFileAsync(localFilePath).ContinueWithOnMainThread(task =>
+        {
+            if (task.IsCompleted)
+            {
+                Debug.Log("이미지 업로드 성공");
+                fileRef.GetDownloadUrlAsync().ContinueWithOnMainThread(urlTask =>
+                {
+                    if (!urlTask.IsFaulted && !urlTask.IsCanceled)
+                    {
+                        string downloadUrl = urlTask.Result.ToString();
+                        Debug.Log("다운로드 URL: " + downloadUrl);
+                    }
+                });
+            }
+            else
+            {
+                Debug.LogError("이미지 업로드 실패: " + task.Exception);
+            }
+        });
+    }
+
+    public void UploadLogoTo(string uid, string localFilePath)
+    {
+        // Storage 참조 설정
+        var storageRef = storage.GetReferenceFromUrl("gs://metaconvention.appspot.com");
+        var fileRef = storageRef.Child("logos/" + uid + "/" + Path.GetFileName(localFilePath));
+
+        // 파일 업로드
+        fileRef.PutFileAsync(localFilePath).ContinueWithOnMainThread(task =>
+        {
+            if (task.IsCompleted)
+            {
+                Debug.Log("이미지 업로드 성공");
+                fileRef.GetDownloadUrlAsync().ContinueWithOnMainThread(urlTask =>
+                {
+                    if (!urlTask.IsFaulted && !urlTask.IsCanceled)
+                    {
+                        string downloadUrl = urlTask.Result.ToString();
+                        Debug.Log("다운로드 URL: " + downloadUrl);
+                    }
+                });
+            }
+            else
+            {
+                Debug.LogError("이미지 업로드 실패: " + task.Exception);
+            }
+        });
+    }
+
+    public void UploadBannerTo(string uid, string localFilePath)
+    {
+        // Storage 참조 설정
+        var storageRef = storage.GetReferenceFromUrl("gs://metaconvention.appspot.com");
+        var fileRef = storageRef.Child("banners/" + uid + "/" + Path.GetFileName(localFilePath));
+
+        // 파일 업로드
+        fileRef.PutFileAsync(localFilePath).ContinueWithOnMainThread(task =>
+        {
+            if (task.IsCompleted)
+            {
+                Debug.Log("이미지 업로드 성공");
+                fileRef.GetDownloadUrlAsync().ContinueWithOnMainThread(urlTask =>
+                {
+                    if (!urlTask.IsFaulted && !urlTask.IsCanceled)
+                    {
+                        string downloadUrl = urlTask.Result.ToString();
+                        Debug.Log("다운로드 URL: " + downloadUrl);
+                    }
+                });
+            }
+            else
+            {
+                Debug.LogError("이미지 업로드 실패: " + task.Exception);
+            }
+        });
+    }
+
+    public void UploadBrochure(string uid, string localFilePath)
+    {
+        // Storage 참조 설정
+        var storageRef = storage.GetReferenceFromUrl("gs://metaconvention.appspot.com");
+        var fileRef = storageRef.Child("brochures/" + uid + "/" + Path.GetFileName(localFilePath));
 
         // 파일 업로드
         fileRef.PutFileAsync(localFilePath).ContinueWithOnMainThread(task =>
@@ -172,6 +287,73 @@ public class DatabaseManager : Singleton<DatabaseManager>
         });
     }
 
+    public void DownloadLogoFrom(string uid, string imageFileName, Action<Texture2D> OnTextureLoad)
+    {
+        var storageRef = storage.GetReferenceFromUrl("gs://metaconvention.appspot.com");
+        var fileRef = storageRef.Child("logos/" + uid + "/" + imageFileName);
+
+        fileRef.GetDownloadUrlAsync().ContinueWithOnMainThread(task =>
+        {
+            if (task.IsCompleted)
+            {
+                string downloadUrl = task.Result.ToString();
+                Debug.Log("이미지 다운로드 URL: " + downloadUrl);
+
+                // URL을 통해 비디오 재생
+                StartCoroutine(CoDownloadImage(downloadUrl, OnTextureLoad));
+            }
+            else
+            {
+                Debug.LogError("이미지 URL 가져오기 실패: " + task.Exception);
+            }
+        });
+    }
+
+    public void DownloadBannerFrom(string uid, string imageFileName, Action<Texture2D> OnTextureLoad)
+    {
+        var storageRef = storage.GetReferenceFromUrl("gs://metaconvention.appspot.com");
+        var fileRef = storageRef.Child("banners/" + uid + "/" + imageFileName);
+
+        fileRef.GetDownloadUrlAsync().ContinueWithOnMainThread(task =>
+        {
+            if (task.IsCompleted)
+            {
+                string downloadUrl = task.Result.ToString();
+                Debug.Log("이미지 다운로드 URL: " + downloadUrl);
+
+                // URL을 통해 비디오 재생
+                StartCoroutine(CoDownloadImage(downloadUrl, OnTextureLoad));
+            }
+            else
+            {
+                Debug.LogError("이미지 URL 가져오기 실패: " + task.Exception);
+            }
+        });
+    }
+
+    public void DownloadBrochureFrom(string uid, string imageFileName, Action<Texture2D> OnTextureLoad)
+    {
+        var storageRef = storage.GetReferenceFromUrl("gs://metaconvention.appspot.com");
+        var fileRef = storageRef.Child("brochures/" + uid + "/" + imageFileName);
+
+        fileRef.GetDownloadUrlAsync().ContinueWithOnMainThread(task =>
+        {
+            if (task.IsCompleted)
+            {
+                string downloadUrl = task.Result.ToString();
+                Debug.Log("이미지 다운로드 URL: " + downloadUrl);
+
+                // URL을 통해 비디오 재생
+                StartCoroutine(CoDownloadImage(downloadUrl, OnTextureLoad));
+            }
+            else
+            {
+                Debug.LogError("이미지 URL 가져오기 실패: " + task.Exception);
+            }
+        });
+    }
+
+
     private IEnumerator CoDownloadImage(string url, Action<Texture2D> OnTextureLoad)
     {
         using (UnityWebRequest www = UnityWebRequestTexture.GetTexture(url))
@@ -191,12 +373,15 @@ public class DatabaseManager : Singleton<DatabaseManager>
             }
         }
     }
-
     public void UploadVideo(string localFilePath)
+    {
+        UploadVideoTo(FireAuthManager.Instance.GetCurrentUser().UserId, localFilePath);
+    }
+    public void UploadVideoTo(string uid, string localFilePath)
     {
         // Storage 참조 설정
         var storageRef = storage.GetReferenceFromUrl("gs://metaconvention.appspot.com");
-        var fileRef = storageRef.Child("videos/" + FireAuthManager.Instance.GetCurrentUser().UserId + "/" + Path.GetFileName(localFilePath));
+        var fileRef = storageRef.Child("videos/" + uid + "/" + Path.GetFileName(localFilePath));
 
         // 파일 업로드
         fileRef.PutFileAsync(localFilePath).ContinueWithOnMainThread(task =>
@@ -250,9 +435,13 @@ public class DatabaseManager : Singleton<DatabaseManager>
 
     public void UploadObject(string localFilePath)
     {
+        UploadObjectTo(FireAuthManager.Instance.GetCurrentUser().UserId, localFilePath);
+    }
+    public void UploadObjectTo(string uid, string localFilePath)
+    {
         // Storage 참조 설정
         var storageRef = storage.GetReferenceFromUrl("gs://metaconvention.appspot.com");
-        var fileRef = storageRef.Child("objects/" + FireAuthManager.Instance.GetCurrentUser().UserId + "/" + Path.GetFileName(localFilePath));
+        var fileRef = storageRef.Child("objects/" + uid + "/" + Path.GetFileName(localFilePath));
 
         // 파일 업로드
         fileRef.PutFileAsync(localFilePath).ContinueWithOnMainThread(task =>

@@ -231,4 +231,14 @@ public class CharacterTopBottomCustomizeData
     [FirestoreProperty]
     public string customImageFileName { get; set; }
 
+    public static CharacterTopBottomCustomizeData GetRandomCharacterData()
+    {
+        CharacterTopBottomCustomizeData newData = new CharacterTopBottomCustomizeData();
+
+        newData.isMan = Random.Range(0, 2) == 0;
+        newData.topIndex = Random.Range(0, 4);
+        newData.bottomIndex = Random.Range(0, 4);
+        return newData;
+    }
+
 }
