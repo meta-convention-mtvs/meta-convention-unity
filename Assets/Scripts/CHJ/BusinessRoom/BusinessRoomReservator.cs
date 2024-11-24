@@ -28,7 +28,7 @@ public class BusinessRoomReservator : MonoBehaviour
 
         for (int i = 0; i < playerList.Length; i++)
         {
-            if (playerList[i].CustomProperties["uuid"] == companyUid)
+            if ((string)playerList[i].CustomProperties["uuid"] == companyUid)
             {
                 return playerList[i];
             }

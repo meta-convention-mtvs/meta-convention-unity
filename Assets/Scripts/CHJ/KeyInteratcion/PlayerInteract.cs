@@ -21,25 +21,24 @@ public class PlayerInteract : MonoBehaviourPun
 
         Collider[] colliders = Physics.OverlapSphere(transform.position, interactionDistance, interactionMask);
 
-        foreach(Collider collider in colliders)
-            //Debug.Log(collider.name);
         // interaction종료를 확인하는 코드
-        if (interactingObject != null && !isCollidersHave(colliders, interactingObject))
+        if (interactingObject != null && !isColliderListContains(colliders, interactingObject))
         {
             interactingObject.GetComponent<IKeyInteractableObject>().InteractEnd();
             interactingObject = null;
         }
 
+        if(interactingObject != null && (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.F)))
+        {
+            interactingObject.GetComponent<IKeyInteractableObject>().InteractEnd();
+            interactingObject = null;
+        }
 
         GameObject closestObject = FindClosestGameObject(colliders, interactionDistance);
         //Debug.Log(closestObject?.name);
         // 만약 이전에 가장 가까운 오브젝트가 존재하고, 그 오브젝트가 현재 오브젝트랑 다를 때
         if(closestObject != null && closestObject != previousClosestObject)
         {
-            // 이전 오브젝트의 Text를 숨기는 코드
-            //IKeyInteractableObject go = previousClosestObject?.GetComponent<IKeyInteractableObject>();
-            //go?.HideText();
-
             // 현재 오브젝트의 Text를 보여주는 코드
             closestObject.GetComponent<IKeyInteractableObject>()?.ShowText();
         }
@@ -85,7 +84,7 @@ public class PlayerInteract : MonoBehaviourPun
         return closestObject;
     }
 
-    bool isCollidersHave(Collider[] colliders, GameObject value)
+    bool isColliderListContains(Collider[] colliders, GameObject value)
     {
         foreach(Collider collider in colliders)
         {

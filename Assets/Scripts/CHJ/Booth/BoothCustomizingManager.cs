@@ -259,32 +259,32 @@ public class BoothCustomizingManager : MonoBehaviour
     {
         if(boothCustomizeData.boothType == BoothType.Blank && boothCustomizeData.boothObjectPath != null)
         {
-            DatabaseManager.Instance.UploadObject(boothCustomizeData.boothObjectPath);
+            DatabaseManager.Instance.UploadObjectTo(UuidMgr.Instance.currentUserInfo.companyUuid, boothCustomizeData.boothObjectPath);
         }
 
         if(boothCustomizeData.logoImagePath != null)
         {
-            DatabaseManager.Instance.UploadImage(boothCustomizeData.logoImagePath);
+            DatabaseManager.Instance.UploadLogoTo(UuidMgr.Instance.currentUserInfo.companyUuid, boothCustomizeData.logoImagePath);
         }
 
         if(boothCustomizeData.modelingPath != null)
         {
-            DatabaseManager.Instance.UploadObject(boothCustomizeData.modelingPath);
+            DatabaseManager.Instance.UploadObjectTo(UuidMgr.Instance.currentUserInfo.companyUuid, boothCustomizeData.modelingPath);
         }
 
         if(boothCustomizeData.videoURL != null)
         {
-            DatabaseManager.Instance.UploadVideo(boothCustomizeData.videoURL.Substring("file://".Length));
+            DatabaseManager.Instance.UploadVideoTo(UuidMgr.Instance.currentUserInfo.companyUuid, boothCustomizeData.videoURL.Substring("file://".Length));
         }
 
         if(boothCustomizeData.bannerImagePath != null)
         {
-            DatabaseManager.Instance.UploadImage(boothCustomizeData.bannerImagePath);
+            DatabaseManager.Instance.UploadBannerTo(UuidMgr.Instance.currentUserInfo.companyUuid, boothCustomizeData.bannerImagePath);
         }
 
         if(boothCustomizeData.brochureImagePath != null)
         {
-            DatabaseManager.Instance.UploadImage(boothCustomizeData.brochureImagePath);
+            DatabaseManager.Instance.UploadBrochure(UuidMgr.Instance.currentUserInfo.companyUuid, boothCustomizeData.brochureImagePath);
 
         }
         boothCustomizeData.boothObjectPath = Path.GetFileName(boothCustomizeData.boothObjectPath);
@@ -299,7 +299,8 @@ public class BoothCustomizingManager : MonoBehaviour
         }
 
         // 데이터 베이스에 저장하는 코드 (수정 필요) : 경로를 Company로 바꿔야 함
-        DatabaseManager.Instance.SaveData<BoothCustomizeData>(boothCustomizeData);
+        DatabaseManager.Instance.SaveCompanyDataTo<BoothCustomizeData>(UuidMgr.Instance.currentUserInfo.companyUuid, boothCustomizeData);
+        print(UuidMgr.Instance.currentUserInfo.companyUuid);
 
     }
 
@@ -406,11 +407,11 @@ public class BoothExtraData
         {
             BoothExtraData extraData = new BoothExtraData(data);
             //logo image
-            if (data.hasLogoImage) extraData.logoImage = await AsyncDatabase.GetTextureFromDatabaseWithUid(uidComponent.uuid, data.logoImagePath);
+            if (data.hasLogoImage) extraData.logoImage = await AsyncDatabase.GetLogoFromDatabaseWithUid(uidComponent.uuid, data.logoImagePath);
             // banner image
-            if (data.hasBannerImage) extraData.bannerImage = await AsyncDatabase.GetTextureFromDatabaseWithUid(uidComponent.uuid, data.bannerImagePath);
+            if (data.hasBannerImage) extraData.bannerImage = await AsyncDatabase.GetBannerFromDatabaseWithUid(uidComponent.uuid, data.bannerImagePath);
             // brochure image
-            if (data.hasBrochureImage) extraData.brochureImage = await AsyncDatabase.GetTextureFromDatabaseWithUid(uidComponent.uuid, data.brochureImagePath);
+            if (data.hasBrochureImage) extraData.brochureImage = await AsyncDatabase.GetBrochureFromDatabaseWithUid(uidComponent.uuid, data.brochureImagePath);
             //tv video url
             if (data.hasVideoUrl) extraData.videoURL = (await AsyncDatabase.GetVideoDownloadUrl(uidComponent.uuid, data.videoURL)).ToString();
             //object file

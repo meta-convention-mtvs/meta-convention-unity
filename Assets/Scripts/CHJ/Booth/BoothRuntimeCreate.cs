@@ -31,12 +31,12 @@ public class BoothRuntimeCreate : MonoBehaviourPun
 
     private UID ownerUID;
 
-    private void Start()
+    private void Awake()
     {
         renderBoothData = GetComponent<RenderBoothData>();
         ownerUID = GetComponent<UID>();
 
-        ownerUID.OnUIDChanged += LoadBoothCustomizeData;
+        ownerUID.OnUUIDChanged += LoadBoothCustomizeData;
     }
 
     void LoadBoothCustomizeData(string uid)
@@ -49,27 +49,27 @@ public class BoothRuntimeCreate : MonoBehaviourPun
         this.data = data;
 
         if (!string.IsNullOrEmpty(data.modelingPath))
-            DatabaseManager.Instance.DownloadObjectFrom(ownerUID.uid, data.modelingPath, OnLoadBoothModelingData);
+            DatabaseManager.Instance.DownloadObjectFrom(ownerUID.uuid, data.modelingPath, OnLoadBoothModelingData);
         else
             isObjectLoaded = true;
 
         if (!string.IsNullOrEmpty(data.logoImagePath))
-            DatabaseManager.Instance.DownloadImageFrom(ownerUID.uid, data.logoImagePath, OnLoadLogoImageData);
+            DatabaseManager.Instance.DownloadLogoFrom(ownerUID.uuid, data.logoImagePath, OnLoadLogoImageData);
         else
             isLogoLoaded = true;
 
         if (!string.IsNullOrEmpty(data.videoURL))
-            DatabaseManager.Instance.DownLoadVideoFrom(ownerUID.uid, data.videoURL, OnLoadVideoData);
+            DatabaseManager.Instance.DownLoadVideoFrom(ownerUID.uuid, data.videoURL, OnLoadVideoData);
         else
             isVideoLoaded = true;
 
         if (!string.IsNullOrEmpty(data.bannerImagePath))
-            DatabaseManager.Instance.DownloadImageFrom(ownerUID.uid, data.bannerImagePath, OnLoadBannerImageData);
+            DatabaseManager.Instance.DownloadBannerFrom(ownerUID.uuid, data.bannerImagePath, OnLoadBannerImageData);
         else
             isBannerLoaded = true;
 
         if (!string.IsNullOrEmpty(data.brochureImagePath))
-            DatabaseManager.Instance.DownloadImageFrom(ownerUID.uid, data.brochureImagePath, OnLoadBrochureImageData);
+            DatabaseManager.Instance.DownloadBrochureFrom(ownerUID.uuid, data.brochureImagePath, OnLoadBrochureImageData);
         else
             isBrochureLoaded = true;
 

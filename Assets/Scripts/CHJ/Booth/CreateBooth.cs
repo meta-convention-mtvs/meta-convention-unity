@@ -13,6 +13,7 @@ public class CreateBooth : MonoBehaviourPun
 
     BoothType boothType;
     int boothPositionIndex;
+    string boothFileName;
 
     bool isBoothDataLoaded;
     bool isBoothPositionLoaded;
@@ -43,6 +44,7 @@ public class CreateBooth : MonoBehaviourPun
     void OnLoadBoothData(BoothCustomizeData data)
     {
         boothType = data.boothType;
+        boothFileName = data.boothObjectPath;
         isBoothDataLoaded = true;
         CheckAllDataLoaded();
     }
@@ -61,12 +63,11 @@ public class CreateBooth : MonoBehaviourPun
             switch (boothType)
             {
                 case BoothType.Blank:
-                    //photonView.RPC(nameof(RPCInstantiateBlankBooth), )
-                    // 데이터 베이스에서 부스 오브젝트를 읽어온다 => 부스를 읽은 다음 저장 후 불러온다. 그런 다음 적절한 위치로 옮긴다.
+                    photonView.RPC(nameof(RPCInstantiateBlankBooth), RpcTarget.All, CashedDataFromDatabase.Instance.playerInfo.uuid, boothFileName);
 
                     break;
                 case BoothType.Cubic:
-                    PhotonNetwork.Instantiate("CubicBooth", BoothPosition[boothPositionIndex].position, Quaternion.identity);
+                    PhotonNetwork.Instantiate("New_Booth_BD", BoothPosition[boothPositionIndex].position, Quaternion.identity);
                     break;
                 case BoothType.Round:
                     PhotonNetwork.Instantiate("RoundBooth", BoothPosition[boothPositionIndex].position, Quaternion.identity);

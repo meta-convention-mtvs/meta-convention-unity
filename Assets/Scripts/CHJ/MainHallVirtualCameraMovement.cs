@@ -49,9 +49,10 @@ public class MainHallVirtualCameraMovement : MonoBehaviour
     }
 
     // ToDo: aiSpeackCamera의 position도 지정할 수 있어야 함
-    public void SetAiSpeackCameraPosition(Transform lookAtPosition, Transform aiSpeackCameraTransform)
+    public void SetAiSpeackCameraPosition(Transform lookAtPosition, Transform followPosition)
     {
-
+        aiSpeackVirtualCamera.LookAt = lookAtPosition;
+        aiSpeackVirtualCamera.Follow = followPosition;
     }
     List<CinemachineVirtualCamera> ResetVirtualCameraPrioriy(List<CinemachineVirtualCamera> cameras)
     {

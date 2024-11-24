@@ -19,6 +19,8 @@ public class Card
     public string email { get; set; }
     [FirestoreProperty]
     public string phoneNumber { get; set; }
+    [FirestoreProperty]
+    public string uuid { get; set; }
 
     public Card(string id, string nickname, string institute, string major, string email, string phoneNumber)
     {

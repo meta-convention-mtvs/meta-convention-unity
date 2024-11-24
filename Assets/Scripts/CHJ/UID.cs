@@ -10,6 +10,7 @@ public class UID : MonoBehaviourPun
     public string uuid;
 
     public Action<string> OnUIDChanged;
+    public Action<string> OnUUIDChanged;
     
     public void SetUID(string id)
     {
@@ -20,6 +21,7 @@ public class UID : MonoBehaviourPun
     public void SetUUID(string id)
     {
         uuid = id;
+        OnUUIDChanged?.Invoke(uuid);
     }
 
     private void Start()
@@ -30,7 +32,11 @@ public class UID : MonoBehaviourPun
             {
                 this.uid = FireAuthManager.Instance.GetCurrentUser().UserId;
                 photonView.RPC(nameof(RPCSetUID), RpcTarget.OthersBuffered, this.uid);
-                OnUIDChanged?.Invoke(this.uid); 
+                OnUIDChanged?.Invoke(this.uid);
+
+                this.uuid = CashedDataFromDatabase.Instance.playerInfo.uuid;
+                photonView.RPC(nameof(RPCSetUUID), RpcTarget.OthersBuffered, this.uuid);
+                OnUUIDChanged?.Invoke(this.uuid);
             }
         }
     }
@@ -40,5 +46,12 @@ public class UID : MonoBehaviourPun
     {
         uid = id;
         OnUIDChanged?.Invoke(uid);
+    }
+
+    [PunRPC]
+    void RPCSetUUID(string id)
+    {
+        uuid = id;
+        OnUUIDChanged?.Invoke(uuid);
     }
 }

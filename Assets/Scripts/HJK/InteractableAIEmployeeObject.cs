@@ -4,10 +4,15 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Threading.Tasks;
 using Photon.Pun;
+using Photon.Realtime;
+using DG.Tweening;
+using CHJ;
 
 public class InteractableAIEmployeeObject : MonoBehaviourPun, IKeyInteractableObject
 {
     public string companyID = "cf79ea17-a487-4b27-a20d-bbd11ff885da";
+    public Transform camPosition;
+    public Texture2D logoImage;
 
     GameObject AISpeackUI;
     BusinessRoomReservator businessRoomReservator;
@@ -31,28 +36,41 @@ public class InteractableAIEmployeeObject : MonoBehaviourPun, IKeyInteractableOb
     {
         isInteracting = true;
         //UI를 띄운다
-        UIManager.Instance.ShowUI(AISpeackUI, UIType.Conversation);
+        Show(AISpeackUI.GetComponent<CanvasGroup>());
+        // ToDo: AISpeack UI에서 이미지 세팅
+        
+
         // Button을 활성화시킨다.
         Button button = AISpeackUI.GetComponentInChildren<Button>();
         if (button != null)
         {
-            // ToDo: photonView Owner 가 아닌 내가 가진 기업의 uuid로 player 객체 만들어서 건네주어야 함
-            button.onClick.AddListener(() => businessRoomReservator.MakeAppointmentWith(photonView.Owner));
+            Player companyOwner = businessRoomReservator.FindPlayerWithCompanyUid(companyID);
+            if (companyOwner != null)
+            {
+                // ToDo: photonView Owner 가 아닌 내가 가진 기업의 uuid로 player 객체 만들어서 건네주어야 함
+                button.onClick.AddListener(() => businessRoomReservator.MakeAppointmentWith(companyOwner));
+            }
+            else
+            {
+                button.onClick.AddListener(() => UIManager.Instance.ShowPopupUI("현재 회사 담당자가 부재중입니다..."));
+            }
         }
         // 카메라 움직임을 조정한다.
         MainHallVirtualCameraMovement.Instance.SetActiveVirtualCamera(MainHallVirtualCameraMovement.Instance.aiSpeackVirtualCamera);
         // ToDo: 카메라 위치를 ai 직원 위치로 맞춰주어야 함;
+        MainHallVirtualCameraMovement.Instance.SetAiSpeackCameraPosition(camPosition, camPosition);
+
         aiWebSocket = GameObject.FindObjectOfType<AIWebSocket>();
         if (aiWebSocket != null)
         {
-            aiWebSocket.Connect(ownerUID.uid, CashedDataFromDatabase.Instance.playerLanguage.language);
+            aiWebSocket.Connect(companyID, CashedDataFromDatabase.Instance.playerLanguage.language);
         }
     }
     public void InteractEnd()
     {
         isInteracting = false;
         // UI를 끈다
-        AISpeackUI.GetComponent<GeneralUI>().Hide();
+        Hide(AISpeackUI.GetComponent<CanvasGroup>());
         aiWebSocket = GameObject.FindObjectOfType<AIWebSocket>();
         if (aiWebSocket != null)
         {
@@ -73,8 +91,13 @@ public class InteractableAIEmployeeObject : MonoBehaviourPun, IKeyInteractableOb
         if (businessRoomReservator == null)
             Debug.LogError("Can't find BusinessRoomReservator, set tag");
         ownerUID = GetComponent<UID>();
+        ownerUID.OnUUIDChanged += SetUUID;
     }
 
+    void SetUUID(string id)
+    {
+        this.companyID = id;
+    }
     async void Update()
     {
         if (isInteracting)
@@ -97,6 +120,18 @@ public class InteractableAIEmployeeObject : MonoBehaviourPun, IKeyInteractableOb
                 voiceManager.StopCurrentAudioPlayback();
             }
         }
+    }
+
+    public void Show(CanvasGroup canvas)
+    {
+        canvas.alpha = 0;
+        canvas.DOFade(1, 1).OnComplete(() => { canvas.blocksRaycasts = true; });
+    }
+
+    public void Hide(CanvasGroup canvas)
+    {
+        canvas.alpha = 1;
+        canvas.DOFade(0, 1).OnComplete(() => { canvas.blocksRaycasts = false; });
     }
 
 }

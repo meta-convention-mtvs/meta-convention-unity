@@ -71,7 +71,8 @@ public class CreatePlayer : MonoBehaviour
             {"email", myCard.email },
             {"phoneNumber",myCard.phoneNumber },
             {"MeetingList",emptyMeetingList },
-            {"MeetingListIndex", 0 }
+            {"MeetingListIndex", 0 },
+            {"uuid", myCard.uuid }
         };
       
         player.SetCustomProperties(myInformation);

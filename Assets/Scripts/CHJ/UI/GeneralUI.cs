@@ -40,7 +40,7 @@ public class GeneralUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
                 Hide();
             }
 
-            if(Input.GetMouseButtonDown(0) && isMouseOutsideUI)
+            if (Input.GetMouseButtonDown(0) && isMouseOutsideUI)
             {
                 Hide();
             }

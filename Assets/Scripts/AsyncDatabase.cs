@@ -40,9 +40,23 @@ namespace CHJ
             }
         }
 
-        public static async Task<Texture2D> GetTextureFromDatabaseWithUid(string uid, string fileName)
+        public static async Task<Texture2D> GetLogoFromDatabaseWithUid(string uid, string fileName)
         {
             var url = await GetLogoDownloadUrl(uid, fileName);
+            var texture = await GetTextureFromDatabaseWithUrl(url.ToString());
+            return texture;
+        }
+
+        public static async Task<Texture2D> GetBannerFromDatabaseWithUid(string uid, string fileName)
+        {
+            var url = await GetBannerDownloadUrl(uid, fileName);
+            var texture = await GetTextureFromDatabaseWithUrl(url.ToString());
+            return texture;
+        }
+
+        public static async Task<Texture2D> GetBrochureFromDatabaseWithUid(string uid, string fileName)
+        {
+            var url = await GetBrochureDownloadUrl(uid, fileName);
             var texture = await GetTextureFromDatabaseWithUrl(url.ToString());
             return texture;
         }
@@ -77,9 +91,14 @@ namespace CHJ
             return await GetDownloadUrl("logos", uid, logoFileName);
         }
 
-        public static async Task<Uri> GetImageDownloadUrl(string uid, string imageFileName)
+        public static async Task<Uri> GetBannerDownloadUrl(string uid, string imageFileName)
         {
-            return await GetDownloadUrl("images", uid, imageFileName);
+            return await GetDownloadUrl("banners", uid, imageFileName);
+        }
+
+        public static async Task<Uri> GetBrochureDownloadUrl(string uid, string imageFileName)
+        {
+            return await GetDownloadUrl("brochures", uid, imageFileName);
         }
 
         public static async Task<Uri> GetVideoDownloadUrl(string uid, string videoFileName)

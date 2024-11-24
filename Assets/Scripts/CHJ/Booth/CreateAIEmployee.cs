@@ -9,11 +9,17 @@ public class CreateAIEmployee : MonoBehaviourPun
     public GameObject aiEmployeeFactory;
 
     GameObject aiEmployee;
+    UID companyUID;
 
-    private void Start()
+    void Awake()
+    {
+        companyUID = GetComponent<UID>();
+        companyUID.OnUUIDChanged += Create;
+    }    
+    private void Create(string uuid)
     {
         aiEmployee = Instantiate(aiEmployeeFactory, this.transform);
-        aiEmployee.GetComponent<UID>().SetUUID(GetComponent<UID>().uuid);
+        aiEmployee.GetComponent<UID>().SetUUID(uuid);
     }
 
     public void RenderAiEmployee(Texture2D texture)
