@@ -16,6 +16,7 @@ public class InteractableAIEmployeeObject : MonoBehaviourPun, IKeyInteractableOb
 
     bool isInteracting = false;
 
+    // ToDo: UUID가 초기화되었을 때 UID 값을 읽어와야 함.
     private UID ownerUID;
 
     public void ShowText()
@@ -35,10 +36,12 @@ public class InteractableAIEmployeeObject : MonoBehaviourPun, IKeyInteractableOb
         Button button = AISpeackUI.GetComponentInChildren<Button>();
         if (button != null)
         {
+            // ToDo: photonView Owner 가 아닌 내가 가진 기업의 uuid로 player 객체 만들어서 건네주어야 함
             button.onClick.AddListener(() => businessRoomReservator.MakeAppointmentWith(photonView.Owner));
         }
         // 카메라 움직임을 조정한다.
         MainHallVirtualCameraMovement.Instance.SetActiveVirtualCamera(MainHallVirtualCameraMovement.Instance.aiSpeackVirtualCamera);
+        // ToDo: 카메라 위치를 ai 직원 위치로 맞춰주어야 함;
         aiWebSocket = GameObject.FindObjectOfType<AIWebSocket>();
         if (aiWebSocket != null)
         {

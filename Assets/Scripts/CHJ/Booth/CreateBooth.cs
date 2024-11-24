@@ -3,6 +3,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using CHJ;
+using System.Threading.Tasks;
 
 public class CreateBooth : MonoBehaviourPun
 {
@@ -60,6 +62,8 @@ public class CreateBooth : MonoBehaviourPun
             {
                 case BoothType.Blank:
                     //photonView.RPC(nameof(RPCInstantiateBlankBooth), )
+                    // 데이터 베이스에서 부스 오브젝트를 읽어온다 => 부스를 읽은 다음 저장 후 불러온다. 그런 다음 적절한 위치로 옮긴다.
+
                     break;
                 case BoothType.Cubic:
                     PhotonNetwork.Instantiate("CubicBooth", BoothPosition[boothPositionIndex].position, Quaternion.identity);
@@ -69,5 +73,17 @@ public class CreateBooth : MonoBehaviourPun
                     break;
             }
         }
+    }
+
+    [PunRPC]
+    async Task RPCInstantiateBlankBooth(string uuid, string objectFileName)
+    {
+        string localPath = await AsyncDatabase.GetObjectFileLocalPathFromDatabaseWithUid(uuid, objectFileName);
+        ObjectLoader.ImportGLTFAsync(localPath, OnLoadFinish);
+    }
+
+    private void OnLoadFinish(GameObject obj, AnimationClip[] arg2)
+    {
+        obj.transform.position = BoothPosition[boothPositionIndex].position;
     }
 }

@@ -40,6 +40,7 @@ public class SummaryMgr : MonoBehaviourPun
             {
                 if (player != null)
                 {
+                    // TODO: uid -> uuid
                     RequestSummary((string)player.CustomProperties["id"], (string)PhotonNetwork.LocalPlayer.CustomProperties["id"], CashedDataFromDatabase.Instance.playerLanguage.language, OnDataLoaded);
                 }
             }

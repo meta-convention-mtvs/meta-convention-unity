@@ -21,4 +21,19 @@ public class BusinessRoomReservator : MonoBehaviour
 
         UIManager.Instance.ShowPopupUI("약속을 잡았습니다! 승인을 기다려주세요");
     }  
+
+    public Player FindPlayerWithCompanyUid(string companyUid)
+    {
+        Player[] playerList = PhotonNetwork.PlayerList;
+
+        for (int i = 0; i < playerList.Length; i++)
+        {
+            if (playerList[i].CustomProperties["uuid"] == companyUid)
+            {
+                return playerList[i];
+            }
+        }
+
+        return null;
+    }
 }

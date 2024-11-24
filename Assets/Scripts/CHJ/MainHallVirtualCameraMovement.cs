@@ -48,6 +48,11 @@ public class MainHallVirtualCameraMovement : MonoBehaviour
         brocureCamera.LookAt = brochure;
     }
 
+    // ToDo: aiSpeackCamera의 position도 지정할 수 있어야 함
+    public void SetAiSpeackCameraPosition(Transform lookAtPosition, Transform aiSpeackCameraTransform)
+    {
+
+    }
     List<CinemachineVirtualCamera> ResetVirtualCameraPrioriy(List<CinemachineVirtualCamera> cameras)
     {
         List<CinemachineVirtualCamera> newCameras = new List<CinemachineVirtualCamera>(cameras);
