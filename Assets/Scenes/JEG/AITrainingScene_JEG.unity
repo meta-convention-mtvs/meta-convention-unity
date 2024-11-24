@@ -181,8 +181,9 @@ MonoBehaviour:
       m_Calls: []
   m_text: "\u200B"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 57b35687294811944b67c4782369727e, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 57b35687294811944b67c4782369727e, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 3091d6bf0835a8d42879d79741384d62, type: 2}
+  m_sharedMaterial: {fileID: 3207305331343204022, guid: 3091d6bf0835a8d42879d79741384d62,
+    type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -1055,6 +1056,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 32f942a75c5add24aad787347ee1053f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  aiTrainingData: {fileID: 640626446}
 --- !u!1 &799997677
 GameObject:
   m_ObjectHideFlags: 0
@@ -1374,7 +1376,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1247220567}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 710573676}
+        m_TargetAssemblyTypeName: AITrainingUI, Assembly-CSharp
+        m_MethodName: OnClickSetAiTrainingData
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1247220567
 MonoBehaviour:
   m_ObjectHideFlags: 0
