@@ -356,7 +356,7 @@ PrefabInstance:
     - target: {fileID: 1020356017380317363, guid: 0c571fa731356c74aad6b297ab7d5205,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 119.60003
+      value: 119.60002
       objectReference: {fileID: 0}
     - target: {fileID: 1715086367429113594, guid: 0c571fa731356c74aad6b297ab7d5205,
         type: 3}
@@ -541,7 +541,11 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 6722426477219761121, guid: 0c571fa731356c74aad6b297ab7d5205,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 65233101}
   m_SourcePrefab: {fileID: 100100000, guid: 0c571fa731356c74aad6b297ab7d5205, type: 3}
 --- !u!114 &65233098 stripped
 MonoBehaviour:
@@ -555,6 +559,37 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2ae21b4c54b174645a03004d8b4fd799, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &65233099 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6722426477219761121, guid: 0c571fa731356c74aad6b297ab7d5205,
+    type: 3}
+  m_PrefabInstance: {fileID: 65233097}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &65233100 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6148435415217608201, guid: 0c571fa731356c74aad6b297ab7d5205,
+    type: 3}
+  m_PrefabInstance: {fileID: 65233097}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &65233101
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 65233099}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 920d23697be40b64f9d5dac53c9e80e8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  logo: {fileID: 65233100}
 --- !u!1 &101810501
 GameObject:
   m_ObjectHideFlags: 0
@@ -5379,7 +5414,103 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 235641dcc0793c74e8e9e4cb50c6ff5d, type: 3}
   - {fileID: 8300000, guid: 994f2b6163b0bcd47b76574be44eb530, type: 3}
   - {fileID: 8300000, guid: fbadd6c92b554bc4385a0f26165a39df, type: 3}
+  announceVoiceKR:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  announceVoiceEN:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  announceVoiceZH:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
   announceText:
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  announceTextKR:
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  announceTextEN:
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  announceTextZH:
+  - 
+  - 
+  - 
+  - 
+  - 
   - 
   - 
   - 
@@ -5392,8 +5523,11 @@ MonoBehaviour:
   - 
   idx: 0
   currentIdx: 0
+  endIdx: 0
   aiBubbleUI: {fileID: 720102223}
   bubbleText: {fileID: 583370124}
+  startNum: 0
+  endNum: 0
 --- !u!114 &7429519112162667028
 MonoBehaviour:
   m_ObjectHideFlags: 0
