@@ -6,9 +6,10 @@ using System.Security.Permissions;
 using Firebase.Firestore;
 using TMPro;
 using System.Threading.Tasks;
+using UnityEngine.UI;
 
 [FirestoreData]
-public class AiTrainingData
+public class ai_training_data
 {
     [FirestoreProperty]
     public string trainingData { get; set; }
@@ -21,21 +22,21 @@ public class AITrainingUI : MonoBehaviour
     FirebaseFirestore store;
     public TMP_InputField aiTrainingData;
     string path;
-    AiTrainingData aiData = new AiTrainingData();
+    ai_training_data aiData = new ai_training_data();
 
 
     void Start()
     {
         store = FirebaseFirestore.DefaultInstance;
-     
+
         // 테스트용 자동 로그인 시켜놓기
-        FireAuth.instance.LogIn("test@test.com", "12341234");
-        // 테스트용 
-        path = DatabasePath.GetCompanyDataPath("test11", "ai_training_data");
+        // FireAuth.instance.LogIn("test@test.com", "12341234");
+        // 테스트용
+        //path = DatabasePath.GetCompanyDataPath("test11", "ai_training_data");
 
         // uuid 있으면 요걸루
-        //path = DatabasePath.GetCompanyDataPath(UuidMgr.Instance.currentUserInfo.companyUuid, "ai_training_data");
-        
+        path = DatabasePath.GetCompanyDataPath(UuidMgr.Instance.currentUserInfo.companyUuid, "ai_training_data");
+
     }
 
     public void OnSetClickTrainingData()
@@ -44,12 +45,12 @@ public class AITrainingUI : MonoBehaviour
         SaveAiTrainingData(aiData);
     }
 
-    public void SaveAiTrainingData(AiTrainingData aidata)
+    public void SaveAiTrainingData(ai_training_data aidata)
     {
         StartCoroutine(CoSaveAiTrainingData(aidata));
     }
 
-    IEnumerator CoSaveAiTrainingData(AiTrainingData aidata)
+    IEnumerator CoSaveAiTrainingData(ai_training_data aidata)
     {
         Task task = store.Document(path).SetAsync(aidata);
         yield return new WaitUntil(() => task.IsCompleted);
@@ -62,12 +63,4 @@ public class AITrainingUI : MonoBehaviour
         }
     }
 
-    //public void  OnClickSetAiTrainingData()
-    //{
-    //    aiData.trainingData = aiTrainingData.text;
-    //    Task<bool> result = AsyncDatabase.SetDataToDatabase<AiTrainingData>(path, aiData);
-
-        
-       
-    //}
 }
