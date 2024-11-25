@@ -22,14 +22,16 @@ public class AIAnnounceMgr : MonoBehaviour
     // .. text 만 있으면 되는 걸까? 일단 만들어 둠
     public Text bubbleText;
 
+    public int startNum;
+    public int endNum;
+
     void Start()
     {
         isAudioPlay = false;
-
-        idx = 0;
+        idx = 15;
         currentIdx = 15;
         announceText[0] = "안녕하세요 언어의 장벽 없이 전 세계 기업 부스를 손 쉽게 탐험하고, 글로벌 비지니스 미팅을 지원하는 메타 컨벤션에 오신 걸 환영해요!";
-        announceText[1] = "원하는 부스를 관람하실 수 이도록, 제가 부스를 추천 해 드릴게요";
+        announceText[1] = "원하는 부스를 관람하실 수 있도록, 제가 부스를 추천 해 드릴게요.";
         announceText[2] = "관심사나 원하는 정보를 입력 해보세요!";
 
         announceText[3] = "Hello and welcome to Meta Convention";
@@ -48,36 +50,6 @@ public class AIAnnounceMgr : MonoBehaviour
 
         announceText[13] = "nǐhao ! wǒ shì nǐ de zhùlǐ.";
         announceText[14] = "cóng xiànzài kāishǐ, nǐ shuō de měi jù huà wǒ doū huì fānyì gei nǐ ! ";
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
-        if (Input.GetKeyDown(KeyCode.M))
-        {
-            
-            idx++;
-            idx %= 15;
-        }
-
-        // 시점에 맞춰서 idx 지정하고 , 텍스트 노출 시키고, 사운드 재생하기
-        if (idx != currentIdx)
-        {
-            currentIdx = idx;
-            PlayAnounce(announceVoice, idx);
-        }
-
-        if (audioSource.isPlaying)
-        {
-            isAudioPlay = true;
-            aiBubbleUI.SetActive(true);
-        }
-        else if (!audioSource.isPlaying)
-        {
-            isAudioPlay = false;
-            aiBubbleUI.SetActive(false);
-        }
 
         // 유저의 언어 정보, 상황
         // 언어 ko, en, zh
@@ -88,15 +60,81 @@ public class AIAnnounceMgr : MonoBehaviour
         //UuidMgr
         //CashedDataFromDatabase.Instance.playerLanguage;
 
+        // 입장하면 
+        // 한글 이면 0-2
+        // 영어면 3-6
+        // 중국어면 7-8
+
+
+        // 미팅룸에 입장하면 
+        // 한글 이면 9-10
+        // 영어면 11-12
+        // 중국어면 13-14
+
     }
 
-    public void PlayAnounce(AudioClip[] clips, int idx)
+    // Update is called once per frame
+    void Update()
+    {
+        // 시점에 맞춰서 idx 지정하고 , 텍스트 노출 시키고, 사운드 재생하기
+        if (idx != currentIdx)
+        {
+            currentIdx = idx;
+            PlayAnounce(idx);
+        }
+
+        // 오디오가 재생 중이 아니고, idx가 endNum보다 작으면 다음 오디오 재생
+        if (!audioSource.isPlaying && idx < endNum)
+        {
+            idx++;
+            if (idx < endNum)
+            {
+                PlayAnounce(idx);
+            }
+        }
+
+        // 오디오 재생 상태에 따라 UI 업데이트
+        if (audioSource.isPlaying)
+        {
+            isAudioPlay = true;
+            aiBubbleUI.SetActive(true);
+        }
+        else
+        {
+            isAudioPlay = false;
+            aiBubbleUI.SetActive(false);
+        }
+
+        if(LanguageSingleton.Instance.language == "KO")
+        {
+            AnnounceSetter(0, 2);
+        }else if(LanguageSingleton.Instance.language =="EN")
+        {
+            AnnounceSetter(3, 6);
+        }else if(LanguageSingleton.Instance.language == "ZH")
+        {
+            AnnounceSetter(7, 8);
+        }
+    }
+
+    public void PlayAnounce(int idx)
     {
         audioSource.Stop();
-
         audioSource.clip = announceVoice[idx];
         bubbleText.text = announceText[idx];
-
         audioSource.Play();
     }
+
+    public void AnnounceSetter(int startNum, int endNum)
+    {
+        this.startNum = startNum;
+        this.endNum = endNum;
+        idx = startNum;
+        if (!audioSource.isPlaying)
+        {
+            PlayAnounce(idx);
+        }
+    }
+
+
 }
