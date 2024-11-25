@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using CHJ;
 using System.Threading.Tasks;
+using TriLibCore;
 
 public class CreateBooth : MonoBehaviourPun
 {
@@ -83,8 +84,8 @@ public class CreateBooth : MonoBehaviourPun
         ObjectLoader.ImportGLTFAsync(localPath, OnLoadFinish);
     }
 
-    private void OnLoadFinish(GameObject obj, AnimationClip[] arg2)
+    private void OnLoadFinish(AssetLoaderContext context)
     {
-        obj.transform.position = BoothPosition[boothPositionIndex].position;
+        context.RootGameObject.transform.position = BoothPosition[boothPositionIndex].position;
     }
 }

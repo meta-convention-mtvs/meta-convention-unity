@@ -1,7 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Siccity.GLTFUtility;
+using TriLibCore;
+using System;
 
 public class GLFTTest : MonoBehaviour
 {
@@ -17,14 +18,15 @@ public class GLFTTest : MonoBehaviour
     void ImportGLTFAsync(string[] filepaths)
     {
         string filepath = filepaths[0];
-        Importer.ImportGLTFAsync(filepath, new ImportSettings(), OnFinishAsync);
+        AssetLoader.CreateDefaultLoaderOptions(false, true);
+        AssetLoader.LoadModelFromFile(filepath, OnFinishAsync);
     }
 
-    void OnFinishAsync(GameObject result, AnimationClip[] animations)
+    private void OnFinishAsync(AssetLoaderContext obj)
     {
-        Debug.Log("Finished importing " + result.name);
-        instantiatedObject = result;
-        result.transform.position = new Vector3(0, -20, 0);
+        instantiatedObject = obj.RootGameObject;
+
     }
+
 
 }

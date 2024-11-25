@@ -1,5 +1,5 @@
 ﻿using Dummiesman;
-using Siccity.GLTFUtility;
+using TriLibCore;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -35,9 +35,9 @@ public class ObjectLoader : MonoBehaviour
         }
     }
 
-    public static void ImportGLTFAsync(string filepath, Action<GameObject, AnimationClip[]> OnLoadFinish)
+    public static void ImportGLTFAsync(string filepath, Action<AssetLoaderContext> OnLoadFinish)
     {
-        Importer.ImportGLTFAsync(filepath, new ImportSettings(), OnLoadFinish);
+        AssetLoader.LoadModelFromFile(filepath, OnLoadFinish);
     }
 
 }

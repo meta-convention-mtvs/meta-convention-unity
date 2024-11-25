@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Video;
+using TriLibCore;
 
 [RequireComponent(typeof(VideoPlayer), typeof(AudioSource))]
 public class RenderBoothData : MonoBehaviour
@@ -71,10 +72,10 @@ public class RenderBoothData : MonoBehaviour
 
     }
 
-    private void OnLoadFinish(GameObject arg1, AnimationClip[] arg2)
+    private void OnLoadFinish(AssetLoaderContext context)
     {
         Debug.Log("Load gltf file finished");
-        ShowBoothModeling(arg1, extraData);
+        ShowBoothModeling(context.RootGameObject, extraData);
     }
 
     void ShowBoothModeling(GameObject modeling, BoothExtraData extraData)

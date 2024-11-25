@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using UnityEngine;
+using TriLibCore;
 
 public class BoothCustomizingManager : MonoBehaviour
 {
@@ -103,9 +104,9 @@ public class BoothCustomizingManager : MonoBehaviour
         }
     }
 
-    private void OnBoothObjectLoad(GameObject arg1, AnimationClip[] arg2)
+    private void OnBoothObjectLoad(AssetLoaderContext assetLoaderContext)
     {
-        currentInstantiatedObject = arg1;
+        currentInstantiatedObject = assetLoaderContext.RootGameObject;
     }
 
 
