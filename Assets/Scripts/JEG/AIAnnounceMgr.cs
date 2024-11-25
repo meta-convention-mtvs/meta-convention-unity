@@ -41,7 +41,6 @@ public class AIAnnounceMgr : MonoBehaviour
         print(UuidMgr.Instance.currentUserInfo.language);
 
         isAudioPlay = false;
-        idx = 15;
         currentIdx = 15;
 
         #region KR text
@@ -120,18 +119,14 @@ public class AIAnnounceMgr : MonoBehaviour
             announceVoice = announceVoiceZH;
             announceText = announceTextZH;
         }
+
+        idx = 0;
+
     }
 
     // Update is called once per frame
     void Update()
     {
-
-        if (Input.GetKeyDown(KeyCode.M))
-        {
-            
-            idx++;
-            idx %= 15;
-        }
 
         // 시점에 맞춰서 idx 지정하고 , 텍스트 노출 시키고, 사운드 재생하기
         if (idx != currentIdx)
