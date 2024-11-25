@@ -41,7 +41,7 @@ public class InteractableAIEmployeeObject : MonoBehaviourPun, IKeyInteractableOb
         if (logoImage != null)
             AISpeackUI.GetComponent<SetLogoImageInSpeackCanvas>().SetLogoImage(logoImage);
         else
-            AISpeackUI.GetComponent<SetLogoImageInSpeackCanvas>().SetLogoImage(null);
+            AISpeackUI.GetComponent<SetLogoImageInSpeackCanvas>().SetDefaultLogoImage();
 
         // Button을 활성화시킨다.
         Button button = AISpeackUI.GetComponentInChildren<Button>();

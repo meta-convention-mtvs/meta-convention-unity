@@ -24,4 +24,9 @@ public class SetLogoImageInSpeackCanvas : MonoBehaviour
         // Image 컴포넌트의 Source Image 설정
         logo.sprite = sprite;
     }
+
+    public void SetDefaultLogoImage()
+    {
+        logo.sprite = null;
+    }
 }
