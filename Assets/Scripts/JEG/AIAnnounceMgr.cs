@@ -56,11 +56,11 @@ public class AIAnnounceMgr : MonoBehaviour
         announceTextKR[8] = "";
         announceTextKR[9] = "";
         
-        announceTextKR[10] = "원활한 소통을 위해, 이제부터 하시는 모든 말씀을 제가 책임지고 통역해드릴게요!";
+        announceTextKR[10] = "성공적인 미팅을 위해 AI 직원이 응대한 내용을 요약하고 비즈니스 미팅 전략을 제안해드릴게요!";
         announceTextKR[11] = "";
         announceTextKR[12] = "";
         
-        announceTextKR[13] = "성공적인 미팅을 위해 AI 직원이 응대한 내용을 요약하고 비즈니스 미팅 전략을 제안해드릴게요!";
+        announceTextKR[13] = "원활한 소통을 위해, 이제부터 하시는 모든 말씀을 제가 책임지고 통역해드릴게요!";
         announceTextKR[14] = "";
         #endregion
 
@@ -77,12 +77,12 @@ public class AIAnnounceMgr : MonoBehaviour
         announceTextEN[8] = "";
         announceTextEN[9] = "";
         
-        announceTextEN[10] = "이제부터 하시는 모든 말씀을 제가 통역해드릴게요 !";
-        announceTextEN[11] = "From now on, I’ll translate everything you say for you!";
+        announceTextEN[10] = "For a successful meeting, I’ll provide a summary of the AI staff’s responses";
+        announceTextEN[11] = "and suggest a tailored business meeting strategy!";
         announceTextEN[12] = "";
 
-        announceTextEN[13] = "For a successful meeting, I’ll provide a summary of the AI staff’s responses";
-        announceTextEN[14] = "and suggest a tailored business meeting strategy!";
+        announceTextEN[13] = "From now on, I’ll translate everything you say for you!";
+        announceTextEN[14] = "";
         #endregion
 
         #region ZH text
@@ -98,12 +98,13 @@ public class AIAnnounceMgr : MonoBehaviour
         announceTextZH[8] = "";
         announceTextZH[9] = "";
         
-        announceTextZH[10] = "你好，我是你的AI个人助理！从现在开始，我会为你翻译你说的每一句话！";
-        announceTextZH[11] = "";
+        announceTextZH[10] = "为了达成一次成功的会议，我将总结AI员工的回复，";
+        announceTextZH[11] = "并为您提供定制的商务会议策略！";
         announceTextZH[12] = "";
 
-        announceTextZH[13] = "为了达成一次成功的会议，我将总结AI员工的回复，";
-        announceTextZH[14] = "并为您提供定制的商务会议策略！";
+        announceTextZH[13] = "你好，我是你的AI个人助理！从现在开始，我会为你翻译你说的每一句话！";
+        announceTextZH[14] = "";
+
         #endregion
 
         if(LanguageSingleton.Instance.language == "ko")
