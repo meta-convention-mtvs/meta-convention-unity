@@ -19,6 +19,8 @@ public class CreateAIEmployee : MonoBehaviourPun
     private void Create(string uuid)
     {
         aiEmployee = Instantiate(aiEmployeeFactory, this.transform);
+        aiEmployee.transform.position = AIEmployeePosition.transform.position;
+        aiEmployee.transform.rotation = AIEmployeePosition.transform.rotation;
         aiEmployee.GetComponent<UID>().SetUUID(uuid);
     }
 

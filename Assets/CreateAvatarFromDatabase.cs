@@ -32,7 +32,7 @@ public class CreateAvatarFromDatabase : MonoBehaviour
 
             if (avatarData.isCustomTop)
             {
-                var texture = await AsyncDatabase.GetLogoFromDatabaseWithUid(id, avatarData.customImageFileName);
+                var texture = await AsyncDatabase.GetImageFromDatabaseWithUid(id, avatarData.customImageFileName);
                 renderAvatarData.OnLoadTexture(texture);
             }
 

@@ -38,7 +38,10 @@ public class InteractableAIEmployeeObject : MonoBehaviourPun, IKeyInteractableOb
         //UI를 띄운다
         Show(AISpeackUI.GetComponent<CanvasGroup>());
         // ToDo: AISpeack UI에서 이미지 세팅
-        
+        if (logoImage != null)
+            AISpeackUI.GetComponent<SetLogoImageInSpeackCanvas>().SetLogoImage(logoImage);
+        else
+            AISpeackUI.GetComponent<SetLogoImageInSpeackCanvas>().SetLogoImage(null);
 
         // Button을 활성화시킨다.
         Button button = AISpeackUI.GetComponentInChildren<Button>();
