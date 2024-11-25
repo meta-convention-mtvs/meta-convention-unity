@@ -17,10 +17,10 @@ public class CreateEmployeeAvatarFromDatabase : MonoBehaviour
         uidComponent = GetComponent<UID>();
         renderAvatarData = GetComponent<RenderAvatarData>();
         interactableAIEmployeeObject = GetComponent<InteractableAIEmployeeObject>();
-        uidComponent.OnUUIDChanged += OnUIDChanged;
+        uidComponent.OnUUIDChanged += OnUUIDChanged;
     }
 
-    void OnUIDChanged(string uuid)
+    void OnUUIDChanged(string uuid)
     {
         GetAvatarDataFromDatabaseAndLoadData(uuid);
     }
@@ -32,12 +32,21 @@ public class CreateEmployeeAvatarFromDatabase : MonoBehaviour
             var avatarData = CharacterTopBottomCustomizeData.GetRandomCharacterData();
             renderAvatarData.CreateAvatar(avatarData);
 
-            var texture = await AsyncDatabase.GetLogoFromDatabaseWithUid(id, avatarData.customImageFileName);
-            renderAvatarData.OnLoadTexture(texture);
+            var boothCustomizeData = await AsyncDatabase.GetDataFromDatabase<BoothCustomizeData>(DatabasePath.GetCompanyDataPath(id, nameof(BoothCustomizeData)));
 
-            // ai employee 랑 상호작용할 때 texture도 미리 세팅해주자
-            interactableAIEmployeeObject.logoImage = texture;
+            if (boothCustomizeData.hasLogoImage)
+            {
+                var texture = await AsyncDatabase.GetLogoFromDatabaseWithUid(id, boothCustomizeData.logoImagePath);
 
+                if (texture != null)
+                {
+                    renderAvatarData.OnLoadTexture(texture);
+
+                    // ai employee 랑 상호작용할 때 texture도 미리 세팅해주자
+                    interactableAIEmployeeObject.logoImage = texture;
+
+                }
+            }
             return true;
         }
         catch (Exception ex)
