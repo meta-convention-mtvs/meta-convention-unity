@@ -40,6 +40,13 @@ namespace CHJ
             }
         }
 
+        public static async Task<Texture2D> GetImageFromDatabaseWithUid(string uid, string fileName)
+        {
+            var url = await GetImageDownloadUrl(uid, fileName);
+            var texture = await GetTextureFromDatabaseWithUrl(url.ToString());
+            return texture;
+        }
+
         public static async Task<Texture2D> GetLogoFromDatabaseWithUid(string uid, string fileName)
         {
             var url = await GetLogoDownloadUrl(uid, fileName);
@@ -84,6 +91,11 @@ namespace CHJ
                 Debug.LogError("Exception in Database loading: " + typeof(T) + " " + task.Exception);
                 return null;
             }
+        }
+        
+        public static async Task<Uri> GetImageDownloadUrl(string uid, string imageFileName)
+        {
+            return await GetDownloadUrl("images", uid, imageFileName);
         }
 
         public static async Task<Uri> GetLogoDownloadUrl(string uid, string logoFileName)
