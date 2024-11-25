@@ -43,12 +43,6 @@ public class AIAnnounceMgr : MonoBehaviour
         isAudioPlay = false;
         idx = 15;
         currentIdx = 15;
-<<<<<<< Updated upstream
-        announceText[0] = "안녕하세요 언어의 장벽 없이 전 세계 기업 부스를 손 쉽게 탐험하고, 글로벌 비지니스 미팅을 지원하는 메타 컨벤션에 오신 걸 환영해요!";
-        announceText[1] = "원하는 부스를 관람하실 수 있도록, 제가 부스를 추천 해 드릴게요.";
-        announceText[2] = "관심사나 원하는 정보를 입력 해보세요!";
-=======
->>>>>>> Stashed changes
 
         #region KR text
         announceTextKR[0] = "안녕하세요, 저는 당신의 AI 개인비서입니다";
@@ -109,10 +103,6 @@ public class AIAnnounceMgr : MonoBehaviour
         announceTextZH[11] = "";
         announceTextZH[12] = "";
 
-<<<<<<< Updated upstream
-        announceText[13] = "nǐhao ! wǒ shì nǐ de zhùlǐ.";
-        announceText[14] = "cóng xiànzài kāishǐ, nǐ shuō de měi jù huà wǒ doū huì fānyì gei nǐ ! ";
-=======
         announceTextZH[13] = "为了达成一次成功的会议，我将总结AI员工的回复，";
         announceTextZH[14] = "并为您提供定制的商务会议策略！";
         #endregion
@@ -169,7 +159,6 @@ public class AIAnnounceMgr : MonoBehaviour
             isAudioPlay = false;
             aiBubbleUI.SetActive(false);
         }
->>>>>>> Stashed changes
 
         // 유저의 언어 정보, 상황
         // 언어 ko, en, zh
@@ -193,53 +182,6 @@ public class AIAnnounceMgr : MonoBehaviour
 
     }
 
-<<<<<<< Updated upstream
-    // Update is called once per frame
-    void Update()
-    {
-        // 시점에 맞춰서 idx 지정하고 , 텍스트 노출 시키고, 사운드 재생하기
-        if (idx != currentIdx)
-        {
-            currentIdx = idx;
-            PlayAnounce(idx);
-        }
-
-        // 오디오가 재생 중이 아니고, idx가 endNum보다 작으면 다음 오디오 재생
-        if (!audioSource.isPlaying && idx < endNum)
-        {
-            idx++;
-            if (idx < endNum)
-            {
-                PlayAnounce(idx);
-            }
-        }
-
-        // 오디오 재생 상태에 따라 UI 업데이트
-        if (audioSource.isPlaying)
-        {
-            isAudioPlay = true;
-            aiBubbleUI.SetActive(true);
-        }
-        else
-        {
-            isAudioPlay = false;
-            aiBubbleUI.SetActive(false);
-        }
-
-        if(LanguageSingleton.Instance.language == "KO")
-        {
-            AnnounceSetter(0, 2);
-        }else if(LanguageSingleton.Instance.language =="EN")
-        {
-            AnnounceSetter(3, 6);
-        }else if(LanguageSingleton.Instance.language == "ZH")
-        {
-            AnnounceSetter(7, 8);
-        }
-    }
-
-=======
->>>>>>> Stashed changes
     public void PlayAnounce(int idx)
     {
         audioSource.Stop();
