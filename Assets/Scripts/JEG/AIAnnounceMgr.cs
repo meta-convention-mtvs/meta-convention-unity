@@ -120,8 +120,6 @@ public class AIAnnounceMgr : MonoBehaviour
             announceText = announceTextZH;
         }
 
-        idx = 0;
-
     }
 
     // Update is called once per frame
