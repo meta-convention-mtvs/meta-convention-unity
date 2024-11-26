@@ -24,6 +24,7 @@ public class BoothPositionReseter : Singleton<BoothPositionReseter>
     public async Task SaveDataWhileQuit()
     {
         await SaveChargedBoothPosition(currentIndex, uuid);
+
         OnSaveData?.Invoke();
     }
 
@@ -31,7 +32,7 @@ public class BoothPositionReseter : Singleton<BoothPositionReseter>
     {
         // 서버에 저장
         ChargedBoothPosition position = await AsyncDatabase.GetDataFromDatabase<ChargedBoothPosition>(DatabasePath.GetPublicDataPath(nameof(ChargedBoothPosition)));
-        position.BoothPositionList[index] = new ChargedBoothData(false, uuid);
+        position.BoothPositionList[index] = new ChargedBoothData(false, "");
         DatabaseManager.Instance.SavePublicData<ChargedBoothPosition>(position);
         return true;
     }

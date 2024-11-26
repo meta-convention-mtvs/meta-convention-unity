@@ -13,6 +13,7 @@ public class UIBoothPosition : MonoBehaviour
     public Camera renderTextureCamera; // RenderTexture를 렌더링하는 카메라
     public RawImage rawImage; // RawImage UI 요소
     private RectTransform rectTransform;
+    [SerializeField]
     private int currentIndex = -1;
     private SelectableParentObject selectedObject;
     private ChargedBoothPosition position;
@@ -30,7 +31,10 @@ public class UIBoothPosition : MonoBehaviour
         {
             if(i < boothPosition.Count)
             {
-                boothPosition[i].GetComponentInParent<SelectableParentObject>().isInteractable = !position.BoothPositionList[i].isCharged;
+                if (position.BoothPositionList[i].isCharged)
+                {
+                    boothPosition[i].GetComponent<SelectableParentObject>().SetNotInteractable();
+                }
             }
         }
     }
@@ -50,7 +54,7 @@ public class UIBoothPosition : MonoBehaviour
                     if(selectedObject != null)
                         selectedObject.Deselect();
                     currentIndex = FindObjectIndexInList(boothPosition, hit.collider.gameObject);
-                    selectedObject = hit.collider.GetComponentInParent<SelectableParentObject>();
+                    selectedObject = hit.collider.GetComponent<SelectableParentObject>();
                     if (selectedObject != null)
                     {
                         selectedObject.Select();
@@ -64,7 +68,7 @@ public class UIBoothPosition : MonoBehaviour
                     // ray에 닿는 물체를 선택한다.
                     if (selectedObject != null)
                         selectedObject.Deselect();
-                    selectedObject = hit.collider.GetComponentInParent<SelectableParentObject>();
+                    selectedObject = hit.collider.GetComponent<SelectableParentObject>();
                     if (selectedObject != null)
                     {
                         selectedObject.Select();

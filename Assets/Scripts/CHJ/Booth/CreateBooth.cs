@@ -61,6 +61,10 @@ public class CreateBooth : MonoBehaviourPun
     {
         if (isBoothPositionLoaded && isBoothDataLoaded)
         {
+
+            // TODO: 
+            photonView.RPC(nameof(DeActivatePreviousBooth), RpcTarget.AllBuffered, boothPositionIndex);
+
             switch (boothType)
             {
                 case BoothType.Blank:
@@ -87,5 +91,11 @@ public class CreateBooth : MonoBehaviourPun
     private void OnLoadFinish(AssetLoaderContext context)
     {
         context.RootGameObject.transform.position = BoothPosition[boothPositionIndex].position;
+    }
+
+    [PunRPC]
+    private void DeActivatePreviousBooth(int boothPositionIndex)
+    {
+        BoothPosition[boothPositionIndex].gameObject.SetActive(false);
     }
 }
