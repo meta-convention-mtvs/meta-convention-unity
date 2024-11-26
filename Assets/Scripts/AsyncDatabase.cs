@@ -21,6 +21,11 @@ namespace CHJ
         {
             return "COMPANY/" + uuid + "/Data/" + className;
         }
+
+        public static string GetPublicDataPath(string className)
+        {
+            return "PUBLIC/" + className;
+        }
     }
 
     public static class AsyncDatabase
