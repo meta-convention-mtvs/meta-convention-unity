@@ -5,16 +5,17 @@ using UnityEngine;
 public class SetChargedBoothPosition : MonoBehaviour
 {
     public ChargedBoothPosition newData;
+    public bool[] isChargedList;
 
     private void Start()
     {
         newData = new ChargedBoothPosition();
 
         newData.BoothPositionList = new List<ChargedBoothData>();
-        newData.BoothPositionList.Add(new ChargedBoothData(true, ""));
-        newData.BoothPositionList.Add(new ChargedBoothData(false, ""));
-        newData.BoothPositionList.Add(new ChargedBoothData(true, ""));
-        newData.BoothPositionList.Add(new ChargedBoothData(false, ""));
+        for(int i = 0; i < isChargedList.Length; i++)
+        {
+            newData.BoothPositionList.Add(new ChargedBoothData(isChargedList[i], ""));
+        }
 
         FireAuthManager.Instance.OnLogin += ResetChargedBoothPosition;
     }
