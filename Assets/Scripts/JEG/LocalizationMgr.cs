@@ -8,13 +8,10 @@ public class LanguageChangeButton : MonoBehaviour
         if (LanguageSingleton.Instance.language == "ko")
         {
             SetLanguage("ko");
-        } else if (LanguageSingleton.Instance.language == "en")
+        } else 
         {
             SetLanguage("en");
-        } else if (LanguageSingleton.Instance.language == "zh")
-        {
-        SetLanguage("zh-Hans");
-        }
+        } 
     }
 
     private void SetLanguage(string languageCode)
