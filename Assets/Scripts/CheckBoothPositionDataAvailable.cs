@@ -21,10 +21,9 @@ public class CheckBoothPositionDataAvailable : MonoBehaviour
 
     public void OnCheckDataAvailable()
     {
-        if (boothPositionMgr.CanSaveData())
+        if (boothPositionMgr.SaveBoothPosition())
         {
             boothMgr.SaveBoothData();
-            boothPositionMgr.SaveBoothPosition();
             myTransition.PerformTransition();
             errorText.text = "";
         }
