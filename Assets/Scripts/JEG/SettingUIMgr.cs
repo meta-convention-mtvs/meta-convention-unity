@@ -8,6 +8,7 @@ public class SettingUIMgr : MonoBehaviour
 {
     public Button screenshotButton;
 
+    public GameObject settingUI;
     private void Start()
     {
         screenshotButton.onClick.AddListener(() => OnClickScreenShot());
@@ -33,5 +34,16 @@ public class SettingUIMgr : MonoBehaviour
         yield return new WaitForSeconds(1f); // 1초 대기
         screenshotButton.interactable = true;       // 버튼 다시 활성화
     }
+
+    public void OnClickSetting()
+    {
+        if (settingUI.activeInHierarchy)
+        {
+            settingUI.SetActive(false);
+        } else if (!settingUI.activeInHierarchy)
+        {
+            settingUI.SetActive(true);
+        }
+    } 
 
 }
