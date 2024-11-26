@@ -21,45 +21,54 @@ public class SummaryMgr : MonoBehaviourPun
         public string summary { get; set; }
         public string full_script { get; set; }
     }
-    private void Start()
+    private void Awake()
     {
-        OnClickTakeUserID();
+        //OnClickTakeUserID();
+        //Action<bool, List<Dictionary<string, object>>>
+        TranslationManager.Instance.OnRoomUpdated += OnRoomUpdated;
     }
-    public void OnClickTakeUserID()
+    public void OnRoomUpdated(bool isReady, List<Dictionary<string, object>> users)
     {
         // 방이름을 기업이름으로 세팅함
         if (PhotonNetwork.CurrentRoom.Name == FireAuthManager.Instance.GetCurrentUser().UserId)
         {
-            Dictionary<int, Player> OtherPlayers = GetOtherPlayer(PhotonNetwork.CurrentRoom.Players);
-            if (OtherPlayers.Count > 1) 
+            List<Dictionary<string, object>> otherUsers = GetOtherPlayer(users, FireAuthManager.Instance.GetCurrentUser().UserId);
+            
+            foreach(var user in otherUsers)
             {
-                Debug.Log("Too many players are in the Room");
-            }
+                RequestSummary(user["userid"] as string, CashedDataFromDatabase.Instance.playerInfo.uuid, CashedDataFromDatabase.Instance.playerLanguage.language, OnDataLoaded);
 
-            foreach (Player player in OtherPlayers.Values)
-            {
-                if (player != null)
-                {
-                    // TODO: uid -> uuid
-                    RequestSummary((string)player.CustomProperties["id"], CashedDataFromDatabase.Instance.playerInfo.uuid, CashedDataFromDatabase.Instance.playerLanguage.language, OnDataLoaded);
-                }
             }
-            if(OtherPlayers.Count == 0)
-                RequestSummary(FireAuthManager.Instance.GetCurrentUser().UserId, CashedDataFromDatabase.Instance.playerInfo.uuid, CashedDataFromDatabase.Instance.playerLanguage.language, OnDataLoaded);
+            //Dictionary<int, Player> OtherPlayers = GetOtherPlayer(PhotonNetwork.CurrentRoom.Players);
+            //if (OtherPlayers.Count > 1) 
+            //{
+            //    Debug.Log("Too many players are in the Room");
+            //}
+
+            //foreach (Player player in OtherPlayers.Values)
+            //{
+            //    if (player != null)
+            //    {
+            //        // TODO: uid -> uuid
+            //        RequestSummary((string)player.CustomProperties["id"], CashedDataFromDatabase.Instance.playerInfo.uuid, CashedDataFromDatabase.Instance.playerLanguage.language, OnDataLoaded);
+            //    }
+            //}
+            //if(OtherPlayers.Count == 0)
+            //    RequestSummary(FireAuthManager.Instance.GetCurrentUser().UserId, CashedDataFromDatabase.Instance.playerInfo.uuid, CashedDataFromDatabase.Instance.playerLanguage.language, OnDataLoaded);
         }
             //GetRequestJson(PhotonNetwork.CurrentRoom., PhotonNetwork.CurrentRoom.Players[PhotonNetwork.CurrentRoom.MasterClientId].CustomProperties["id"]);
     }
 
-    public Dictionary<int, Player> GetOtherPlayer(Dictionary<int, Player> Players)
+    public List<Dictionary<string, object>> GetOtherPlayer(List<Dictionary<string, object>> users, string playerUID)
     {
-        Dictionary<int, Player> result = new Dictionary<int, Player>();
-        foreach (int key in Players.Keys)
+        List<Dictionary<string, object>> result = new List<Dictionary<string, object>>();
+        foreach (var user in users)
         {
-            if (Players[key].IsLocal)
-            {
+            string userId = user["userid"] as string;
+
+            if (user["userid"] as string == playerUID)
                 continue;
-            }
-            result.Add(key, Players[key]);
+            result.Add(user);
         }
         return result;
     }
