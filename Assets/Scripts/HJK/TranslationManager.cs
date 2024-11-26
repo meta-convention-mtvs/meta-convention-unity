@@ -263,6 +263,15 @@ public class TranslationManager : Singleton<TranslationManager>
                     Debug.Log($"[TranslationManager] Left room: {roomId}");
                     CurrentRoomID = string.Empty;
                     OnRoomBye?.Invoke(roomId);
+                    
+                    // WebSocket 연결 종료
+                    if (ws != null && _isConnected)
+                    {
+                        Debug.Log("[TranslationManager] Closing WebSocket connection after leaving room");
+                        ws.Close();
+                        _isConnected = false;
+                        ws = null;
+                    }
                     break;
                     
                 case "room.updated":
