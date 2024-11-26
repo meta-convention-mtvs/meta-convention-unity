@@ -259,10 +259,10 @@ public class TranslationManager : Singleton<TranslationManager>
                     break;
                     
                 case "room.bye":
-                    string roomId = data["roomid"].ToString();
-                    Debug.Log($"[TranslationManager] Left room: {roomId}");
-                    CurrentRoomID = string.Empty;
-                    OnRoomBye?.Invoke(roomId);
+                    // string roomId = data["roomid"].ToString();
+                    // Debug.Log($"[TranslationManager] Left room: {roomId}");
+                    // CurrentRoomID = string.Empty;
+                    OnRoomBye?.Invoke();
                     
                     // WebSocket 연결 종료
                     if (ws != null && _isConnected)
