@@ -18,8 +18,7 @@ public class MewtwoEX : MonoBehaviour
 
     private void Start()
     {
-        //GameObject[] playerList = GameObject.FindGameObjectsWithTag("Player");
-        //psycowave(playerList);
+        print("Mewtwo EX was called" + this.gameObject);
 
         GameObject[] boothList = new GameObject[companyUuidList.Length];
         for(int i = 0; i < companyUuidList.Length; i++)
@@ -60,7 +59,7 @@ public class MewtwoEX : MonoBehaviour
 
             if (data.isCustomTop)
             {
-                var texture = await AsyncDatabase.GetLogoFromDatabaseWithUid(uidComponent.uid, data.customImageFileName);
+                var texture = await AsyncDatabase.GetImageFromDatabaseWithUid(uidComponent.uid, data.customImageFileName);
                 runtimeCreate.OnLoadTexture(texture);
             }
 

@@ -8,7 +8,7 @@ public class CharacterAudioController : MonoBehaviour
 
     void Start()
     {
-        //voiceManager = GameObject.FindWithTag("VoiceManager")?.GetComponent<VoiceManager>();
+        voiceManager = GameObject.FindWithTag("VoiceManager")?.GetComponent<VoiceManager>();
         // AudioSource 컴포넌트가 없으면 자동으로 추가
         audioSource = GetComponent<AudioSource>();
         if (audioSource == null)

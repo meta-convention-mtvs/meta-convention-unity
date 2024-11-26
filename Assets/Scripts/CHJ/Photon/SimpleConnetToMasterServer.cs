@@ -10,16 +10,33 @@ public class SimpleConnetToMasterServer : MonoBehaviourPunCallbacks
     public float sceneTransitionTime = 3.0f;
     public float fadeDuration = 2.0f;
 
-    void Start()
+    float currentTime = 0;
+    bool isPhotonConnecting = false;
+
+    private void Awake()
+    {
+        ShowBlackUi();
+    }
+
+    private void Update()
+    {
+        if (!isPhotonConnecting)
+        {
+            // sceneTransitionTime + fadeDuration 이 지나고, CashedDataFromDatabase가 다 읽어왔으면 실행
+            if (currentTime > sceneTransitionTime + fadeDuration && CashedDataFromDatabase.Instance.allDataCashed)
+            {
+                PhotonConnect();
+                isPhotonConnecting = true;
+            }
+
+            currentTime += Time.deltaTime;
+        }
+    }
+    void PhotonConnect()
     {
         PhotonNetwork.SendRate = 120;
         PhotonNetwork.SerializationRate = 60;
         PhotonNetwork.ConnectUsingSettings();
-
-        GameObject go = Instantiate(blackUi);
-        CanvasGroup canvasGroup = go.GetComponent<CanvasGroup>();
-        canvasGroup.alpha = 0f;
-        StartCoroutine(NextScene(canvasGroup));
     }
     IEnumerator NextScene(CanvasGroup canvasGroup)
     {
@@ -37,17 +54,16 @@ public class SimpleConnetToMasterServer : MonoBehaviourPunCallbacks
         // 최종 알파 값 설정 (완전 불투명)
         canvasGroup.alpha = 1f;
         yield return null;
-
-        // 기존 코드 - 마스터 서버 연결 전 방 생성 시도 (문제 발생)
-        /*
-        RoomOptions roomOptions = new RoomOptions();
-        roomOptions.MaxPlayers = 20;
-        roomOptions.PublishUserId = true;
-        PhotonNetwork.JoinOrCreateRoom("MainHall", roomOptions, TypedLobby.Default);
-        */
     }
     #region 메인서버에 연결
 
+    void ShowBlackUi()
+    {
+        GameObject go = Instantiate(blackUi);
+        CanvasGroup canvasGroup = go.GetComponent<CanvasGroup>();
+        canvasGroup.alpha = 0f;
+        StartCoroutine(NextScene(canvasGroup));
+    }
     public override void OnConnectedToMaster()
     {
         print("Connected to Master");

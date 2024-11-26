@@ -4,7 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class UID : MonoBehaviourPun
+public class UID : MonoBehaviour
 {
     public string uid;
     public string uuid;
@@ -26,6 +26,8 @@ public class UID : MonoBehaviourPun
 
     private void Start()
     {
+        PhotonView photonView = GetComponent<PhotonView>();
+
         if (photonView != null)
         {
             if (photonView.IsMine)

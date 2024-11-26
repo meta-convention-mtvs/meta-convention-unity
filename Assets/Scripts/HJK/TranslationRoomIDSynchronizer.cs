@@ -12,8 +12,12 @@ public class TranslationRoomIDSynchronizer : MonoBehaviourPunCallbacks
     private const float RESET_TIMEOUT = 10f;
     private Coroutine resetCoroutine;
 
+    private TranslationManager translationManager;
+
     private void Start()
     {
+        translationManager = TranslationManager.Instance;
+        
         // PhotonView 소유권 설정
         if (photonView.IsMine && photonView.Owner == null)
         {
@@ -21,9 +25,29 @@ public class TranslationRoomIDSynchronizer : MonoBehaviourPunCallbacks
             Debug.Log("[TranslationRoomIDSynchronizer] PhotonView 소유권 요청");
         }
 
-        TranslationManager.Instance.OnConnect += CreateRoom;
-        TranslationManager.Instance.OnRoomJoined += JoinRoom;
-        TranslationManager.Instance.Connect();
+        translationManager.OnConnect += CreateRoom;
+        translationManager.OnRoomJoined += JoinRoom;
+        translationManager.Connect();
+    }
+    private void OnDestroy()
+    {
+        if (translationManager != null)
+        {
+            translationManager.OnConnect -= CreateRoom;
+            translationManager.OnRoomJoined -= JoinRoom;
+        }
+    }
+
+    public override void OnLeftRoom()
+    {
+        base.OnLeftRoom();
+        Debug.Log("[TranslationRoomIDSynchronizer] Photon room left, leaving AI server room");
+        
+        // AI 서버 방 퇴장 요청
+        if (translationManager != null && !string.IsNullOrEmpty(translationManager.CurrentRoomID))
+        {
+            translationManager.LeaveRoom();
+        }
     }
 
     // public override void OnOwnershipTransferred(PhotonView targetView, Player previousOwner)

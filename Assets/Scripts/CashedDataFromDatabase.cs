@@ -1,6 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using CHJ;
+using System.Threading.Tasks;
+using System;
 
 public class CashedDataFromDatabase : Singleton<CashedDataFromDatabase>
 {
@@ -9,48 +12,25 @@ public class CashedDataFromDatabase : Singleton<CashedDataFromDatabase>
     public Card playerInfo;
     public RecommendedCompanyListData playerRecommendedCompanyListData;
 
-    [SerializeField]
-    private bool isLanguageLoaded;
-    [SerializeField]
-    private bool isCharacterLoaded;
-    [SerializeField]
-    private bool isInfoLoaded;
-    [SerializeField]
-    private bool isCompanyListLoaded;
+    public bool allDataCashed { get; private set; }
 
+    public Action OnCashedData;
+    
     private void Start()
     {
-        CashDataFromDatabase();
+        CashDataFromDatabase();       
     }
-    void CashDataFromDatabase()
+    async Task CashDataFromDatabase()
     {
-        DatabaseManager.Instance.GetData<Language>(OnPlayerLanguageLoaded);
-        DatabaseManager.Instance.GetData<CharacterTopBottomCustomizeData>(OnPlayerCharacterLoaded);
-        DatabaseManager.Instance.GetData<Card>(OnPlayerInfoLoaded);
-        DatabaseManager.Instance.GetData<RecommendedCompanyListData>(OnPlayerRecommendedCompanyListDataLoaded);
-    }
+        var uid = FireAuthManager.Instance.GetCurrentUser().UserId;
 
-    void OnPlayerLanguageLoaded(Language language)
-    {
-        playerLanguage = language;
-        isLanguageLoaded = true;
-    }
+        playerLanguage = await AsyncDatabase.GetDataFromDatabase<Language>(DatabasePath.GetUserDataPath(uid, nameof(Language)));
+        playerCustomizeData = await AsyncDatabase.GetDataFromDatabase<CharacterTopBottomCustomizeData>(DatabasePath.GetUserDataPath(uid, nameof(CharacterTopBottomCustomizeData)));
+        playerInfo = await AsyncDatabase.GetDataFromDatabase<Card>(DatabasePath.GetUserDataPath(uid, nameof(Card)));
+        playerRecommendedCompanyListData = await AsyncDatabase.GetDataFromDatabase<RecommendedCompanyListData>(DatabasePath.GetUserDataPath(uid, nameof(RecommendedCompanyListData)));
 
-    void OnPlayerCharacterLoaded(CharacterTopBottomCustomizeData customizeData)
-    {
-        playerCustomizeData = customizeData;
-        isCharacterLoaded = true;
-    }
+        allDataCashed = true;
+        OnCashedData?.Invoke();
 
-    void OnPlayerInfoLoaded(Card playerInfo)
-    {
-        this.playerInfo = playerInfo;
-        isInfoLoaded = true;
-    }
-
-    void OnPlayerRecommendedCompanyListDataLoaded(RecommendedCompanyListData recommendedCompanyListData)
-    {
-        playerRecommendedCompanyListData = recommendedCompanyListData;
-        isCompanyListLoaded = true;
     }
 }
