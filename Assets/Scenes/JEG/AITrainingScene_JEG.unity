@@ -410,12 +410,17 @@ PrefabInstance:
     - target: {fileID: 617740750397896285, guid: 75f8c77309cd7431b9ecd50aacd500cf,
         type: 3}
       propertyPath: m_fontColor32.rgba
-      value: 1290792949
+      value: 1289477083
       objectReference: {fileID: 0}
     - target: {fileID: 617740750397896285, guid: 75f8c77309cd7431b9ecd50aacd500cf,
         type: 3}
       propertyPath: m_enableWordWrapping
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 617740750397896285, guid: 75f8c77309cd7431b9ecd50aacd500cf,
+        type: 3}
+      propertyPath: m_HorizontalAlignment
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 617740750397896285, guid: 75f8c77309cd7431b9ecd50aacd500cf,
         type: 3}
@@ -1416,7 +1421,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 289}
-  m_SizeDelta: {x: 700, y: 300}
+  m_SizeDelta: {x: 1000, y: 300}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1672673330
 GameObject:
@@ -1453,7 +1458,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: 0, y: -93}
+  m_AnchoredPosition: {x: 0, y: -80}
   m_SizeDelta: {x: 900, y: 100}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &1672673332
@@ -1487,7 +1492,7 @@ MonoBehaviour:
     m_AlignByGeometry: 0
     m_RichText: 1
     m_HorizontalOverflow: 0
-    m_VerticalOverflow: 0
+    m_VerticalOverflow: 1
     m_LineSpacing: 1
   m_Text: "AI\uB97C \uAD50\uC721\uD560 \uAE30\uC5C5 \uC815\uBCF4\uB97C \uC785\uB825\uD558\uC138\uC694."
 --- !u!222 &1672673333
