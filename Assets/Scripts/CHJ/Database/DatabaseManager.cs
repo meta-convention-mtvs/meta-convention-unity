@@ -104,7 +104,28 @@ public class DatabaseManager : Singleton<DatabaseManager>
             print("회사 정보 저장 실패 : " + task.Exception);
         }
     }
-
+    public void SavePublicData<T>(T info) where T:class
+    {
+        StartCoroutine(CoSavePublicInfo<T>(info));
+    }
+    IEnumerator CoSavePublicInfo<T>(T info) where T : class
+    {
+        // 저장 경로 USER/ID/내정보
+        string path = "PUBLIC/" + typeof(T).ToString();
+        // 정보 저장 요청
+        Task task = FirebaseFirestore.DefaultInstance.Document(path).SetAsync(info);
+        // 통신이 완료 될 때 까지 기다린다.
+        yield return new WaitUntil(() => task.IsCompleted);
+        // 만약에 예외가 없으면 
+        if (task.Exception == null)
+        {
+            print("회사 정보 저장 성공");
+        }
+        else
+        {
+            print("회사 정보 저장 실패 : " + task.Exception);
+        }
+    }
     public void GetDataFrom<T>(string uid, Action<T> OnComplete) where T : class
     {
         StartCoroutine(CoLoadUserInfo<T>(uid, OnComplete));
