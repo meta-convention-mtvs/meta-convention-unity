@@ -261,8 +261,8 @@ public class TranslationManager : Singleton<TranslationManager>
                 case "room.bye":
                     // string roomId = data["roomid"].ToString();
                     // Debug.Log($"[TranslationManager] Left room: {roomId}");
-                    // CurrentRoomID = string.Empty;
-                    OnRoomBye?.Invoke();
+                    CurrentRoomID = string.Empty;
+                    OnRoomBye?.Invoke(null);
                     
                     // WebSocket 연결 종료
                     if (ws != null && _isConnected)
