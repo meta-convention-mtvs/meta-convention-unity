@@ -12,6 +12,8 @@ public class TranslationRoomIDSynchronizer : MonoBehaviourPunCallbacks
     private const float RESET_TIMEOUT = 10f;
     private Coroutine resetCoroutine;
 
+    private TranslationManager translationManager;
+
     private void Start()
     {
         translationManager = TranslationManager.Instance;
