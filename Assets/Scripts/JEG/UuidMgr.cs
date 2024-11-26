@@ -44,6 +44,19 @@ public class UuidMgr : MonoBehaviour
     public class UuidCompanyList
     {
         public List<UuidCompany> companies;
+
+        public override string ToString()
+        {
+            string result = "";
+
+            foreach(var company in companies)
+            {
+                result += company.company_name;
+                result += "\n";
+            }
+
+            return result;
+        }
     }
 
     private UuidCompanyList companyData;
