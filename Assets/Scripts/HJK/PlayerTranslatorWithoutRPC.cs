@@ -43,7 +43,6 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
     // 오디오 녹음 관련 상수
     private const int RECORDING_FREQUENCY = 24000;              // 녹음 주파수
     private readonly int RECORDING_BUFFER_SIZE = 24000 * 60;    // 녹음 버퍼 크기 (1분)
-    private Recorder translatorRecorder; // Translator 전용 Recorder
 
 
     // 스트리밍 재생 관련 변수들
