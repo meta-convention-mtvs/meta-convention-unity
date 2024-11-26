@@ -57,6 +57,7 @@ public class TranslationRoomIDSynchronizer : MonoBehaviourPunCallbacks
 
     void CreateRoom()
     {
+        Debug.Log("[TranslationRoomIDSynchronizer] CreateRoom 실행됨");
         // 이 스크립트는 공용 오브젝트에 붙을 것이다 => owner이면 isMine은 true, 아니면 false
         if (PhotonNetwork.CurrentRoom.Name == FireAuthManager.Instance.GetCurrentUser().UserId)
         {
@@ -68,6 +69,7 @@ public class TranslationRoomIDSynchronizer : MonoBehaviourPunCallbacks
 
     void JoinRoom(string roomID)
     {
+        Debug.Log("[TranslationRoomIDSynchronizer] JoinRoom 실행됨");
         // 내가 방장이면..
         // ToDo: 이 부분을 구현해주세요...
         if (PhotonNetwork.CurrentRoom.Name == FireAuthManager.Instance.GetCurrentUser().UserId)
