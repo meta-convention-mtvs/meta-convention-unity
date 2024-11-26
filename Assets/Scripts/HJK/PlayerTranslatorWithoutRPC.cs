@@ -44,6 +44,7 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
     private const int RECORDING_FREQUENCY = 24000;              // 녹음 주파수
     private readonly int RECORDING_BUFFER_SIZE = 24000 * 60;    // 녹음 버퍼 크기 (1분)
 
+
     // 스트리밍 재생 관련 변수들
     private List<float> audioBuffer = new List<float>();        // 오디오 재생 버퍼
     private const int BUFFER_THRESHOLD = 24000;                 // 버퍼 임계값 (1초)
@@ -112,7 +113,7 @@ public class PlayerTranslatorWithoutRPC : MonoBehaviourPunCallbacks
         translatedAudioSource = gameObject.AddComponent<AudioSource>();
         // 녹음 버퍼 초기화
         tempRecordingBuffer = new float[RECORDING_BUFFER_SIZE];
-
+        
         // TranslationEventHandler의 Ready 상태 변경 이벤트 구독
         TranslationEventHandler.Instance.OnRoomReadyStateChanged += UpdateSpeakUI;
         TranslationEventHandler.Instance.OnSpeakerChanged += HandleSpeakerChanged;
