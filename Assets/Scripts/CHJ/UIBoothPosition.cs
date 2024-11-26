@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using CHJ;
+using System.Threading.Tasks;
 
 public class UIBoothPosition : MonoBehaviour
 {
@@ -28,13 +30,12 @@ public class UIBoothPosition : MonoBehaviour
         {
             if(i < boothPosition.Count)
             {
-                boothPosition[i].GetComponentInParent<SelectableParentObject>().isInteractable = !position.BoothPositionList[i];
+                boothPosition[i].GetComponentInParent<SelectableParentObject>().isInteractable = !position.BoothPositionList[i].isCharged;
             }
         }
     }
     void Update()
     {
-
         // 마우스가 RawImage 위에 있는지 확인
         if (RectTransformUtility.RectangleContainsScreenPoint(rectTransform, Input.mousePosition))
         {
@@ -74,21 +75,37 @@ public class UIBoothPosition : MonoBehaviour
         }
     }
 
-    public void SaveBoothPosition()
+    public bool SaveBoothPosition()
     {
-        if(currentIndex != -1)
+        if(currentIndex != -1 && CanSaveData(position, currentIndex))
         {
+            // 내 꺼에 저장
             BoothPosition myPosition = new BoothPosition();
             myPosition.boothPositionIndex = currentIndex;
             DatabaseManager.Instance.SaveData<BoothPosition>(myPosition);
+
+            // 서버에 저장
+            SaveChargedBoothPosition(currentIndex, UuidMgr.Instance.currentUserInfo.companyUuid);
+
+            // BoothPositionReseter 설정하기
+            BoothPositionReseter.Instance.SetValue(currentIndex, UuidMgr.Instance.currentUserInfo.companyUuid);
+            return true;
         }
+        return false;
     }
 
-    public bool CanSaveData()
+    public async Task SaveChargedBoothPosition(int index, string uuid)
     {
-        if (currentIndex == -1)
+        // 서버에 저장
+        ChargedBoothPosition position = await AsyncDatabase.GetDataFromDatabase<ChargedBoothPosition>(DatabasePath.GetPublicDataPath(nameof(ChargedBoothPosition)));
+        position.BoothPositionList[index] = new ChargedBoothData(true, uuid);
+        DatabaseManager.Instance.SavePublicData<ChargedBoothPosition>(position);
+    }
+    public bool CanSaveData(ChargedBoothPosition currentChargedBoothPosition, int index)
+    {
+        if (index == -1)
             return false;
-        if (position != null && position.BoothPositionList[currentIndex] == true)
+        if (currentChargedBoothPosition != null && currentChargedBoothPosition.BoothPositionList[index].isCharged == true)
             return false;
         return true;
     }
@@ -129,5 +146,25 @@ public class BoothPosition
 public class ChargedBoothPosition
 {
     [FirestoreProperty]
-    public List<bool> BoothPositionList { get; set; }
+    public List<ChargedBoothData> BoothPositionList { get; set; }
+}
+
+[FirestoreData]
+public class ChargedBoothData
+{
+    [FirestoreProperty]
+    public bool isCharged { get; set; }
+    [FirestoreProperty]
+    public string ownerUUID { get; set; }
+
+    public ChargedBoothData()
+    {
+
+    }
+
+    public ChargedBoothData(bool isCharged, string ownerUUID)
+    {
+        this.isCharged = isCharged;
+        this.ownerUUID = ownerUUID;
+    }
 }
