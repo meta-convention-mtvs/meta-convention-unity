@@ -29,6 +29,7 @@ public class CashedDataFromDatabase : Singleton<CashedDataFromDatabase>
         playerInfo = await AsyncDatabase.GetDataFromDatabase<Card>(DatabasePath.GetUserDataPath(uid, nameof(Card)));
         playerRecommendedCompanyListData = await AsyncDatabase.GetDataFromDatabase<RecommendedCompanyListData>(DatabasePath.GetUserDataPath(uid, nameof(RecommendedCompanyListData)));
 
+        allDataCashed = true;
         OnCashedData?.Invoke();
 
     }

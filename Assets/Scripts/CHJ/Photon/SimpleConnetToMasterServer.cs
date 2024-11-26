@@ -10,10 +10,27 @@ public class SimpleConnetToMasterServer : MonoBehaviourPunCallbacks
     public float sceneTransitionTime = 3.0f;
     public float fadeDuration = 2.0f;
 
+    float currentTime = 0;
+    bool isPhotonConnecting = false;
+
     private void Awake()
     {
-        CashedDataFromDatabase.Instance.OnCashedData += PhotonConnect;
-        CashedDataFromDatabase.Instance.OnCashedData += ShowBlackUi;
+        ShowBlackUi();
+    }
+
+    private void Update()
+    {
+        if (!isPhotonConnecting)
+        {
+            // sceneTransitionTime + fadeDuration 이 지나고, CashedDataFromDatabase가 다 읽어왔으면 실행
+            if (currentTime > sceneTransitionTime + fadeDuration && CashedDataFromDatabase.Instance.allDataCashed)
+            {
+                PhotonConnect();
+                isPhotonConnecting = true;
+            }
+
+            currentTime += Time.deltaTime;
+        }
     }
     void PhotonConnect()
     {
