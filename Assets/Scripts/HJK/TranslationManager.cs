@@ -270,6 +270,7 @@ public class TranslationManager : Singleton<TranslationManager>
                         Debug.Log("[TranslationManager] Closing WebSocket connection after leaving room");
                         ws.Close();
                         _isConnected = false;
+                        isConnecting = false;
                         ws = null;
                     }
                     break;

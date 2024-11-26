@@ -533,6 +533,10 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 4959585688688539851}
+    - targetCorrespondingSourceObject: {fileID: 4131733748807728804, guid: 9392a7e58d4c142e4ba373a8efc05e26,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4857384455394203196}
   m_SourcePrefab: {fileID: 100100000, guid: 9392a7e58d4c142e4ba373a8efc05e26, type: 3}
 --- !u!1 &688014986911971491 stripped
 GameObject:
@@ -574,6 +578,46 @@ MonoBehaviour:
     m_VerticalOverflow: 1
     m_LineSpacing: 1
   m_Text: "\uB0B4 \uBA85\uD568"
+--- !u!114 &4857384455394203196
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 688014986911971491}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 56eb0353ae6e5124bb35b17aff880f16, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_StringReference:
+    m_TableReference:
+      m_TableCollectionName: GUID:31cd97e4ff61912489a16a41ffc26a07
+    m_TableEntryReference:
+      m_KeyId: 1569465786368
+      m_Key: 
+    m_FallbackState: 0
+    m_WaitForCompletion: 0
+    m_LocalVariables: []
+  m_FormatArguments: []
+  m_UpdateString:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 4959585688688539851}
+        m_TargetAssemblyTypeName: UnityEngine.UI.Text, UnityEngine.UI
+        m_MethodName: set_text
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 1
+  references:
+    version: 2
+    RefIds: []
 --- !u!224 &4604725988735247156 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 1098255898888365363, guid: 9392a7e58d4c142e4ba373a8efc05e26,
@@ -1349,7 +1393,7 @@ PrefabInstance:
     - target: {fileID: 6582326712556296682, guid: 2665ab5d2ef754de6a45c15193a31670,
         type: 3}
       propertyPath: m_Size
-      value: 0.5672691
+      value: 0.744845
       objectReference: {fileID: 0}
     - target: {fileID: 6582326712556296682, guid: 2665ab5d2ef754de6a45c15193a31670,
         type: 3}
@@ -1386,6 +1430,10 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 5096289737817456527}
+    - targetCorrespondingSourceObject: {fileID: 329256013910945414, guid: 2665ab5d2ef754de6a45c15193a31670,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1054834148563635663}
   m_SourcePrefab: {fileID: 100100000, guid: 2665ab5d2ef754de6a45c15193a31670, type: 3}
 --- !u!224 &4734387316278358772 stripped
 RectTransform:
@@ -1439,3 +1487,43 @@ MonoBehaviour:
     m_VerticalOverflow: 1
     m_LineSpacing: 1
   m_Text: "\uBC1B\uC740 \uBA85\uD568"
+--- !u!114 &1054834148563635663
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8711423867322270051}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 56eb0353ae6e5124bb35b17aff880f16, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_StringReference:
+    m_TableReference:
+      m_TableCollectionName: GUID:31cd97e4ff61912489a16a41ffc26a07
+    m_TableEntryReference:
+      m_KeyId: 1323344027648
+      m_Key: 
+    m_FallbackState: 0
+    m_WaitForCompletion: 0
+    m_LocalVariables: []
+  m_FormatArguments: []
+  m_UpdateString:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 5096289737817456527}
+        m_TargetAssemblyTypeName: UnityEngine.UI.Text, UnityEngine.UI
+        m_MethodName: set_text
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 1
+  references:
+    version: 2
+    RefIds: []
