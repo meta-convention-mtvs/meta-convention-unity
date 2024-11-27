@@ -59,9 +59,12 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    public void ShowPopupUI(string text) {
+    public void ShowPopupUI(string koText, string enText) {
         GameObject go = Instantiate(popupUiFactory);
         go.transform.SetParent(popupCanvas.transform, false);
-        go.GetComponent<SetPopupText>()?.SetText(text);
+        if (LanguageSingleton.Instance.language == "ko")
+            go.GetComponent<SetPopupText>()?.SetText(koText);
+        else if (LanguageSingleton.Instance.language == "en")
+            go.GetComponent<SetPopupText>()?.SetText(enText);
     }
 }

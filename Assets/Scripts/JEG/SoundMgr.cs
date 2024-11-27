@@ -11,7 +11,7 @@ public class SoundMgr : Singleton<SoundMgr>
     public AudioClip[] audios = new AudioClip[10];
 
     public int idx;
-    public int curidx;
+    private int curidx;
     void Start()
     {
         idx = 0;

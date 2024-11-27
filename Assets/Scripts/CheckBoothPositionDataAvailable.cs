@@ -32,7 +32,10 @@ public class CheckBoothPositionDataAvailable : MonoBehaviour
         }
         else
         {
-            errorText.text = "부스 위치를 설정해주세요!";
+            if (LanguageSingleton.Instance.language == "ko")
+                errorText.text = "부스 위치를 설정해주세요!";
+            else if (LanguageSingleton.Instance.language == "en")
+                errorText.text = "Please set the booth location";
         }
     }
 

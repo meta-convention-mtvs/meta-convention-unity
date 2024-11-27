@@ -23,6 +23,10 @@ public class UIRoomQuit : MonoBehaviour
             BoothPositionReseter.Instance.OnSaveData += QuitApplication;
             BoothPositionReseter.Instance.SaveDataWhileQuit();
         }
+        else
+        {
+            QuitApplication();
+        }
     }
 
     void QuitApplication()
