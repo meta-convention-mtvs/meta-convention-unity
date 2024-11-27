@@ -15,9 +15,10 @@ public class EnterKeyButtonClick : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Return))
+        if (button.interactable && Input.GetKeyDown(KeyCode.Return))
         {
             button.onClick?.Invoke();
+            button.interactable = false;
         }
     }
 }

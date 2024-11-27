@@ -18,7 +18,7 @@ public class BusinessRoomQueueManager : MonoBehaviourPunCallbacks
     private void Start()
     {
         meetingQueue = new Queue<string>();
-        ui_br.OnYesButtonClick += () => { StartAppointmentIn(meetingQueue); };
+        ui_br.OnYesButtonClick += () => { StartAppointmentIn(meetingQueue);  };
         ui_br.OnNoButtonClick += () => { CancelAppointmentIn(meetingQueue); };
     }
     Player FindPlayerWithId(string id)

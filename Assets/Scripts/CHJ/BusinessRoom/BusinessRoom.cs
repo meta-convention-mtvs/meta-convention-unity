@@ -27,7 +27,7 @@ public class BusinessRoom : MonoBehaviour
     void WriteDocument()
     {
         // 회의록 ui를 띄운다.
-        UIManager.Instance.ShowUI(documentUI, UIType.Normal);
+        documentUI.GetComponent<GeneralUI>().Show();
     }
 
     void ShowObject()
@@ -39,6 +39,6 @@ public class BusinessRoom : MonoBehaviour
 
     void QuitRoom()
     {
-        UIManager.Instance.ShowUI(quitUI, UIType.Normal);
+        quitUI.GetComponent<GeneralUI>().Show();
     }
 }
