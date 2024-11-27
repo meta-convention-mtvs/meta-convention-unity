@@ -1425,6 +1425,26 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!1 &422055451 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: -5557984472696946113, guid: ac235f3a43cf489429d63e8a6afc985e,
+    type: 3}
+  m_PrefabInstance: {fileID: 1077996483}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &422055452
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 422055451}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ef97f7bc00515f748b4ec645473b7154, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  moveDistance: 0.05
+  duration: 2
 --- !u!1001 &433886199
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2676,7 +2696,11 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: -5557984472696946113, guid: ac235f3a43cf489429d63e8a6afc985e,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 422055452}
   m_SourcePrefab: {fileID: 8969075095451503090, guid: ac235f3a43cf489429d63e8a6afc985e,
     type: 3}
 --- !u!1 &1089877985
@@ -4036,6 +4060,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: NewDocumentCanvas
       objectReference: {fileID: 0}
+    - target: {fileID: 5425712352610204018, guid: 4aede057cad937949997e53578cc04f8,
+        type: 3}
+      propertyPath: m_SortingOrder
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5703299191749031791, guid: 4aede057cad937949997e53578cc04f8,
         type: 3}
       propertyPath: m_fontAsset
@@ -5213,6 +5242,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6246272011085086921, guid: 15c281b09578c604fa5df5121c950c9c,
+        type: 3}
+      propertyPath: m_SortingOrder
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 6452774283639272178, guid: 15c281b09578c604fa5df5121c950c9c,
         type: 3}

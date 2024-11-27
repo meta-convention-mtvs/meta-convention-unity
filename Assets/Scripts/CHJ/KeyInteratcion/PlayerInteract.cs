@@ -21,6 +21,12 @@ public class PlayerInteract : MonoBehaviourPun
 
         Collider[] colliders = Physics.OverlapSphere(transform.position, interactionDistance, interactionMask);
 
+        string collidernames = "";
+        foreach (Collider collider in colliders)
+        {
+            collidernames += collider.name;
+        }
+        print(collidernames);
         // interaction종료를 확인하는 코드
         if (interactingObject != null && !isColliderListContains(colliders, interactingObject))
         {
@@ -37,6 +43,7 @@ public class PlayerInteract : MonoBehaviourPun
         GameObject closestObject = FindClosestGameObject(colliders, interactionDistance);
         //Debug.Log(closestObject?.name);
         // 만약 이전에 가장 가까운 오브젝트가 존재하고, 그 오브젝트가 현재 오브젝트랑 다를 때
+        print(closestObject.name);
         if(closestObject != null && closestObject != previousClosestObject)
         {
             // 현재 오브젝트의 Text를 보여주는 코드

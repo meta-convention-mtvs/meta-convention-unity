@@ -15,6 +15,7 @@ public class RenderBoothData : MonoBehaviour
     public GameObject brochure;
     public Renderer[] boothRenderers;
     public bool soundOff;
+    public float boothObjectSizeAmplifier = 1.0f;
 
     private Renderer boothLogoRenderer;
     private Renderer boothVideoRenderer;
@@ -54,7 +55,7 @@ public class RenderBoothData : MonoBehaviour
         }
         if (currentInstantiatedObject != null)
         {
-            currentInstantiatedObject.transform.localScale = new Vector3(extraData.modelingScale, extraData.modelingScale, extraData.modelingScale);
+            currentInstantiatedObject.transform.localScale = new Vector3(extraData.modelingScale, extraData.modelingScale, extraData.modelingScale) * boothObjectSizeAmplifier;
         }
         SetBanner(extraData.hasBanner, extraData.bannerImage, extraData.homepageLink);
         SetBrochure(extraData.hasBrochure, extraData.brochureImage);
@@ -68,6 +69,7 @@ public class RenderBoothData : MonoBehaviour
         {
             Destroy(currentInstantiatedObject);
         }
+        print("modeling Path : " + extraData.modelingPath);
         if(extraData.modelingPath != null)
             ObjectLoader.ImportGLTFAsync(extraData.modelingPath, OnLoadFinish);
 
@@ -84,7 +86,7 @@ public class RenderBoothData : MonoBehaviour
         currentInstantiatedObject = modeling;
         if (currentInstantiatedObject != null)
         {
-            currentInstantiatedObject.transform.localScale = new Vector3(extraData.modelingScale, extraData.modelingScale, extraData.modelingScale);
+            currentInstantiatedObject.transform.localScale = new Vector3(extraData.modelingScale, extraData.modelingScale, extraData.modelingScale)  * boothObjectSizeAmplifier;
             currentInstantiatedObject.transform.SetParent(this.gameObject.transform, false);
         }
     }

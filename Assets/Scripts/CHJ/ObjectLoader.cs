@@ -37,6 +37,7 @@ public class ObjectLoader : MonoBehaviour
 
     public static void ImportGLTFAsync(string filepath, Action<AssetLoaderContext> OnLoadFinish)
     {
+        print("ImportGLTFAsync called");
         AssetLoader.LoadModelFromFile(filepath, OnLoadFinish);
     }
 
