@@ -146,12 +146,14 @@ public class AIAnnounceMgr : MonoBehaviour
         if (audioSource.isPlaying)
         {
             isAudioPlay = true;
-            aiBubbleUI.SetActive(true);
+            if(aiBubbleUI != null)
+                aiBubbleUI.SetActive(true);
         }
         else if (!audioSource.isPlaying)
         {
             isAudioPlay = false;
-            aiBubbleUI.SetActive(false);
+            if(aiBubbleUI != null)
+                aiBubbleUI.SetActive(false);
         }
 
         // 유저의 언어 정보, 상황
@@ -180,7 +182,8 @@ public class AIAnnounceMgr : MonoBehaviour
     {
         audioSource.Stop();
         audioSource.clip = announceVoice[idx];
-        bubbleText.text = announceText[idx];
+        if(bubbleText != null)
+            bubbleText.text = announceText[idx];
         audioSource.Play();
     }
 

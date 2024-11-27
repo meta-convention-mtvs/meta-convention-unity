@@ -14,6 +14,7 @@ public class RenderBoothData : MonoBehaviour
     public GameObject banner;
     public GameObject brochure;
     public Renderer[] boothRenderers;
+    public bool soundOff;
 
     private Renderer boothLogoRenderer;
     private Renderer boothVideoRenderer;
@@ -122,6 +123,10 @@ public class RenderBoothData : MonoBehaviour
         videoPlayer.isLooping = true;
         videoPlayer.audioOutputMode = VideoAudioOutputMode.AudioSource;
         videoPlayer.SetTargetAudioSource(0, audioSource);
+        if (soundOff)
+            audioSource.mute = true;
+        else
+            audioSource.volume = 0.2f;
         videoPlayer.Prepare();
         videoPlayer.prepareCompleted += PlayVideo;
     }

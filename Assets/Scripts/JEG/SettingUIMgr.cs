@@ -25,7 +25,7 @@ public class SettingUIMgr : MonoBehaviour
         string filePath = directoryPath + "/" + System.DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss") + ".png";
         ScreenCapture.CaptureScreenshot(filePath);
         Debug.Log("Editor Screenshot saved to: " + filePath);
-        UIManager.Instance.ShowPopupUI("스크린샷이 저장되었습니다.");
+        UIManager.Instance.ShowPopupUI("스크린샷이 저장되었습니다.", "The screenshot has been saved.");
         StartCoroutine(ReenableButton());
     }
 
