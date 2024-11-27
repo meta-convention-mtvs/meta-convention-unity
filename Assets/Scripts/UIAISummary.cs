@@ -10,16 +10,8 @@ public class UIAISummary : MonoBehaviour
     public Text summaryText;
     public Text originalText;
 
-    public CanvasGroup canvas;
-
     public RectTransform summaryContentRectTransform;  // Scroll View의 Content RectTransform
     public RectTransform originalContentRectTransform;
-
-    private void Start()
-    {
-        canvas.DOFade(1, 1);
-        canvas.blocksRaycasts = true;
-    }
 
     public void SetSummaryText(string summary)
     {
@@ -32,12 +24,6 @@ public class UIAISummary : MonoBehaviour
         originalText.text = text;
         UpdateContentHeight(originalText, originalContentRectTransform);
     }
-    public void Hide()
-    {
-        canvas.DOFade(0, 1);
-        canvas.blocksRaycasts = false;
-    }
-
 
     // 텍스트 내용이 변경될 때마다 호출
     public void UpdateContentHeight(Text text, RectTransform contentRectTransform)

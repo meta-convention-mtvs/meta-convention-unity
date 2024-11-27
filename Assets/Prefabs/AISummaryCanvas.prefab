@@ -759,6 +759,7 @@ GameObject:
   - component: {fileID: 4743662358528505360}
   - component: {fileID: 172160241246941034}
   - component: {fileID: 3812719893493806958}
+  - component: {fileID: 3628579790297578339}
   m_Layer: 5
   m_Name: AISummaryCanvas
   m_TagString: Untagged
@@ -863,9 +864,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   summaryText: {fileID: 7818591198506345504}
   originalText: {fileID: 6474107125496519135}
-  canvas: {fileID: 4330394437240019007}
   summaryContentRectTransform: {fileID: 7406526368333723944}
   originalContentRectTransform: {fileID: 899019675406850945}
+--- !u!114 &3628579790297578339
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7142517359931289552}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e6171a3b822efcb43a3310e8ae07fd2c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hideKeys: 1b000000
 --- !u!1 &7241191609907571191
 GameObject:
   m_ObjectHideFlags: 0
@@ -1857,7 +1870,7 @@ PrefabInstance:
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 3812719893493806958}
+      objectReference: {fileID: 3628579790297578339}
     - target: {fileID: 5817510849166728196, guid: 6f9621007d775495f9c8de66058392bc,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
@@ -1871,7 +1884,7 @@ PrefabInstance:
     - target: {fileID: 5817510849166728196, guid: 6f9621007d775495f9c8de66058392bc,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
-      value: UIAISummary, Assembly-CSharp
+      value: GeneralUI, Assembly-CSharp
       objectReference: {fileID: 0}
     - target: {fileID: 5817510849166728196, guid: 6f9621007d775495f9c8de66058392bc,
         type: 3}

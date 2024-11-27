@@ -93,6 +93,7 @@ public class SummaryMgr : MonoBehaviourPun
         // string t가 받아온 데이터
         // 데이터를 띄우는 로직
         GameObject go = Instantiate(SummaryUIFactory);
+        go.GetComponent<GeneralUI>().Show();
         go.GetComponent<UIAISummary>()?.SetSummaryText(summary.summary);
         go.GetComponent<UIAISummary>()?.SetAllText(summary.full_script);
 
