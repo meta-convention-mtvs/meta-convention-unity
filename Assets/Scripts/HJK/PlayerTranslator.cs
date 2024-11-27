@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using UnityEngine.UI;
 using TMPro;
 using System.Linq;  // Text 컴포넌트 사용을 위해 추가
+using Photon.Voice.Unity;  // Recorder를 위해 추가
 
 /// <summary>
 /// 개별 플레이어의 AI 통역 관련 기능을 처리하는 컴포넌트
@@ -20,15 +21,11 @@ public class PlayerTranslator : MonoBehaviourPunCallbacks
 {
     // 오디오 관련 컴포넌트
     private AudioSource translatedAudioSource;  // 통역된 음성을 재생할 AudioSource
-    private AudioClip recordingClip;           // 현재 녹음 중인 AudioClip
-    private bool isRecording = false;          // 현재 녹음 중인지 여부
-    private float[] tempRecordingBuffer;       // 임시 녹음 버퍼
-    private int recordingPosition = 0;         // 현재 녹음 위치
-
-    private const float CHUNK_DURATION = 0.1f;                  // 청크 단위 (100ms)
-    private const int SAMPLES_PER_CHUNK = (int)(RECORDING_FREQUENCY * CHUNK_DURATION);  // 청크당 샘플 수
-    private Coroutine recordingCoroutine;                      // 녹음 코루틴
-
+    private bool isTranslating = false;
+    
+    [SerializeField] private Recorder voiceRecorder;  // Inspector에서 할당
+    private const int RECORDING_FREQUENCY = 24000;    // 녹음 주파수는 유지
+    
     // 설정값들
     [SerializeField] private KeyCode speakKey = KeyCode.M;      // 발언 시작/종료 키
     [SerializeField] private float maxRecordingTime = 60f;      // 최대 녹음 시간(초)
@@ -41,7 +38,6 @@ public class PlayerTranslator : MonoBehaviourPunCallbacks
 
 
     // 오디오 녹음 관련 상수
-    private const int RECORDING_FREQUENCY = 24000;              // 녹음 주파수
     private readonly int RECORDING_BUFFER_SIZE = 24000 * 60;    // 녹음 버퍼 크기 (1분)
 
 
@@ -111,10 +107,21 @@ public class PlayerTranslator : MonoBehaviourPunCallbacks
     {
         // 통역된 음성 재생을 위한 AudioSource 컴포넌트 추가
         translatedAudioSource = gameObject.AddComponent<AudioSource>();
-        // 녹음 버퍼 초기화
-        tempRecordingBuffer = new float[RECORDING_BUFFER_SIZE];
         
-        // TranslationEventHandler의 Ready 상태 변경 이벤트 구독
+        // Recorder 이벤트 구독
+        if (voiceRecorder == null)
+        {
+            voiceRecorder = FindObjectOfType<Recorder>();
+            if (voiceRecorder == null)
+            {
+                Debug.LogError("[PlayerTranslator] Recorder를 찾을 수 없습니다!");
+                return;
+            }
+        }
+        
+        voiceRecorder.AudioFrame += OnAudioFrameReceived;
+        
+        // TranslationEventHandler 이벤트 구독 유지
         TranslationEventHandler.Instance.OnRoomReadyStateChanged += UpdateSpeakUI;
         TranslationEventHandler.Instance.OnSpeakerChanged += HandleSpeakerChanged;
     }
@@ -134,12 +141,12 @@ public class PlayerTranslator : MonoBehaviourPunCallbacks
         else if (Input.GetKeyUp(speakKey))
         {
             Debug.Log("M키에서 손을 뗐습니다.");
-            StopRecording();
+            StopTranslating();
         }
         // 취소 키(ESC)를 눌렀을 때
         else if (Input.GetKeyDown(cancelKey))
         {
-            CancelRecording();
+            CancelTranslating();
         }
         // 리셋 키(R) 눌렀을 때
         if (Input.GetKeyDown(resetKey))
@@ -187,8 +194,8 @@ public class PlayerTranslator : MonoBehaviourPunCallbacks
             return;
         }
 
-        // 발언 가능한지 확인
-        if (!string.IsNullOrEmpty(TranslationEventHandler.Instance.CurrentSpeakerId) && TranslationEventHandler.Instance.CurrentSpeakerId != userId)
+        if (!string.IsNullOrEmpty(TranslationEventHandler.Instance.CurrentSpeakerId) && 
+            TranslationEventHandler.Instance.CurrentSpeakerId != userId)
         {
             ShowWaitingUI("이미 상대방이 통역 중입니다");
             return;
@@ -204,266 +211,73 @@ public class PlayerTranslator : MonoBehaviourPunCallbacks
 
         if (userid == FireAuthManager.Instance.GetCurrentUser().UserId)
         {
-            // 내가 발언권을 얻은 경우
             ShowCanSpeakUI();
-            // Debug.Log("UI 표시됨: ShowCanSpeakUI() 실행 in OnApprovedSpeech()");
-            StartRecording();
-            // Debug.Log("녹음 시작됨: StartRecording() 실행 in OnApprovedSpeech()");
-        }
-        else
-        {
-            // 다른 사용자가 발언권을 얻은 경우
-            // 필요에 따라 처리
+            StartTranslating();
         }
     }
 
-    /// <summary>
-    /// 실제 녹음 시작
-    /// </summary>
-    private void StartRecording()
+    private void StartTranslating()
     {
-        // print("StartRecording(녹음 시작되는 함수에 진입)");
-        // currentSpeakerId 참조를 TranslationEventHandler로 변경
-        // print("CurrentSpeakerId: " + TranslationEventHandler.Instance.CurrentSpeakerId);
-        // if (!string.IsNullOrEmpty(TranslationEventHandler.Instance.CurrentSpeakerId)) return;
-
-        isRecording = true;
-        recordingPosition = 0;
+        isTranslating = true;
         
-        // MessageData 생성
-        MessageData messageData = new MessageData();
-        messageData.isMine = true;
-        messageData.order = currentOrder;
-        messageData.userid = FireAuthManager.Instance.GetCurrentUser().UserId;
+        MessageData messageData = new MessageData
+        {
+            isMine = true,
+            order = currentOrder,
+            userid = FireAuthManager.Instance.GetCurrentUser().UserId
+        };
 
-        // 내 메시지 프리팹 생성
-        Debug.Log("StartRecording()에서 MessageBubble_Original_Mine 생성");
         messageData.userMessagePrefab = Instantiate(MessageBubble_Original_Mine, translationScrollView.content);
         messages.Add(messageData);
         StartCoroutine(ScrollToBottomNextFrame());
-
-        // 사용 가능한 마이크 확인
-        string[] devices = Microphone.devices;
-        if (devices.Length == 0)
-        {
-            Debug.LogError("사용 가능한 마이크 없습니다!");
-            return;
-        }
-
-        // 녹음 시작
-        // Debug.Log("녹음을 진짜 시작하는 부분(recordingClip)");
-        recordingClip = Microphone.Start(null, true, (int)maxRecordingTime, RECORDING_FREQUENCY);
-
-        // 실시간 스트리밍 코루틴 시작
-        if (recordingCoroutine != null)
-        {
-            StopCoroutine(recordingCoroutine);
-        }
-        recordingCoroutine = StartCoroutine(StreamAudioData());
     }
 
-    private IEnumerator StreamAudioData()
+    private void StopTranslating()
     {
-        int lastPosition = 0;
-        float[] tempBuffer = new float[SAMPLES_PER_CHUNK];
-    
-        while (isRecording)
-        {
-            int currentPosition = Microphone.GetPosition(null);
-            if (currentPosition < 0 || lastPosition == currentPosition)
-            {
-                yield return new WaitForSeconds(CHUNK_DURATION / 2);
-                continue;
-            }
-    
-            // 청크 크기만큼의 데이터가 있는지 확인
-            int availableSamples = 0;
-            if (currentPosition < lastPosition)
-            {
-                // 버퍼가 순환된 경우
-                availableSamples = (recordingClip.samples - lastPosition) + currentPosition;
-            }
-            else
-            {
-                availableSamples = currentPosition - lastPosition;
-            }
-    
-            if (availableSamples >= SAMPLES_PER_CHUNK)
-            {
-                // 청크 데이터 추출
-                recordingClip.GetData(tempBuffer, lastPosition);
-                
-                // Base64로 변환하여 전송
-                string audioData = ConvertAudioToBase64(tempBuffer);
-                if (!string.IsNullOrEmpty(audioData))
-                {
-                    TranslationManager.Instance.SendAudioData(audioData);
-                }
-    
-                // 다음 청크를 위한 위치 업데이트
-                lastPosition = (lastPosition + SAMPLES_PER_CHUNK) % recordingClip.samples;
-            }
-    
-            yield return new WaitForSeconds(CHUNK_DURATION / 2);
-        }
-    }
-
-    /// <summary>
-    /// 녹음 중지 및 녹음된 오디오 전송
-    /// </summary>
-    private void StopRecording()
-    {
-        if (!isRecording) return;
+        if (!isTranslating) return;
         
-        // 녹음 중지
-        isRecording = false;
-        if (recordingCoroutine != null)
-        {
-            StopCoroutine(recordingCoroutine);
-            recordingCoroutine = null;
-        }
-    
-        // 마이크 녹음 중지
-        Microphone.End(null);
-        
-        // 발언 종료 신호 전송
+        isTranslating = false;
         TranslationManager.Instance.DoneSpeech();
-    
-        // 발언자 상태 초기화
         TranslationEventHandler.Instance.ResetSpeaker();
     }
 
-    public void OnInputAudioDone(int order, string text)
+    private void OnDestroy()
     {
-        // order로 메시지 데이터를 찾음
-        MessageData messageData = messages.FirstOrDefault(m => m.order == order);
-
-        if (messageData != null)
+        if (voiceRecorder != null)
         {
-            // 발화자가 나인지 상대방인지에 따라 적절한 컴포넌트를 찾습니다.
-            string contentName = messageData.isMine ? "Content_Mine" : "Content_Yours";
-            TextMeshProUGUI contentText = messageData.userMessagePrefab.transform.Find(contentName)?.GetComponent<TextMeshProUGUI>();
-            if (contentText != null)
-            {
-                contentText.text = text;
-                if (translationScrollView != null)
-                {
-                    // Debug.Log("ScrollToBottomNextFrame()가 OnInputAudioDone()에서 실행됨");
-                    StartCoroutine(ScrollToBottomNextFrame());
-                }
-                Debug.Log($"Updated original text for order: {order}");
-            }
-            else
-            {
-                Debug.LogError($"{contentName} TMP component not found");
-            }
+            voiceRecorder.AudioFrame -= OnAudioFrameReceived;
         }
-        else
-        {
-            Debug.LogError($"MessageData not found for order: {order}");
-        }
-    }
-
-    public void OnOtherInputAudioDone(int order, string text, string speakerId)
-    {
-        // 기존 메시지를 찾거나 새로 생성
-        MessageData messageData = messages.FirstOrDefault(m => m.order == order);
-        if (messageData == null)
-        {
-            messageData = new MessageData
-            {
-                isMine = (speakerId == FireAuthManager.Instance.GetCurrentUser().UserId),
-                order = order,
-                userid = speakerId
-            };
-            messages.Add(messageData);
-            Debug.Log($"Created new MessageData for order: {order}");
-        }
-    }
-
-
-    public void UpdatePartialTranslatedText(int order, string partialText, string speakerId)
-    {
-        Debug.Log($"[Translation Debug] Starting UpdatePartialTranslatedText for order: {order}");
-
-        // order로 메시지 데이터를 찾음
-        MessageData messageData = messages.FirstOrDefault(m => m.order == order);
-
-        // 메시지 데이터가 없는 경우 새로 생성
-        if (messageData == null)
-        {
-            bool isMine = (speakerId == FireAuthManager.Instance.GetCurrentUser().UserId);
-
-            messageData = new MessageData();
-            messageData.order = order;
-            messageData.isMine = isMine;
-            messageData.userid = speakerId;
-
-            // isMine이 false일 때만 (상대방 메시지일 때만) 프리팹 생성
-            if (!isMine)
-            {
-                messageData.userMessagePrefab = Instantiate(MessageBubble_Original_Yours, translationScrollView.content);
-                messages.Add(messageData);
-                Debug.Log($"Created new MessageData for order: {order}, isMine: {isMine}");
-            }
-        }
-
-        // 번역 프리팹이 없는 경우에만 생성
-        if (messageData.translationPrefab == null)
-        {
-            Debug.Log("[Translation Debug] Creating new translation prefab");
-            messageData.translationPrefab = Instantiate(MessageBubble_Translated, translationScrollView.content);
-            int index = messageData.userMessagePrefab.transform.GetSiblingIndex();
-            messageData.translationPrefab.transform.SetSiblingIndex(index + 1);
-            Debug.Log($"[Translation Debug] Translation prefab created and positioned at index: {index + 1}");
-        }
-
-        // 번역된 내용을 표시하는 TextMeshProUGUI 컴포넌트를 찾습니다.
-        TextMeshProUGUI textComponent = messageData.translationPrefab.transform.Find("TranslatedContent")?.GetComponent<TextMeshProUGUI>();
-        if (textComponent != null)
-        {
-            // 기존 텍스트에 partialText를 추가합니다.
-            textComponent.text += partialText;
-
-            Debug.Log($"[Translation Debug] Updated accumulated text: {textComponent.text}");
-
-            if (translationScrollView != null)
-            {
-                StartCoroutine(ScrollToBottomNextFrame());
-            }
-        }
-        else
-        {
-            Debug.LogError("[Translation Debug] TranslatedContent TMP component not found");
-        }
-    }
-
-
-
-    private IEnumerator ScrollToBottomNextFrame()
-    {
-        yield return new WaitForEndOfFrame(); // 모든 UI 업데이트가 완료될 때까지 대기
-        Canvas.ForceUpdateCanvases(); // Canvas를 강제로 업데이트하여 content 크기를 정확하게 계산
         
-        float targetPos = 0f; // 스크롤의 맨 아래 (0이 맨 아래, 1이 맨 위)
-        float startPos = translationScrollView.verticalNormalizedPosition;
-        float elapsed = 0f;
-    
-        while (elapsed < scrollAnimationDuration)
+        var handler = TranslationEventHandler.Instance;
+        if (handler != null)
         {
-            elapsed += Time.deltaTime;
-            float t = elapsed / scrollAnimationDuration;
-            
-            // easeInOutCubic 곡선 적용 (시작과 끝이 모두 부드럽게)
-            t = t < 0.5f ? 4f * t * t * t : 1f - Mathf.Pow(-2f * t + 2f, 3f) / 2f;
-            
-            // 현재 위치에서 목표 위치까지 부드럽게 보간
-            translationScrollView.verticalNormalizedPosition = Mathf.Lerp(startPos, targetPos, t);
-            yield return null;
+            handler.OnRoomReadyStateChanged -= UpdateSpeakUI;
+            handler.OnSpeakerChanged -= HandleSpeakerChanged;
         }
-    
-        // 정확한 최종 위치 설정
-        translationScrollView.verticalNormalizedPosition = targetPos;
+    }
+
+    private void OnAudioFrameReceived(float[] frame)
+    {
+        if (isTranslating)
+        {
+            string audioData = ConvertAudioToBase64(frame);
+            if (!string.IsNullOrEmpty(audioData))
+            {
+                TranslationManager.Instance.SendAudioData(audioData);
+            }
+        }
+    }
+
+    private void CancelTranslating()
+    {
+        string userId = FireAuthManager.Instance.GetCurrentUser().UserId;
+        if (TranslationEventHandler.Instance.CurrentSpeakerId != userId) return;
+
+        if (isTranslating)
+        {
+            isTranslating = false;
+            TranslationManager.Instance.ClearAudioBuffer();
+        }
     }
 
     /// <summary>
@@ -679,68 +493,15 @@ public class PlayerTranslator : MonoBehaviourPunCallbacks
     }
 
     /// <summary>
-    /// 녹음 취소 처리
-    /// </summary>
-    private void CancelRecording()
-    {
-        string userId = FireAuthManager.Instance.GetCurrentUser().UserId;
-        if (TranslationEventHandler.Instance.CurrentSpeakerId != userId) return;
-
-        if (isRecording)
-        {
-            Microphone.End(null);
-            isRecording = false;
-            TranslationManager.Instance.ClearAudioBuffer();
-        }
-    }
-
-    /// <summary>
-    /// 컴포넌트 제거 시 정리 작업
-    /// </summary>
-    private void OnDestroy()
-    {
-        // currentSpeakerId 참조를 TranslationEventHandler로 변경
-        if (photonView.IsMine && !string.IsNullOrEmpty(TranslationEventHandler.Instance.CurrentSpeakerId))
-        {
-            TranslationManager.Instance.ClearAudioBuffer();
-            TranslationManager.Instance.LeaveRoom();
-        }
-
-        // 이벤트 구독 해제
-        var handler = TranslationEventHandler.Instance;
-        if (handler != null)
-        {
-            handler.OnRoomReadyStateChanged -= UpdateSpeakUI;
-            handler.OnSpeakerChanged -= HandleSpeakerChanged;
-        }
-    }
-
-    /// <summary>
-    /// 발언권 승인 처리
-    /// </summary>
-    // public void OnSpeechApproved(string approvedUserId)
-    // {
-    //     print("OnSpeechApproved(발언권 승인됨)");
-    //     if (FireAuthManager.Instance.GetCurrentUser().UserId == approvedUserId)
-    //     {
-    //         ShowCanSpeakUI();
-    //         Debug.Log("UI 표시됨: ShowCanSpeakUI() 실행");
-    //         StartRecording();
-    //         Debug.Log("녹음 시작됨: StartRecording() 실행");
-
-    //     }
-    // }
-
-    /// <summary>
     /// 에러 처리
     /// </summary>
     public void HandleError(string errorMessage)
     {
         print("HandleError(에러 발생됨)");
         // 현재 녹음 중이면 녹음 중지
-        if (isRecording)
+        if (isTranslating)
         {
-            CancelRecording();
+            StopTranslating();
         }
 
         // 현재 재생 중이면 재생 중지
@@ -849,9 +610,9 @@ public class PlayerTranslator : MonoBehaviourPunCallbacks
         messages.Clear();
         
         // 3. 현재 진행중인 번역/음성 처리 중단
-        if (isRecording)
+        if (isTranslating)
         {
-            CancelRecording();
+            StopTranslating();
         }
         CancelAudioPlayback();
         
