@@ -150,7 +150,7 @@ public class TranslationRoomIDSynchronizer : MonoBehaviourPunCallbacks
         Debug.Log("[TranslationRoomIDSynchronizer] 현재 방 나가기 실행");
         
         // 1. 메시지 버블 초기화
-        var playerTranslator = FindObjectOfType<PlayerTranslatorWithoutRPC>();
+        var playerTranslator = FindObjectOfType<PlayerTranslator>();
         if (playerTranslator != null)
         {
             Debug.Log("[TranslationRoomIDSynchronizer] 메시지 초기화 시작");
