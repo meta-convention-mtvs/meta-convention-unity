@@ -6,6 +6,6 @@ public class ButtonPopUp : MonoBehaviour
 {
     public void ShowPopup(string s)
     {
-        UIManager.Instance.ShowPopupUI(s);
+        UIManager.Instance.ShowPopupUI(s, s);
     }
 }

@@ -26,7 +26,7 @@ public class InteractableAIEmployeeObject : MonoBehaviourPun, IKeyInteractableOb
 
     public void ShowText()
     {
-        UIManager.Instance.ShowPopupUI("(F)키를 눌러 AI 직원과 실시간 상담을 시작해 보세요!");
+        UIManager.Instance.ShowPopupUI("(F)키를 눌러 AI 직원과 실시간 상담을 시작해 보세요!", "Press the (F) key to start a real-time consultation with an AI agent");
     }
     public void HideText()
     {
@@ -55,7 +55,7 @@ public class InteractableAIEmployeeObject : MonoBehaviourPun, IKeyInteractableOb
             }
             else
             {
-                button.onClick.AddListener(() => UIManager.Instance.ShowPopupUI("현재 회사 담당자가 부재중입니다..."));
+                button.onClick.AddListener(() => UIManager.Instance.ShowPopupUI("현재 회사 담당자가 부재중입니다...", "The company representative is currently absent."));
             }
         }
         // 카메라 움직임을 조정한다.

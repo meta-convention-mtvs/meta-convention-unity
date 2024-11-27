@@ -32,7 +32,7 @@ public class CardReader : MonoBehaviour
     public void OnAddCard(Card card)
     {
         cardBook.addCard(card);
-        UIManager.Instance.ShowPopupUI("카드가 추가되었습니다.");
+        UIManager.Instance.ShowPopupUI("카드가 추가되었습니다.", "Card added."); ;
     }
     public static Card ReadCard(Player player)
     {

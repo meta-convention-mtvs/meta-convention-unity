@@ -26,7 +26,10 @@ public class UICardMaker : MonoBehaviour
     {
         if (nameInput.text == "" || instituteInput.text == "" || majorInput.text == "" || phoneNumberInput.text == "")
         {
-            cardErrorText.text = "모든 필드를 채워주세요";
+            if (LanguageSingleton.Instance.language == "ko")
+                cardErrorText.text = "모든 필드를 채워주세요";
+            else if (LanguageSingleton.Instance.language == "en")
+                cardErrorText.text = "Please fill in all fields";
             StartCoroutine(SetButtonInteractable());
             return;
         }
