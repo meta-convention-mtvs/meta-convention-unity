@@ -125,6 +125,8 @@ public class RenderBoothData : MonoBehaviour
         videoPlayer.SetTargetAudioSource(0, audioSource);
         if (soundOff)
             audioSource.mute = true;
+        else
+            audioSource.volume = 0.2f;
         videoPlayer.Prepare();
         videoPlayer.prepareCompleted += PlayVideo;
     }
