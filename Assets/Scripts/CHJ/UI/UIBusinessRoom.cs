@@ -6,9 +6,9 @@ using UnityEngine.UI;
 
 public class UIBusinessRoom : MonoBehaviour
 {
-    public Button qrcodeButton;
+    //public Button qrcodeButton;
     public Button documentButton;
-    public Button objectButton;
+    //public Button objectButton;
     public Button quitButton;
 
     public Action OnQrcode, OnDocument, OnObject, OnQuit;
@@ -16,9 +16,9 @@ public class UIBusinessRoom : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        qrcodeButton.onClick.AddListener(_OnQrcode);
+        //qrcodeButton.onClick.AddListener(_OnQrcode);
         documentButton.onClick.AddListener(_OnDocument);
-        objectButton.onClick.AddListener(_OnObject);
+        //objectButton.onClick.AddListener(_OnObject);
         quitButton.onClick.AddListener(_OnQuit);
     }
 

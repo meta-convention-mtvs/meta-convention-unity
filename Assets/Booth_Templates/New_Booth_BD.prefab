@@ -128,7 +128,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 3e0a915ef970b3c48a1087d5290906a6, type: 2}
+  - {fileID: 2100000, guid: 65b45536596594e44a919f874d6a8033, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -291,7 +291,7 @@ VideoPlayer:
   m_EnabledAudioTracks: 01
   m_DirectAudioMutes: 00
   m_ControlledAudioTrackCount: 1
-  m_PlayOnAwake: 1
+  m_PlayOnAwake: 0
   m_SkipOnDrop: 1
   m_Looping: 0
   m_WaitForFirstFrame: 1
@@ -309,7 +309,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
   m_PlayOnAwake: 1
-  m_Volume: 1
+  m_Volume: 0
   m_Pitch: 1
   Loop: 0
   Mute: 0
@@ -318,7 +318,7 @@ AudioSource:
   Priority: 128
   DopplerLevel: 1
   MinDistance: 1
-  MaxDistance: 500
+  MaxDistance: 1.01
   Pan2D: 0
   rolloffMode: 0
   BypassEffects: 0
@@ -353,7 +353,7 @@ AudioSource:
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 0
+      value: 1
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -418,6 +418,7 @@ MonoBehaviour:
   - {fileID: 5206026618058505314}
   - {fileID: 3511681902768896293}
   - {fileID: 4537620588710129403}
+  soundOff: 1
 --- !u!23 &3143642043148366314
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -523,7 +524,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 3e0a915ef970b3c48a1087d5290906a6, type: 2}
+  - {fileID: 2100000, guid: 65b45536596594e44a919f874d6a8033, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -1408,7 +1409,7 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: 2100000, guid: c279afc37200ef44c85757c1f8241f78, type: 2}
+      objectReference: {fileID: 2100000, guid: 65b45536596594e44a919f874d6a8033, type: 2}
     - target: {fileID: 7193869763155359957, guid: 8134e00563223fa49ba35fa75bc8eb58,
         type: 3}
       propertyPath: m_Name
@@ -1726,9 +1727,14 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1614564980014912178, guid: 2c2dcc65b16c88048b29d2240126379e,
         type: 3}
+      propertyPath: m_Materials.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1614564980014912178, guid: 2c2dcc65b16c88048b29d2240126379e,
+        type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: 2100000, guid: ba0a1dfd55653d94f9fbbc4c894133b7, type: 2}
+      objectReference: {fileID: 2100000, guid: 65b45536596594e44a919f874d6a8033, type: 2}
     - target: {fileID: 3163592390469073899, guid: 2c2dcc65b16c88048b29d2240126379e,
         type: 3}
       propertyPath: m_Name
