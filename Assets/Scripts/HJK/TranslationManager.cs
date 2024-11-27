@@ -158,7 +158,7 @@ public class TranslationManager : Singleton<TranslationManager>
             { "userid", userId }
         };
         Send(message);
-    }
+    } 
 
     public void SendAudioData(string audioData)
     {
