@@ -15554,6 +15554,17 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: 31a473a83f991804ab4c908b5b07ae12, type: 2}
+    - target: {fileID: 43501513991139215, guid: 901328722679151449424881c751c87c,
+        type: 3}
+      propertyPath: m_VideoClip
+      value: 
+      objectReference: {fileID: 32900000, guid: b412d2f279d9b81478cf6bb0b13a90c9,
+        type: 3}
+    - target: {fileID: 43501513991139215, guid: 901328722679151449424881c751c87c,
+        type: 3}
+      propertyPath: m_TargetTexture
+      value: 
+      objectReference: {fileID: 8400000, guid: 3d437a7cd206598499bcee34ac160e8e, type: 2}
     - target: {fileID: 2885852488974554109, guid: 901328722679151449424881c751c87c,
         type: 3}
       propertyPath: m_Materials.Array.data[0]
@@ -44888,12 +44899,12 @@ PrefabInstance:
     - target: {fileID: 43501513991139215, guid: 901328722679151449424881c751c87c,
         type: 3}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1439989038645185506, guid: 901328722679151449424881c751c87c,
         type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2885852488974554109, guid: 901328722679151449424881c751c87c,
         type: 3}
@@ -44907,9 +44918,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4738572813211884461, guid: 901328722679151449424881c751c87c,
         type: 3}
+      propertyPath: m_Materials.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4738572813211884461, guid: 901328722679151449424881c751c87c,
+        type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: ba0a1dfd55653d94f9fbbc4c894133b7, type: 2}
+    - target: {fileID: 4738572813211884461, guid: 901328722679151449424881c751c87c,
+        type: 3}
+      propertyPath: m_Materials.Array.data[1]
+      value: 
+      objectReference: {fileID: 2100000, guid: 65b45536596594e44a919f874d6a8033, type: 2}
     - target: {fileID: 5744916846290189650, guid: 901328722679151449424881c751c87c,
         type: 3}
       propertyPath: m_Materials.Array.data[0]
@@ -44983,7 +45004,7 @@ PrefabInstance:
     - target: {fileID: 8968912586063902350, guid: 901328722679151449424881c751c87c,
         type: 3}
       propertyPath: m_Looping
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8968912586063902350, guid: 901328722679151449424881c751c87c,
         type: 3}
@@ -44994,7 +45015,7 @@ PrefabInstance:
     - target: {fileID: 8968912586063902350, guid: 901328722679151449424881c751c87c,
         type: 3}
       propertyPath: m_PlayOnAwake
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8968912586063902350, guid: 901328722679151449424881c751c87c,
         type: 3}
@@ -45370,6 +45391,17 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: 1b374d42e08a830489638b5826f4c9b7, type: 2}
+    - target: {fileID: 43501513991139215, guid: 901328722679151449424881c751c87c,
+        type: 3}
+      propertyPath: m_VideoClip
+      value: 
+      objectReference: {fileID: 32900000, guid: 7b4623fd8f829aa44b59b474fed48750,
+        type: 3}
+    - target: {fileID: 43501513991139215, guid: 901328722679151449424881c751c87c,
+        type: 3}
+      propertyPath: m_TargetTexture
+      value: 
+      objectReference: {fileID: 8400000, guid: 1f7d587946d2fe44b83a715d32ce7be6, type: 2}
     - target: {fileID: 2885852488974554109, guid: 901328722679151449424881c751c87c,
         type: 3}
       propertyPath: m_Materials.Array.data[0]
@@ -45385,7 +45417,7 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: 2100000, guid: 1b374d42e08a830489638b5826f4c9b7, type: 2}
+      objectReference: {fileID: 2100000, guid: 36a2075b85da4be46a36c0825629279b, type: 2}
     - target: {fileID: 5744916846290189650, guid: 901328722679151449424881c751c87c,
         type: 3}
       propertyPath: m_Materials.Array.data[0]
@@ -45451,6 +45483,42 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[1]
       value: 
       objectReference: {fileID: 2100000, guid: 6da4b469df4fac44382da885dc383259, type: 2}
+    - target: {fileID: 8968912586063902350, guid: 901328722679151449424881c751c87c,
+        type: 3}
+      propertyPath: m_VideoClip
+      value: 
+      objectReference: {fileID: 32900000, guid: 7b4623fd8f829aa44b59b474fed48750,
+        type: 3}
+    - target: {fileID: 8968912586063902350, guid: 901328722679151449424881c751c87c,
+        type: 3}
+      propertyPath: m_TargetTexture
+      value: 
+      objectReference: {fileID: 8400000, guid: 1f7d587946d2fe44b83a715d32ce7be6, type: 2}
+    - target: {fileID: 8968912586063902350, guid: 901328722679151449424881c751c87c,
+        type: 3}
+      propertyPath: m_ControlledAudioTrackCount
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8968912586063902350, guid: 901328722679151449424881c751c87c,
+        type: 3}
+      propertyPath: m_DirectAudioMutes.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8968912586063902350, guid: 901328722679151449424881c751c87c,
+        type: 3}
+      propertyPath: m_DirectAudioVolumes.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8968912586063902350, guid: 901328722679151449424881c751c87c,
+        type: 3}
+      propertyPath: m_EnabledAudioTracks.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8968912586063902350, guid: 901328722679151449424881c751c87c,
+        type: 3}
+      propertyPath: m_TargetAudioSources.Array.size
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects:
@@ -48186,6 +48254,17 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: 408094918b684fd4daaabc86b391913d, type: 2}
+    - target: {fileID: 43501513991139215, guid: 901328722679151449424881c751c87c,
+        type: 3}
+      propertyPath: m_VideoClip
+      value: 
+      objectReference: {fileID: 32900000, guid: d829fd0fae01a16498da0949ff03f43a,
+        type: 3}
+    - target: {fileID: 43501513991139215, guid: 901328722679151449424881c751c87c,
+        type: 3}
+      propertyPath: m_TargetTexture
+      value: 
+      objectReference: {fileID: 8400000, guid: b8b2e5722f0210847bc806f8a388ae3c, type: 2}
     - target: {fileID: 2885852488974554109, guid: 901328722679151449424881c751c87c,
         type: 3}
       propertyPath: m_Materials.Array.data[0]
@@ -48205,7 +48284,7 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: 2100000, guid: 408094918b684fd4daaabc86b391913d, type: 2}
+      objectReference: {fileID: 2100000, guid: 23614983c0070f4498510567f571e941, type: 2}
     - target: {fileID: 5744916846290189650, guid: 901328722679151449424881c751c87c,
         type: 3}
       propertyPath: m_Materials.Array.data[0]
@@ -48259,6 +48338,42 @@ PrefabInstance:
     - target: {fileID: 6276801375140233669, guid: 901328722679151449424881c751c87c,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8968912586063902350, guid: 901328722679151449424881c751c87c,
+        type: 3}
+      propertyPath: m_VideoClip
+      value: 
+      objectReference: {fileID: 32900000, guid: d829fd0fae01a16498da0949ff03f43a,
+        type: 3}
+    - target: {fileID: 8968912586063902350, guid: 901328722679151449424881c751c87c,
+        type: 3}
+      propertyPath: m_TargetTexture
+      value: 
+      objectReference: {fileID: 8400000, guid: b8b2e5722f0210847bc806f8a388ae3c, type: 2}
+    - target: {fileID: 8968912586063902350, guid: 901328722679151449424881c751c87c,
+        type: 3}
+      propertyPath: m_ControlledAudioTrackCount
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8968912586063902350, guid: 901328722679151449424881c751c87c,
+        type: 3}
+      propertyPath: m_DirectAudioMutes.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8968912586063902350, guid: 901328722679151449424881c751c87c,
+        type: 3}
+      propertyPath: m_DirectAudioVolumes.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8968912586063902350, guid: 901328722679151449424881c751c87c,
+        type: 3}
+      propertyPath: m_EnabledAudioTracks.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8968912586063902350, guid: 901328722679151449424881c751c87c,
+        type: 3}
+      propertyPath: m_TargetAudioSources.Array.size
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
