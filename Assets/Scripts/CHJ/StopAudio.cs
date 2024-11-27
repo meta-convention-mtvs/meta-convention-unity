@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class StopBGM : MonoBehaviour
+public class StopAudio : MonoBehaviour
 {
     public void Stop()
     {
         SoundMgr.Instance.StopAudio();
-    }
+    }   
 }
