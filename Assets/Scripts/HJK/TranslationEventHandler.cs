@@ -24,7 +24,7 @@ public class TranslationEventHandler : Singleton<TranslationEventHandler>
     // 에러 발생 시 호출될 이벤트
     public event System.Action<string> OnError;
 
-    private PlayerTranslatorWithoutRPC playerTranslator;
+    private PlayerTranslator playerTranslator;
 
     private string currentSpeakerId = "";  // 현재 발언자 ID 추가
     public string CurrentSpeakerId => currentSpeakerId;  // 읽기 전용 프로퍼티
@@ -35,7 +35,7 @@ public class TranslationEventHandler : Singleton<TranslationEventHandler>
     private void Start()
     {
         Debug.Log("[TranslationEventHandler] Start method called");
-        playerTranslator = FindObjectOfType<PlayerTranslatorWithoutRPC>();
+        playerTranslator = FindObjectOfType<PlayerTranslator>();
         var manager = TranslationManager.Instance;
         if (manager == null)
         {
