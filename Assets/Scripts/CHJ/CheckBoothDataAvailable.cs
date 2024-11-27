@@ -13,7 +13,7 @@ public class CheckBoothDataAvailable : MonoBehaviour
 
     private void Start()
     {
-        myTransition = GetComponent<CanvasGroupTransition>();    
+        myTransition = GetComponent<CanvasGroupTransition>();
     }
     public void OnCheckDataAvailable()
     {

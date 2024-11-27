@@ -12,11 +12,13 @@ public class CheckBoothPositionDataAvailable : MonoBehaviour
     public BoothCustomizingManager boothMgr;
 
     SceneTransition myTransition;
+    Button myButton;
 
 
     private void Start()
     {
         myTransition = GetComponent<SceneTransition>();
+        myButton = GetComponent<Button>();
     }
 
     public void OnCheckDataAvailable()
@@ -24,6 +26,7 @@ public class CheckBoothPositionDataAvailable : MonoBehaviour
         if (boothPositionMgr.SaveBoothPosition())
         {
             boothMgr.SaveBoothData();
+            myButton.interactable = false;
             myTransition.PerformTransition();
             errorText.text = "";
         }
