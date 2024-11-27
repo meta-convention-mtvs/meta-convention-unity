@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -14,5 +14,9 @@ public class SoundEffectMgr : MonoBehaviour
     void Update()
     {
         
+    }
+    public void OnClickPlay()
+    {
+        gameObject.GetComponent<AudioSource>().Play();
     }
 }

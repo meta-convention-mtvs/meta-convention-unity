@@ -51,10 +51,4 @@ public class SoundMgr : Singleton<SoundMgr>
     }
     // 백그라운드 audio가 필요하면 따로 만들어서 계속 재생되게 하면 됨..
 
-    public void OnClickPlay()
-    {
-        gameObject.GetComponent<AudioSource>().Play();
-    }
-
-
 }
