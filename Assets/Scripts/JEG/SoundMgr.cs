@@ -11,7 +11,7 @@ public class SoundMgr : Singleton<SoundMgr>
     public AudioClip[] audios = new AudioClip[10];
 
     public int idx;
-    public int curidx;
+    private int curidx;
     void Start()
     {
         idx = 0;
@@ -50,5 +50,11 @@ public class SoundMgr : Singleton<SoundMgr>
         audioSource.Play();
     }
     // 백그라운드 audio가 필요하면 따로 만들어서 계속 재생되게 하면 됨..
+
+    public void OnClickPlay()
+    {
+        gameObject.GetComponent<AudioSource>().Play();
+    }
+
 
 }

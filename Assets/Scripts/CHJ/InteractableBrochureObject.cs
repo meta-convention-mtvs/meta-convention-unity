@@ -28,6 +28,6 @@ public class InteractableBrochureObject : MonoBehaviour,IKeyInteractableObject
 
     public void ShowText()
     {
-        UIManager.Instance.ShowPopupUI("(F) 키 눌러 자세히 보기");
+        UIManager.Instance.ShowPopupUI("(F) 키 눌러 자세히 보기", "(F) Press the key to see details");
     }
 }

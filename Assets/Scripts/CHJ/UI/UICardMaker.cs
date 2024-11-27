@@ -26,9 +26,15 @@ public class UICardMaker : MonoBehaviour
     {
         if (nameInput.text == "" || instituteInput.text == "" || majorInput.text == "" || phoneNumberInput.text == "")
         {
-            cardErrorText.text = "모든 필드를 채워주세요";
+            if (LanguageSingleton.Instance.language == "ko")
+                cardErrorText.text = "모든 필드를 채워주세요";
+            else if (LanguageSingleton.Instance.language == "en")
+                cardErrorText.text = "Please fill in all fields";
+            StartCoroutine(SetButtonInteractable());
             return;
         }
+        saveButton.interactable = false;
+
         UuidMgr.Instance.currentUserInfo.userName = nameInput.text;
         UuidMgr.Instance.currentUserInfo.companyName = instituteInput.text;
         UuidMgr.Instance.PrintUserInfo();
@@ -36,5 +42,10 @@ public class UICardMaker : MonoBehaviour
         saveButton.gameObject.GetComponent<SceneTransition>().PerformTransition();
     }
 
+    IEnumerator SetButtonInteractable()
+    {
+        yield return null;
+        saveButton.interactable = true;
+    }
 
 }

@@ -72,10 +72,10 @@ public class CreateBooth : MonoBehaviourPun
 
                     break;
                 case BoothType.Cubic:
-                    PhotonNetwork.Instantiate("New_Booth_BD", BoothPosition[boothPositionIndex].position, Quaternion.identity);
+                    PhotonNetwork.Instantiate("New_Booth_BD", BoothPosition[boothPositionIndex].position, BoothPosition[boothPositionIndex].rotation);
                     break;
                 case BoothType.Round:
-                    PhotonNetwork.Instantiate("RoundBooth", BoothPosition[boothPositionIndex].position, Quaternion.identity);
+                    PhotonNetwork.Instantiate("RoundBooth", BoothPosition[boothPositionIndex].position, BoothPosition[boothPositionIndex].rotation);
                     break;
             }
         }
@@ -91,6 +91,7 @@ public class CreateBooth : MonoBehaviourPun
     private void OnLoadFinish(AssetLoaderContext context)
     {
         context.RootGameObject.transform.position = BoothPosition[boothPositionIndex].position;
+        context.RootGameObject.transform.rotation = BoothPosition[boothPositionIndex].rotation;
     }
 
     [PunRPC]
