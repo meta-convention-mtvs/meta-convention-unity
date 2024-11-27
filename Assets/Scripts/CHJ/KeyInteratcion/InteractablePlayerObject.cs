@@ -27,7 +27,7 @@ public class InteractablePlayerObject : MonoBehaviourPun, IKeyInteractableObject
 
     public void ShowText()
     {
-        UIManager.Instance?.ShowPopupUI("(F)키를 눌러 명함을 주고 받으세요!");
+        UIManager.Instance?.ShowPopupUI("(F)키를 눌러 명함을 주고 받으세요!", "Press the (F) key to exchange business cards!");
     }
 
     public void InteractEnd()
