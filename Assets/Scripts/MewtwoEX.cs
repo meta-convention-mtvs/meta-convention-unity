@@ -12,24 +12,45 @@ using CHJ;
 
 public class MewtwoEX : MonoBehaviour
 {
+    [SerializeField]
     public GameObject boothFactory;
-    public string[] companyUuidList;
+    [SerializeField]
+    public List<string> companyUuidList;
+
     public Transform[] boothPositionList;
 
-    private void Start()
+    private async void Start()
     {
         print("Mewtwo EX was called" + this.gameObject);
 
-        GameObject[] boothList = new GameObject[companyUuidList.Length];
-        for(int i = 0; i < companyUuidList.Length; i++)
+        companyUuidList = await GetUUIDListFromDatabase();
+
+        GameObject[] boothList = new GameObject[companyUuidList.Count];
+        for(int i = 0; i < companyUuidList.Count; i++)
         {
-            GameObject go = Instantiate(boothFactory, boothPositionList[i]);
-            go.GetComponent<UID>().SetUUID(companyUuidList[i]);
-            boothList[i] = go;
+            if(!string.IsNullOrEmpty(companyUuidList[i]))
+            {
+                print(i + " is not null or empty");
+                GameObject go = Instantiate(boothFactory);
+                go.transform.position = boothPositionList[i].transform.position;
+                go.transform.rotation = boothPositionList[i].transform.rotation;
+                go.GetComponent<UID>().SetUUID(companyUuidList[i]);
+                boothList[i] = go;
+                boothPositionList[i].gameObject.SetActive(false);
+            }  
         }
-        ApplyBoothDatasFromDatabaseInList(boothList);
+        //ApplyBoothDatasFromDatabaseInList(boothList);
+
+        
 
     }
+
+    private async Task<List<string>> GetUUIDListFromDatabase()
+    {
+        var boothPositionData =  await AsyncDatabase.GetDataFromDatabase<ChargedBoothPosition>(DatabasePath.GetPublicDataPath(nameof(ChargedBoothPosition)));
+        return boothPositionData.GetUUIDList();
+    }
+
     #region 안씀
     private async Task ApplyAvatarDatasFromDatabaseInList(GameObject[] playerList)
     {
@@ -75,17 +96,26 @@ public class MewtwoEX : MonoBehaviour
 
     private async Task ApplyBoothDatasFromDatabaseInList(GameObject[] boothList)
     {
+        print("0");
         List<UID> uidList = GetUidCompontentsIn(boothList);
 
+        print("0.1");
         BoothCustomizeData[] boothCustomizeDatas = await LoadAllDatasWithUUID<BoothCustomizeData>(uidList);
+
+        print("1");
 
         var boothExtraDataLoadingTasks = uidList.Zip(boothCustomizeDatas, (uid, data) => BoothExtraData.LoadBoothExtraDataInDatabase(uid, data));
 
         BoothExtraData[] boothExtraDatas = await Task.WhenAll(boothExtraDataLoadingTasks);
 
+        print("2");
+
         var successCount = uidList.Zip(boothExtraDatas, (uid, data) => RenderBoothDataWithExtraData(uid.GetComponent<RenderBoothData>(), data)).Count(r => r);
 
         uidList.Zip(boothExtraDatas, (uid, data) => RenderEmployeeWithExtraData(uid.GetComponent<CreateAIEmployee>(), data)).Count(r => r);
+
+
+        print("3");
         Debug.Log(successCount);
         
     }

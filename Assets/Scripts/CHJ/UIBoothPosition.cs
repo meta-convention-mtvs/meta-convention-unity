@@ -151,6 +151,28 @@ public class ChargedBoothPosition
 {
     [FirestoreProperty]
     public List<ChargedBoothData> BoothPositionList { get; set; }
+
+    public List<string> GetUUIDList()
+    {
+        List<string> uuidList = new List<string>();
+
+        if (BoothPositionList == null)
+            return null;
+
+        for(int i = 0; i < BoothPositionList.Count; i++)
+        {
+            if (BoothPositionList[i].isCharged)
+            {
+                uuidList.Add(BoothPositionList[i].ownerUUID);
+            }
+            else
+            {
+                uuidList.Add("");
+            }
+        }
+
+        return uuidList;
+    }
 }
 
 [FirestoreData]
