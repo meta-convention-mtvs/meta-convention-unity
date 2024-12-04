@@ -12,16 +12,25 @@ public class UIBoothPosition : MonoBehaviour
 
     public Camera renderTextureCamera; // RenderTexture를 렌더링하는 카메라
     public RawImage rawImage; // RawImage UI 요소
+    public BoothCustomizingManager boothCustomzingManager;
+
     private RectTransform rectTransform;
     [SerializeField]
     private int currentIndex = -1;
     private SelectableParentObject selectedObject;
     private ChargedBoothPosition position;
 
-    void Start()
+
+    async void Start()
     {
         rectTransform = rawImage.GetComponent<RectTransform>();
-        DatabaseManager.Instance.GetPublicData<ChargedBoothPosition>(SetChargedBoothPosition);
+        // ToDo: 입력한 category 정보를 바탕으로 database에서 값을 읽어서 지정해주어야 한다.
+        boothCustomzingManager.OnSelectData += GetBoothPositionDataFromDatabase;
+    }
+
+    public async void GetBoothPositionDataFromDatabase(BoothCustomizeData data)
+    {
+        SetChargedBoothPosition(await AsyncDatabase.GetDataFromDatabase<ChargedBoothPosition>(DatabasePath.GetPublicBoothPositionDataPath(data.category)));
     }
 
     void SetChargedBoothPosition(ChargedBoothPosition position)
@@ -79,31 +88,33 @@ public class UIBoothPosition : MonoBehaviour
         }
     }
 
-    public bool SaveBoothPosition()
+    public bool SaveBoothPosition(BoothCategory category)
     {
         if(currentIndex != -1 && CanSaveData(position, currentIndex))
         {
-            // 내 꺼에 저장
+            // 내 꺼에 저장 (꼭 없어도 됨)
             BoothPosition myPosition = new BoothPosition();
             myPosition.boothPositionIndex = currentIndex;
             DatabaseManager.Instance.SaveData<BoothPosition>(myPosition);
 
             // 서버에 저장
-            SaveChargedBoothPosition(currentIndex, UuidMgr.Instance.currentUserInfo.companyUuid);
+            SaveChargedBoothPosition(currentIndex, UuidMgr.Instance.currentUserInfo.companyUuid, category);
 
             // BoothPositionReseter 설정하기
-            BoothPositionReseter.Instance.SetValue(currentIndex, UuidMgr.Instance.currentUserInfo.companyUuid);
+            BoothPositionReseter.Instance.SetValue(currentIndex, UuidMgr.Instance.currentUserInfo.companyUuid, category);
             return true;
         }
         return false;
     }
 
-    public async Task SaveChargedBoothPosition(int index, string uuid)
+    public async Task SaveChargedBoothPosition(int index, string uuid, BoothCategory category)
     {
         // 서버에 저장
-        ChargedBoothPosition position = await AsyncDatabase.GetDataFromDatabase<ChargedBoothPosition>(DatabasePath.GetPublicDataPath(nameof(ChargedBoothPosition)));
+        ChargedBoothPosition position = await AsyncDatabase.GetDataFromDatabase<ChargedBoothPosition>(DatabasePath.GetPublicBoothPositionDataPath(category));
         position.BoothPositionList[index] = new ChargedBoothData(true, uuid);
-        DatabaseManager.Instance.SavePublicData<ChargedBoothPosition>(position);
+
+        //DatabaseManager.Instance.SavePublicData<ChargedBoothPosition>(position);
+        AsyncDatabase.SetDataToDatabase(DatabasePath.GetPublicBoothPositionDataPath(category), position);
     }
     public bool CanSaveData(ChargedBoothPosition currentChargedBoothPosition, int index)
     {

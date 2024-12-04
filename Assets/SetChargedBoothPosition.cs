@@ -1,4 +1,6 @@
-﻿using System.Collections;
+﻿using CHJ;
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -23,5 +25,10 @@ public class SetChargedBoothPosition : MonoBehaviour
     void ResetChargedBoothPosition()
     {
         DatabaseManager.Instance.SavePublicData<ChargedBoothPosition>(newData);
+
+        foreach(BoothCategory value in Enum.GetValues(typeof(BoothCategory)))
+        {
+            AsyncDatabase.SetDataToDatabase(DatabasePath.GetPublicBoothPositionDataPath(value), newData);
+        }
     }
 }

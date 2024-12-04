@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Networking;
 using CHJ;
+using Photon.Pun;
 
 public class MewtwoEX : MonoBehaviour
 {
@@ -23,7 +24,14 @@ public class MewtwoEX : MonoBehaviour
     {
         print("Mewtwo EX was called" + this.gameObject);
 
-        companyUuidList = await GetUUIDListFromDatabase();
+        BoothCategory? category = GetCurrentRoomCategory();
+        if (!category.HasValue)
+        {
+            Debug.Log("Can't find category in boothCategory.");
+            return;
+        }
+
+        companyUuidList = await GetUUIDListFromDatabase(category.Value);
 
         GameObject[] boothList = new GameObject[companyUuidList.Count];
         for(int i = 0; i < companyUuidList.Count; i++)
@@ -45,9 +53,15 @@ public class MewtwoEX : MonoBehaviour
 
     }
 
-    private async Task<List<string>> GetUUIDListFromDatabase()
+    public BoothCategory? GetCurrentRoomCategory()
     {
-        var boothPositionData =  await AsyncDatabase.GetDataFromDatabase<ChargedBoothPosition>(DatabasePath.GetPublicDataPath(nameof(ChargedBoothPosition)));
+        return EnumUtility.GetEnumValue<BoothCategory>(PhotonNetwork.CurrentRoom.Name);
+    }
+
+    //ToDo: 부스 이름에 따라서 읽어오는 데이터를 바꿔야 한다.
+    private async Task<List<string>> GetUUIDListFromDatabase(BoothCategory category)
+    {
+        var boothPositionData =  await AsyncDatabase.GetDataFromDatabase<ChargedBoothPosition>(DatabasePath.GetPublicBoothPositionDataPath(category));
         return boothPositionData.GetUUIDList();
     }
 

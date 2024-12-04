@@ -23,7 +23,7 @@ public class CheckBoothPositionDataAvailable : MonoBehaviour
 
     public void OnCheckDataAvailable()
     {
-        if (boothPositionMgr.SaveBoothPosition())
+        if (boothPositionMgr.SaveBoothPosition(boothMgr.GetBoothCategory()))
         {
             boothMgr.SaveBoothData();
             myButton.interactable = false;

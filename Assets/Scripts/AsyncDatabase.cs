@@ -26,6 +26,11 @@ namespace CHJ
         {
             return "PUBLIC/" + className;
         }
+
+        public static string GetPublicBoothPositionDataPath(BoothCategory boothCategory)
+        {
+            return "PUBLIC/" + boothCategory.ToString() + "ChargedBoothPosition";
+        }
     }
 
     public static class AsyncDatabase
