@@ -27,8 +27,8 @@ public class CreateEmployeeAvatarFromDatabase : MonoBehaviour
 
     async Task<bool> GetAvatarDataFromDatabaseAndLoadData(string id)
     {
-        try
-        {
+        //try
+        //{
             var avatarData = CharacterTopBottomCustomizeData.GetRandomCharacterData();
             renderAvatarData.CreateAvatar(avatarData);
 
@@ -48,11 +48,11 @@ public class CreateEmployeeAvatarFromDatabase : MonoBehaviour
                 }
             }
             return true;
-        }
-        catch (Exception ex)
-        {
-            Debug.LogError($"UID {id}에서 아바타 생성 중 오류 발생: {ex.Message}");
-            return false;
-        }
+        //}
+        //catch (Exception ex)
+        //{
+        //    Debug.LogError($"UID {id}에서 아바타 생성 중 오류 발생: {ex.Message}");
+        //    return false;
+        //}
     }
 }

@@ -38,9 +38,21 @@ public class ObjectLoader : MonoBehaviour
     public static void ImportGLTFAsync(string filepath, Action<AssetLoaderContext> OnLoadFinish)
     {
         print("ImportGLTFAsync called");
-        AssetLoader.LoadModelFromFile(filepath, OnLoadFinish);
 
         AssetLoaderOptions _assetLoaderOptions = AssetLoader.CreateDefaultLoaderOptions(false, true);
+
+        //AssetLoaderOptions _assetLoaderOptions = new AssetLoaderOptions
+        //{
+        //    // 필요한 경우, 텍스처나 메쉬만 로드하도록 설정할 수 있음
+        //    LoadTextures = true,
+        //    LoadMaterials = true,
+        //    LoadMeshes = true,
+        //    LoadAnimation = false // 애니메이션을 비활성화하여 로딩 시간을 줄임
+        //};
+
+        //AssetLoaderOptions options = AssetLoader.CreateDefaultLoaderOptions();
+        _assetLoaderOptions.ImportTextures = false;
+
         AssetLoader.LoadModelFromFile(filepath, OnLoadFinish, OnMaterialsLoad, OnProgress, OnError, null, _assetLoaderOptions);
     }
     /// <summary>

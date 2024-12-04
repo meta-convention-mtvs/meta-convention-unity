@@ -26,6 +26,11 @@ namespace CHJ
         {
             return "PUBLIC/" + className;
         }
+
+        public static string GetPublicBoothPositionDataPath(BoothCategory boothCategory)
+        {
+            return "PUBLIC/" + boothCategory.ToString() + "ChargedBoothPosition";
+        }
     }
 
     public static class AsyncDatabase
@@ -138,8 +143,12 @@ namespace CHJ
         async static Task<Uri> GetDownloadUrl(string type, string uid, string fileName)
         {
             var storageRef = FirebaseStorage.DefaultInstance.GetReferenceFromUrl("gs://metaconvention.appspot.com");
-            var fileRef = storageRef.Child(type + "/" + uid + "/" + fileName);
 
+            // Encode only the path and file name, not the whole URL
+            string path = type + "/" + uid + "/" + fileName;
+            string encodedPath = Uri.EscapeDataString(path);
+
+            var fileRef = storageRef.Child(encodedPath); // Use the encoded path only
             Task<Uri> task = fileRef.GetDownloadUrlAsync();
             await task;
 

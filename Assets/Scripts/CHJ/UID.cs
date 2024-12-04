@@ -6,9 +6,10 @@ using UnityEngine;
 
 public class UID : MonoBehaviour
 {
+    [SerializeField]
     public string uid;
+    [SerializeField]
     public string uuid;
-
     public Action<string> OnUIDChanged;
     public Action<string> OnUUIDChanged;
     

@@ -8,6 +8,7 @@ using Firebase.Storage;
 using System.IO;
 using Firebase.Extensions;
 using UnityEngine.Networking;
+using CHJ;
 
 public class DatabaseManager : Singleton<DatabaseManager>
 {
@@ -412,13 +413,13 @@ public class DatabaseManager : Singleton<DatabaseManager>
 
     private IEnumerator CoDownloadImage(string url, Action<Texture2D> OnTextureLoad)
     {
-        using (UnityWebRequest www = UnityWebRequestTexture.GetTexture(url))
+        using (UnityWebRequest www = UnityWebRequestTexture.GetTexture(UrlUtility.ReplaceSpacesWithEncodedValue(url)))
         {
             yield return www.SendWebRequest();
 
             if (www.result != UnityWebRequest.Result.Success)
             {
-                Debug.LogError("이미지 다운로드 실패: " + www.error);
+                Debug.LogError("url : " + url + " \nEscapeUriString: " + Uri.EscapeUriString(url) + " 이미지 다운로드 실패: " + www.error);
             }
             else
             {
@@ -555,6 +556,22 @@ public class DatabaseManager : Singleton<DatabaseManager>
     {
         // 로컬 파일 저장 경로 설정
         string localPath = Path.Combine(Application.persistentDataPath, uid, fileName);
+
+        // 다운로드할 파일이 이미 존재하면 삭제
+        if (File.Exists(localPath))
+        {
+            Debug.Log("파일이 이미 존재합니다.: " + localPath);
+            OnObjDownload?.Invoke(localPath);
+            yield break;
+        }
+
+        string directoryPath = Path.GetDirectoryName(localPath);
+
+        if (!Directory.Exists(directoryPath))
+        {
+            Directory.CreateDirectory(directoryPath);
+            Debug.Log("Created directory: " + directoryPath);
+        }
 
         // UnityWebRequest를 통해 URL에서 파일을 다운로드
         using (var www = new UnityWebRequest(url))

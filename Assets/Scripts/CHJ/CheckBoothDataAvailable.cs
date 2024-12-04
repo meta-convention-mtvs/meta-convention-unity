@@ -22,6 +22,7 @@ public class CheckBoothDataAvailable : MonoBehaviour
         {
             errorText.text = "";
             myTransition.FadeOldCanvasGroup();
+            boothMgr.OnNextButtonClick();
         }
         else
         {
