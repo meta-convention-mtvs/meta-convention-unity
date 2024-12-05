@@ -148,13 +148,6 @@ public class UuidMgr : MonoBehaviour
         Debug.Log($"Company UUID: {currentUserInfo.companyUuid}");
     }
 
-    // newCompany 가 true 면 
-    // generateUuid 해서
-    // uuid 에 넣어주기 
-
-    // 그럼 새로 생성된 uuid 와 기업 정보는 어떻게 저장 되는가........?......??
-    // firebase에 uuid 기반으로 기업 정보 저장 된다..
-    // 로드 방식도 같을 것.. 
 
 }
 

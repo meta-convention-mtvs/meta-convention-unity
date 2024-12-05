@@ -34,11 +34,14 @@ public class UserTypeSelecter : MonoBehaviour
         if (isNewCompany.isOn)
         {
             UuidMgr.Instance.GenerateUuid();
+            print("신규 uuid 가 발행되었습니다");
         } else if (!isNewCompany.isOn)
         {
             UuidMgr.Instance.FindClosestCompanyUUID();
-
+            print(" 기존 기업의 uuid 를 찾아서 할당 합니다.");
         }
+        print(UuidMgr.Instance.currentUserInfo.companyName);
+        print($" uuid : {UuidMgr.Instance.currentUserInfo.companyUuid}");
         UuidMgr.Instance.PrintUserInfo();
         UserTypeData userType = new UserTypeData();
         userType.userType = UserTypeData.UserType.company;
