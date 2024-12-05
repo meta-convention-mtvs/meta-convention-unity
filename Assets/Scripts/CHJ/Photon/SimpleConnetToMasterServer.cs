@@ -9,6 +9,7 @@ public class SimpleConnetToMasterServer : MonoBehaviourPunCallbacks
     public GameObject blackUi;
     public float sceneTransitionTime = 3.0f;
     public float fadeDuration = 2.0f;
+    public BoothCategory boothCategory = BoothCategory.Mobility;
 
     float currentTime = 0;
     bool isPhotonConnecting = false;
@@ -72,7 +73,8 @@ public class SimpleConnetToMasterServer : MonoBehaviourPunCallbacks
         RoomOptions roomOptions = new RoomOptions();
         roomOptions.MaxPlayers = 20;
         roomOptions.PublishUserId = true;
-        PhotonNetwork.JoinOrCreateRoom("MainHall", roomOptions, TypedLobby.Default);
+        //ToDo: Main Hall이 아니라 카테고리 이름으로 읽어와야 한다.
+        PhotonNetwork.JoinOrCreateRoom(boothCategory.ToString(), roomOptions, TypedLobby.Default);
     }
 
     public override void OnJoinedRoom()

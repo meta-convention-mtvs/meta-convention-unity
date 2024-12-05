@@ -5,6 +5,7 @@ using UnityEngine;
 public class InteractableBrochureObject : MonoBehaviour,IKeyInteractableObject
 {
     public Transform brochureCameraTransform;
+    public Transform brochurePosition;
 
     public void HideText()
     {
@@ -13,7 +14,7 @@ public class InteractableBrochureObject : MonoBehaviour,IKeyInteractableObject
 
     public void Interact()
     {
-        MainHallVirtualCameraMovement.Instance.SetBrochureCameraPosition(transform, brochureCameraTransform);
+        MainHallVirtualCameraMovement.Instance.SetBrochureCameraPosition(brochurePosition, brochureCameraTransform);
         // 시네머신 카메라가 브로슈어 앞으로 이동한다.
         MainHallVirtualCameraMovement.Instance.SetActiveVirtualCamera(MainHallVirtualCameraMovement.Instance.brocureCamera);
         // F키를 눌러서 화면 끄기 버튼 추가하기

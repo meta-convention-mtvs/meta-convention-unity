@@ -14,6 +14,7 @@ public class BoothCustomizingManager : MonoBehaviour
     public ColorPicker colorPicker;
     [Space]
     public BoothCustomizeData boothCustomizeData;
+    public Action<BoothCustomizeData> OnSelectData;
 
     private bool boothDataChanged;
     private bool boothTypeChanged;
@@ -34,6 +35,10 @@ public class BoothCustomizingManager : MonoBehaviour
         LoadGamePrefab(boothPrefabs);
     }
 
+    public void OnNextButtonClick()
+    {
+        OnSelectData?.Invoke(boothCustomizeData);
+    }
     public void SetUIDefaultSetting(UIBoothDefaultSetting defaultSetting)
     {
         defaultSetting.OnDropdownChanged += SetBoothCategory;
@@ -129,6 +134,11 @@ public class BoothCustomizingManager : MonoBehaviour
     void SetBoothCategory(int index)
     {
         boothCustomizeData.category = (BoothCategory)index;
+    }
+
+    public BoothCategory GetBoothCategory()
+    {
+        return boothCustomizeData.category;
     }
 
     void SetCompanyName(string s)
