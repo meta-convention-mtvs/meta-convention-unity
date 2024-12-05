@@ -19,6 +19,7 @@ public class UICompanyRecommend : MonoBehaviour
         {
             GameObject go =Instantiate(companyItemsFactory, Content);
             go.GetComponent<CompanyRecommendItem>().SetItemText(companyInfo);
+            go.GetComponent<CompanyRecommendItem>().SetButtonTransition(companyInfo);
 
         }
     }

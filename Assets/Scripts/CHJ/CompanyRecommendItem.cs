@@ -4,7 +4,9 @@ using UnityEngine;
 using UnityEngine.UI;
 using CHJ;
 using System.Threading.Tasks;
+using Ricimi;
 
+[RequireComponent(typeof(SceneTransition))]
 public class CompanyRecommendItem : MonoBehaviour
 {
     public Text companyName;
@@ -12,6 +14,7 @@ public class CompanyRecommendItem : MonoBehaviour
     public Text companyLink;
     public Text companyMission;
     public Image companyLogo;
+    public Button sceneTransitionButton;
 
     public RectTransform companyLogoParentRectTransform;
 
@@ -29,6 +32,18 @@ public class CompanyRecommendItem : MonoBehaviour
         SetLogo(companyInfo.uuid, companyInfo.logo_file_name);
     }
 
+    public void SetButtonTransition(TestRecommendedCompany companyInfo)
+    {
+        if(sceneTransitionButton != null)
+        {
+            sceneTransitionButton.onClick.AddListener(() =>
+            {
+                string categoryString = companyInfo.category.Replace("_", " ");
+                BoothCategory category = EnumUtility.GetEnumValue<BoothCategory>(categoryString).Value;
+                MainHallData.Instance.SetMainHallLoadingData(category, "Start_Universe");
+            });
+        }
+    }
     /// <summary>
     /// 주어진 경로의 로고 이미지를 로드하고 UI에 적절히 설정합니다.
     /// </summary>
@@ -113,4 +128,6 @@ public class CompanyRecommendItem : MonoBehaviour
         rectTransform.pivot = new Vector2(0.5f, 0.5f);
         rectTransform.anchoredPosition = Vector2.zero;
     }
+
+    
 }

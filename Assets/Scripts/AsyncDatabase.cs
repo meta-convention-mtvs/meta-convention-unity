@@ -146,9 +146,8 @@ namespace CHJ
 
             // Encode only the path and file name, not the whole URL
             string path = type + "/" + uid + "/" + fileName;
-            string encodedPath = Uri.EscapeDataString(path);
 
-            var fileRef = storageRef.Child(encodedPath); // Use the encoded path only
+            var fileRef = storageRef.Child(path); // Use the encoded path only
             Task<Uri> task = fileRef.GetDownloadUrlAsync();
             await task;
 

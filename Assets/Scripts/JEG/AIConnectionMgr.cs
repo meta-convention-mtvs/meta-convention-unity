@@ -45,6 +45,10 @@ public class TestRecommendedCompany
     public string logo_file_name { get; set; }
     [FirestoreProperty]
     public string uuid { get; set; }
+    [FirestoreProperty]
+    public string[] tags { get; set; }
+    [FirestoreProperty]
+    public string category { get; set; }
 
 }
 

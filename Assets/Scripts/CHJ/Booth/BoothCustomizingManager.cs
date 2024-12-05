@@ -440,12 +440,16 @@ public class BoothExtraData
 
 public enum BoothCategory
 {
+    Smart_Home,
+    Electronics,
     Mobility,
-    DigitalHealth,
-    ARXRVR,
-    ThreeDPrinting,
+    Artificial_Intelligence,
+    Entertainment,
     Robotics,
-    Technology
+    Health,
+    Retail,
+    Security,
+    Energy
 }
 
 public enum BoothType
