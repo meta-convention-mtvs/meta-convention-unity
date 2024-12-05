@@ -13,6 +13,8 @@ public class UserTypeSelecter : MonoBehaviour
     public SceneTransition individualSceneTransition;
     public SceneTransition companySceneTransition;
 
+    public Toggle isNewCompany;
+
     private void Start()
     {
         individualButton.onClick.AddListener(OnIndividualButtonClick);
@@ -29,7 +31,14 @@ public class UserTypeSelecter : MonoBehaviour
 
     void OnCompanyButtonClick()
     {
-        UuidMgr.Instance.FindClosestCompanyUUID();
+        if (isNewCompany.isOn)
+        {
+            UuidMgr.Instance.GenerateUuid();
+        } else if (!isNewCompany.isOn)
+        {
+            UuidMgr.Instance.FindClosestCompanyUUID();
+
+        }
         UuidMgr.Instance.PrintUserInfo();
         UserTypeData userType = new UserTypeData();
         userType.userType = UserTypeData.UserType.company;
