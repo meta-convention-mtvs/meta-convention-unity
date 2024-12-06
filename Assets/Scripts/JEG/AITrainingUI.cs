@@ -39,10 +39,12 @@ public class AITrainingUI : MonoBehaviour
 
     }
 
-    public void OnSetClickTrainingData()
+    public async void OnSetClickTrainingData()
     {
         aiData.trainingData = aiTrainingData.text;
         SaveAiTrainingData(aiData);
+        SendToAiServer(await AsyncDatabase.GetDataFromDatabase<BoothCustomizeData>(DatabasePath.GetCompanyDataPath(UuidMgr.Instance.currentUserInfo.companyUuid, nameof(BoothCustomizeData))), aiData);
+
     }
 
     public void SaveAiTrainingData(ai_training_data aidata)
@@ -63,4 +65,10 @@ public class AITrainingUI : MonoBehaviour
         }
     }
 
+
+    public void SendToAiServer(BoothCustomizeData boothData, ai_training_data aiData)        
+    {
+        NewCompanyDataForAIBoothRecommendation sendData = new NewCompanyDataForAIBoothRecommendation(UuidMgr.Instance.currentUserInfo.companyUuid, boothData.companyName, aiData.trainingData, boothData.category.ToString());
+        NewPostManager.Instance.PostNewCompanyData(sendData.company_uuid, sendData);
+    }
 }
