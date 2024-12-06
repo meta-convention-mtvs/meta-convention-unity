@@ -282,6 +282,7 @@ GameObject:
   - component: {fileID: 4049822186640541649}
   - component: {fileID: 2206109854182225242}
   - component: {fileID: 5131770038305237421}
+  - component: {fileID: 1992676924789766906}
   m_Layer: 5
   m_Name: MypageCanvas_BoothRecommendation_Element
   m_TagString: Untagged
@@ -367,7 +368,23 @@ MonoBehaviour:
   companyLink: {fileID: 0}
   companyMission: {fileID: 5799442485493844095}
   companyLogo: {fileID: 3466276028576229740}
+  sceneTransitionButton: {fileID: 5967356498577732370}
   companyLogoParentRectTransform: {fileID: 757060647824934714}
+--- !u!114 &1992676924789766906
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2200709689256871806}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 29eb4a5a725ae4a07a39820fbbcc201d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  scene: <Insert scene name>
+  duration: 1
+  color: {r: 0, g: 0, b: 0, a: 1}
 --- !u!1 &5622872975283160701
 GameObject:
   m_ObjectHideFlags: 0
@@ -794,6 +811,18 @@ RectTransform:
     type: 3}
   m_PrefabInstance: {fileID: 174440083846885142}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &5967356498577732370 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5817510849166728196, guid: 6f9621007d775495f9c8de66058392bc,
+    type: 3}
+  m_PrefabInstance: {fileID: 174440083846885142}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &7748041744050063727 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 7632808342733776505, guid: 6f9621007d775495f9c8de66058392bc,
