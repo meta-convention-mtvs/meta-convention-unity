@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using CHJ;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -7,6 +8,8 @@ public class UICompanyRecommend : MonoBehaviour
 {
     public GameObject companyItemsFactory;
     public RectTransform Content;
+    public string LoadingSceneName = "Start_Universe";
+    public Button nextSceneButton;
 
     public void GetRecommendDataFromDatabase()
     {
@@ -19,8 +22,29 @@ public class UICompanyRecommend : MonoBehaviour
         {
             GameObject go =Instantiate(companyItemsFactory, Content);
             go.GetComponent<CompanyRecommendItem>().SetItemText(companyInfo);
-            go.GetComponent<CompanyRecommendItem>().SetButtonTransition(companyInfo);
+            if (companyInfo.category == null)
+            {
+                go.GetComponent<CompanyRecommendItem>().DisableButton();
+            }
+            else
+            {
+                print(companyInfo.category);
+                string categoryString = companyInfo.category.Replace("_", " ");
+                print(categoryString);
 
+                go.GetComponent<CompanyRecommendItem>().SetButtonTransition(() =>
+                {
+                    ButtonOnClick(categoryString, LoadingSceneName);
+                    if (nextSceneButton != null)
+                        nextSceneButton.onClick?.Invoke();
+                });
+
+            }
         }
+    }
+    public void ButtonOnClick(string companyCategory, string LoadingSceneName)
+    {
+        BoothCategory category = EnumUtility.GetEnumValue<BoothCategory>(companyCategory).Value;
+        MainHallData.Instance.SetMainHallLoadingData(category, LoadingSceneName);
     }
 }

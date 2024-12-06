@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using CHJ;
 using System.Threading.Tasks;
 using Ricimi;
+using UnityEngine.Events;
 
 [RequireComponent(typeof(SceneTransition))]
 public class CompanyRecommendItem : MonoBehaviour
@@ -32,18 +33,19 @@ public class CompanyRecommendItem : MonoBehaviour
         SetLogo(companyInfo.uuid, companyInfo.logo_file_name);
     }
 
-    public void SetButtonTransition(TestRecommendedCompany companyInfo)
+    public void SetButtonTransition(UnityAction action)
     {
         if(sceneTransitionButton != null)
         {
-            sceneTransitionButton.onClick.AddListener(() =>
-            {
-                string categoryString = companyInfo.category.Replace("_", " ");
-                BoothCategory category = EnumUtility.GetEnumValue<BoothCategory>(categoryString).Value;
-                MainHallData.Instance.SetMainHallLoadingData(category, "Start_Universe");
-            });
+            sceneTransitionButton.onClick.AddListener(action);
         }
     }
+
+    public void DisableButton()
+    {
+        sceneTransitionButton.gameObject.SetActive(false);
+    }
+
     /// <summary>
     /// 주어진 경로의 로고 이미지를 로드하고 UI에 적절히 설정합니다.
     /// </summary>

@@ -17,6 +17,7 @@ public class SimpleConnetToMasterServer : MonoBehaviourPunCallbacks
     private void Awake()
     {
         ShowBlackUi();
+        boothCategory = MainHallData.Instance.mainHallCategory;
     }
 
     private void Update()
