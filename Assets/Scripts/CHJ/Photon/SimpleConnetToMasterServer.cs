@@ -27,7 +27,15 @@ public class SimpleConnetToMasterServer : MonoBehaviourPunCallbacks
             // sceneTransitionTime + fadeDuration 이 지나고, CashedDataFromDatabase가 다 읽어왔으면 실행
             if (currentTime > sceneTransitionTime + fadeDuration && CashedDataFromDatabase.Instance.allDataCashed)
             {
-                PhotonConnect();
+                // 만약 연결이 안 되었으면
+                if (!PhotonNetwork.IsConnected)
+                {
+                    PhotonConnect();
+                }
+                else
+                {
+                    PhotonNetwork.LeaveRoom();
+                }
                 isPhotonConnecting = true;
             }
 
