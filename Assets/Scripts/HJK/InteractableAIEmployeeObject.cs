@@ -64,7 +64,6 @@ public class InteractableAIEmployeeObject : MonoBehaviourPun, IKeyInteractableOb
         // ToDo: 카메라 위치를 ai 직원 위치로 맞춰주어야 함;
         MainHallVirtualCameraMovement.Instance.SetAiSpeackCameraPosition(camPosition, camPosition);
 
-
         aiWebSocket = GameObject.FindObjectOfType<AIWebSocket>();
         if (aiWebSocket != null)
         {
