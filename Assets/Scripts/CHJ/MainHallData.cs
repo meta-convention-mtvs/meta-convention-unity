@@ -6,6 +6,7 @@ public class MainHallData : Singleton<MainHallData>
 {
     public BoothCategory mainHallCategory;
     public string loadingSceneName;
+    public string targetCompanyUuid;
 
     public void SetMainHallLoadingData(BoothCategory category, string loadingSceneName)
     {
@@ -13,6 +14,9 @@ public class MainHallData : Singleton<MainHallData>
         this.loadingSceneName = loadingSceneName;
     }
 
-
+    public void SetTargetCompanyUuid(string uuid)
+    {
+        this.targetCompanyUuid = uuid;
+    }
 
 }

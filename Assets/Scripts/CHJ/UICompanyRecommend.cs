@@ -34,7 +34,7 @@ public class UICompanyRecommend : MonoBehaviour
 
                 go.GetComponent<CompanyRecommendItem>().SetButtonTransition(() =>
                 {
-                    ButtonOnClick(categoryString, LoadingSceneName);
+                    ButtonOnClick(categoryString, LoadingSceneName, companyInfo.uuid);
                     if (nextSceneButton != null)
                         nextSceneButton.onClick?.Invoke();
                 });
@@ -42,9 +42,10 @@ public class UICompanyRecommend : MonoBehaviour
             }
         }
     }
-    public void ButtonOnClick(string companyCategory, string LoadingSceneName)
+    public void ButtonOnClick(string companyCategory, string LoadingSceneName, string uuid)
     {
         BoothCategory category = EnumUtility.GetEnumValue<BoothCategory>(companyCategory).Value;
         MainHallData.Instance.SetMainHallLoadingData(category, LoadingSceneName);
+        MainHallData.Instance.SetTargetCompanyUuid(uuid);
     }
 }
