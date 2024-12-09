@@ -1,4 +1,5 @@
 ﻿using Cinemachine;
+using StarterAssets;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -21,6 +22,9 @@ public class MainHallVirtualCameraMovement : MonoBehaviour
 
     public List<CinemachineVirtualCamera> virtualCameras;
 
+    CreatePlayer playerFactory;
+    StarterAssetsInputs playerInputs;
+
     public enum MainHallCameraType
     {
         PlayerFollowCam,
@@ -34,12 +38,31 @@ public class MainHallVirtualCameraMovement : MonoBehaviour
         virtualCameras.Add(playerFollowCamera);
         virtualCameras.Add(aiSpeackVirtualCamera);
         virtualCameras.Add(brocureCamera);
+
+        playerFactory = GameObject.FindWithTag("PlayerFactory").GetComponent<CreatePlayer>();
+        if (playerFactory == null)
+            Debug.LogError("Player Factory is null... set tag");
+        playerFactory.OnPlayerCreate += OnPlayerCreate;
+    }
+
+    void OnPlayerCreate(GameObject player)
+    {
+        playerInputs = player.GetComponent<StarterAssetsInputs>();
     }
 
     public void SetActiveVirtualCamera(CinemachineVirtualCamera activeCamera)
     {
         virtualCameras = ResetVirtualCameraPrioriy(virtualCameras);
         activeCamera.Priority = 20;
+        if(activeCamera != playerFollowCamera)
+        {
+            playerInputs.cursorInputForLook = false;
+        }
+        else
+        {
+            playerInputs.cursorInputForLook = true;
+        }
+        
     }
 
     public void SetBrochureCameraPosition(Transform brochure, Transform brochureCamTransform)

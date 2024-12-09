@@ -7,6 +7,7 @@ using Photon.Pun;
 using Photon.Realtime;
 using DG.Tweening;
 using CHJ;
+using StarterAssets;
 
 public class InteractableAIEmployeeObject : MonoBehaviourPun, IKeyInteractableObject
 {
@@ -62,6 +63,7 @@ public class InteractableAIEmployeeObject : MonoBehaviourPun, IKeyInteractableOb
         MainHallVirtualCameraMovement.Instance.SetActiveVirtualCamera(MainHallVirtualCameraMovement.Instance.aiSpeackVirtualCamera);
         // ToDo: 카메라 위치를 ai 직원 위치로 맞춰주어야 함;
         MainHallVirtualCameraMovement.Instance.SetAiSpeackCameraPosition(camPosition, camPosition);
+
 
         aiWebSocket = GameObject.FindObjectOfType<AIWebSocket>();
         if (aiWebSocket != null)
