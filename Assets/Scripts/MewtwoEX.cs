@@ -20,6 +20,12 @@ public class MewtwoEX : MonoBehaviour
 
     public Transform[] boothPositionList;
 
+    [Header("Mobility List")]
+    public List<GameObject> mobilityObjects;
+
+    [Header("Electronic List")]
+    public List<GameObject> electronicObjects;
+
     private async void Start()
     {
         print("Mewtwo EX was called" + this.gameObject);
@@ -38,11 +44,17 @@ public class MewtwoEX : MonoBehaviour
         {
             if(!string.IsNullOrEmpty(companyUuidList[i]))
             {
-                print(i + " is not null or empty");
                 GameObject go = Instantiate(boothFactory);
                 go.transform.position = boothPositionList[i].transform.position;
                 go.transform.rotation = boothPositionList[i].transform.rotation;
                 go.GetComponent<UID>().SetUUID(companyUuidList[i]);
+
+                // 미리 깔아놓는 오브젝트
+                if (category == BoothCategory.Electronics)
+                    go.GetComponent<BoothRuntimeCreate>().SetBoothModelingPrefab(electronicObjects[i]);
+                else if(category == BoothCategory.Mobility)
+                    go.GetComponent<BoothRuntimeCreate>().SetBoothModelingPrefab(mobilityObjects[i]);
+
                 boothList[i] = go;
                 boothPositionList[i].gameObject.SetActive(false);
             }  

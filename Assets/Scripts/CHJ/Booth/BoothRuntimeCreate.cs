@@ -16,6 +16,7 @@ public class BoothRuntimeCreate : MonoBehaviourPun
     private RenderBoothData renderBoothData;
 
     private string boothModelingPath;
+    private GameObject boothModelingPrefab;
     private Texture2D logoImage;
     private Texture2D bannerImage;
     private Texture2D brochureImage;
@@ -37,6 +38,11 @@ public class BoothRuntimeCreate : MonoBehaviourPun
         ownerUID = GetComponent<UID>();
 
         ownerUID.OnUUIDChanged += LoadBoothCustomizeData;
+    }
+
+    public void SetBoothModelingPrefab(GameObject modelingPrefab)
+    {
+        this.boothModelingPrefab = modelingPrefab;
     }
 
     void LoadBoothCustomizeData(string uid)
@@ -119,23 +125,20 @@ public class BoothRuntimeCreate : MonoBehaviourPun
             BoothExtraData extraData = GetBoothExtraData(data);
 
             renderBoothData.RenderBoothDataWith(extraData);
-            renderBoothData.RenderBoothModeling(extraData);
+            if(boothModelingPrefab == null)
+                renderBoothData.RenderBoothModeling(extraData);
+            else
+                renderBoothData.RenderBoothModelingPrefab(boothModelingPrefab);
         }
     }
     BoothExtraData GetBoothExtraData(BoothCustomizeData data)
     {
-        BoothExtraData extraData = new BoothExtraData();
-        extraData.boothType = data.boothType;
-        extraData.color = data.color.GetColor();
+        BoothExtraData extraData = new BoothExtraData(data);
         extraData.logoImage = logoImage;
-        extraData.modelingScale = data.modelingScale;
         extraData.modelingPath = boothModelingPath;
         extraData.videoURL = videoURL;
-        extraData.hasBanner = data.hasBanner;
         extraData.bannerImage = bannerImage;
-        extraData.hasBrochure = data.hasBrochure;
         extraData.brochureImage = brochureImage;
-        extraData.homepageLink = data.homepageLink;
         return extraData;
     }
 }
