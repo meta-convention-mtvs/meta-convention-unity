@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+using static TMPro.SpriteAssetUtilities.TexturePacker_JsonArray;
 
 namespace UI2.Recommend
 {
@@ -10,6 +11,7 @@ namespace UI2.Recommend
         public List<RecommendItem> items = new();
         public List<RecommendPanelRow> rows = new();
         public RecommendPanelRow rowPrefab;
+        [SerializeField] private string loadingSceneName;
 
         public void Awake()
         {
@@ -23,16 +25,16 @@ namespace UI2.Recommend
         public void Start()
         {
             // test data
-            for (var i = 0; i < 12; i++)
-            {
-                AddRecommendItem(new RecommendItem()
-                {
-                    sprite = null,
-                    name = "Metaverse Academi",
-                    desc = "The company named Metaverse Academi."
-                });
-            }
-
+            //for (var i = 0; i < 12; i++)
+            //{
+            //    AddRecommendItem(new RecommendItem()
+            //    {
+            //        sprite_name = "",
+            //        company_uuid = "",
+            //        name = "Metaverse Academy",
+            //        desc = "The company named Metaverse Academy."
+            //    });
+            //}
         }
 
         public void AddRecommendItem(RecommendItem item)
@@ -43,7 +45,7 @@ namespace UI2.Recommend
                 lastRow = CreateRow();
             }
             items.Add(item);
-            lastRow.View(item);
+            lastRow.View(item, loadingSceneName);
         }
 
         private RecommendPanelRow CreateRow()
@@ -66,8 +68,10 @@ namespace UI2.Recommend
 
     public class RecommendItem
     {
-        public Sprite sprite;
+        public string sprite_name;
+        public string company_uuid;
         public string name;
         public string desc;
+        public string category;
     }
 }

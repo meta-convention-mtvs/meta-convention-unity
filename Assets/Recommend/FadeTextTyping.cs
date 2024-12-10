@@ -23,12 +23,16 @@ namespace UI2.Recommend
             if (b)
             {
                 StopAllCoroutines();
+                group.interactable = true;
+                group.blocksRaycasts = true;
                 StartCoroutine(SetAlpha(1));
                 StartCoroutine(Typing(TypingText));
             }
             else
             {
                 StopAllCoroutines();
+                group.interactable = false;
+                group.blocksRaycasts = false;
                 StartCoroutine(SetAlpha(0));
                 StartCoroutine(Typing(""));
             }
@@ -52,6 +56,7 @@ namespace UI2.Recommend
                 text.text = str[..i];
                 yield return new WaitForSeconds(0.02f);
             }
+            text.text = str;
         }
 
         private bool IsEqual(float f1, float f2)

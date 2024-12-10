@@ -11,9 +11,10 @@ namespace UI2.Recommend
 
         public int ItemAmount { get; private set; }
 
-        public void View(RecommendItem item)
+        public void View(RecommendItem item, string loadingSceneName)
         {
             GetComponentsInChildren<RecommendPanelItem>()[ItemAmount].SetItem(item);
+            GetComponentsInChildren<RecommendPanelItem>()[ItemAmount].LoadingScene = loadingSceneName;
             ItemAmount++;
         }
     }

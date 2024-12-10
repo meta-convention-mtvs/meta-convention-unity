@@ -3,6 +3,7 @@ using Firebase.Storage;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Drawing.Printing;
 using System.IO;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -146,8 +147,9 @@ namespace CHJ
 
             // Encode only the path and file name, not the whole URL
             string path = type + "/" + uid + "/" + fileName;
-
+            
             var fileRef = storageRef.Child(path); // Use the encoded path only
+            Debug.Log(path);
             Task<Uri> task = fileRef.GetDownloadUrlAsync();
             await task;
 

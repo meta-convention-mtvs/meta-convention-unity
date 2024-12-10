@@ -7,9 +7,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using TMPro;
+using UI2.Recommend;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
+using CHJ;
 
 [System.Serializable]
 public class TestUserInfo
@@ -59,6 +61,9 @@ public class AIConnectionMgr : MonoBehaviour
     public TMP_InputField situ_input;
 
     public UICompanyRecommend ui_cr;
+
+    public RecommendPanel recommendPanel;
+
     #region 현재 안씀
     //   public static string[] fields = new string[49] {"3D Printing",
     //"5G Technologies",
@@ -199,7 +204,17 @@ public class AIConnectionMgr : MonoBehaviour
                 RecommendedCompanyListData data = new RecommendedCompanyListData();
                 data.recommendedCompanyList = recommendedCompany;
 
-                ui_cr.SetRecommendField(data);
+                foreach(var item in data.recommendedCompanyList)
+                {
+                    recommendPanel.AddRecommendItem(new RecommendItem
+                    {
+                        company_uuid = item.uuid,
+                        name = item.company_name,
+                        sprite_name = UrlUtility.ReplaceSpacesWithUnderline(item.company_name),
+                        desc = item.company_mission,
+                        category = item.category
+                    });
+                }
                 DatabaseManager.Instance.SaveData<RecommendedCompanyListData>(data);
 
             }else
