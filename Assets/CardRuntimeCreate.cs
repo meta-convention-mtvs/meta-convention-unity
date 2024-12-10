@@ -26,6 +26,7 @@ public class CardRuntimeCreate : MonoBehaviour
         Card card = await AsyncDatabase.GetDataFromDatabase<Card>(DatabasePath.GetUserDataPath(uid, nameof(Card)));
         if (card != null)
         {
+            uiCard.gameObject.SetActive(true);
             uiCard.ShowCardUI(card);
             interactableCardObject.SetCard(card);
         }
