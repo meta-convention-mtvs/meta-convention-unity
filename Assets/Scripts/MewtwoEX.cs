@@ -39,7 +39,6 @@ public class MewtwoEX : MonoBehaviour
 
         companyUuidList = await GetUUIDListFromDatabase(category.Value);
 
-        GameObject[] boothList = new GameObject[companyUuidList.Count];
         for(int i = 0; i < companyUuidList.Count; i++)
         {
             if(!string.IsNullOrEmpty(companyUuidList[i]))
@@ -48,6 +47,11 @@ public class MewtwoEX : MonoBehaviour
                 go.transform.position = boothPositionList[i].transform.position;
                 go.transform.rotation = boothPositionList[i].transform.rotation;
                 go.GetComponent<UID>().SetUUID(companyUuidList[i]);
+                BoothOwner boothOwner = await AsyncDatabase.GetDataFromDatabase<BoothOwner>(DatabasePath.GetCompanyDataPath(companyUuidList[i], nameof(BoothOwner)));
+                if (boothOwner != null)
+                {
+                    go.GetComponent<UID>().SetUID(boothOwner.uid);
+                }
 
                 // 미리 깔아놓는 오브젝트
                 if (category == BoothCategory.Electronics)
@@ -55,8 +59,13 @@ public class MewtwoEX : MonoBehaviour
                 else if(category == BoothCategory.Mobility)
                     go.GetComponent<BoothRuntimeCreate>().SetBoothModelingPrefab(mobilityObjects[i]);
 
-                boothList[i] = go;
                 boothPositionList[i].gameObject.SetActive(false);
+
+                // 갈려는 부스
+                if (companyUuidList[i] == MainHallData.Instance.targetCompanyUuid)
+                {
+                    
+                }
             }  
         }
         //ApplyBoothDatasFromDatabaseInList(boothList);

@@ -16,7 +16,7 @@ public class UIMainHallLoad : MonoBehaviour
         for(int i = 0; i < buttons.Length; i++)
         {
             int j = i;
-            buttons[i].onClick.AddListener(() => { MainHallData.Instance.SetMainHallLoadingData((BoothCategory)j, LoadingScene); PerformTransition(LoadingScene); });
+            buttons[i].onClick.AddListener(() => { MainHallData.Instance.SetMainHallLoadingData((BoothCategory)j, LoadingScene); PerformTransition(LoadingScene); buttons[i].interactable = false; });
         }
     }
 
