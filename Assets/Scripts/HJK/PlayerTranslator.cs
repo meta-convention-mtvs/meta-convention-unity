@@ -206,14 +206,22 @@ public class PlayerTranslator : MonoBehaviourPunCallbacks
         {
             // 내가 발언권을 얻은 경우
             ShowCanSpeakUI();
-            // Debug.Log("UI 표시됨: ShowCanSpeakUI() 실행 in OnApprovedSpeech()");
             StartRecording();
-            // Debug.Log("녹음 시작됨: StartRecording() 실행 in OnApprovedSpeech()");
         }
         else
         {
-            // 다른 사용자가 발언권을 얻은 경우
-            // 필요에 따라 처리
+            // 상대방이 발언권을 얻은 경우
+            MessageData messageData = new MessageData
+            {
+                isMine = false,
+                order = order,
+                userid = userid
+            };
+
+            // 상대방 메시지 프리팹 생성
+            messageData.userMessagePrefab = Instantiate(MessageBubble_Original_Yours, translationScrollView.content);
+            messages.Add(messageData);
+            Debug.Log($"Created new MessageBubble_Original_Yours for order: {order}, userid: {userid}");
         }
     }
 
@@ -392,20 +400,22 @@ public class PlayerTranslator : MonoBehaviourPunCallbacks
         // 메시지 데이터가 없는 경우 새로 생성
         if (messageData == null)
         {
-            bool isMine = (speakerId == FireAuthManager.Instance.GetCurrentUser().UserId);
+            Debug.LogError($"MessageData not found for order: {order}");
+            return;
+            // bool isMine = (speakerId == FireAuthManager.Instance.GetCurrentUser().UserId);
 
-            messageData = new MessageData();
-            messageData.order = order;
-            messageData.isMine = isMine;
-            messageData.userid = speakerId;
+            // messageData = new MessageData();
+            // messageData.order = order;
+            // messageData.isMine = isMine;
+            // messageData.userid = speakerId;
 
-            // isMine이 false일 때만 (상대방 메시지일 때만) 프리팹 생성
-            if (!isMine)
-            {
-                messageData.userMessagePrefab = Instantiate(MessageBubble_Original_Yours, translationScrollView.content);
-                messages.Add(messageData);
-                Debug.Log($"Created new MessageData for order: {order}, isMine: {isMine}");
-            }
+            // // isMine이 false일 때만 (상대방 메시지일 때만) 프리팹 생성
+            // if (!isMine)
+            // {
+            //     messageData.userMessagePrefab = Instantiate(MessageBubble_Original_Yours, translationScrollView.content);
+            //     messages.Add(messageData);
+            //     Debug.Log($"Created new MessageData for order: {order}, isMine: {isMine}");
+            // }
         }
 
         // 번역 프리팹이 없는 경우에만 생성

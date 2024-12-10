@@ -75,6 +75,11 @@ public class RenderBoothData : MonoBehaviour
 
     }
 
+    public void RenderBoothModelingPrefab(GameObject modelingPrefab)
+    {
+        Instantiate(modelingPrefab, this.transform);
+    }
+
     private void OnLoadFinish(AssetLoaderContext context)
     {
         Debug.Log("Load gltf file finished");

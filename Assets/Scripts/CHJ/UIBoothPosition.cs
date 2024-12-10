@@ -97,6 +97,9 @@ public class UIBoothPosition : MonoBehaviour
             myPosition.boothPositionIndex = currentIndex;
             DatabaseManager.Instance.SaveData<BoothPosition>(myPosition);
 
+            // 위치 지정
+            MainHallData.Instance.SetMainHallLoadingData(category, "Start_Universe");
+
             // 서버에 저장
             SaveChargedBoothPosition(currentIndex, UuidMgr.Instance.currentUserInfo.companyUuid, category);
 

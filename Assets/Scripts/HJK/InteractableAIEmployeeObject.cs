@@ -7,6 +7,7 @@ using Photon.Pun;
 using Photon.Realtime;
 using DG.Tweening;
 using CHJ;
+using StarterAssets;
 
 public class InteractableAIEmployeeObject : MonoBehaviourPun, IKeyInteractableObject
 {
