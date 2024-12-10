@@ -56,6 +56,7 @@ public class MewtwoEX : MonoBehaviour
 
                 boothPositionList[i].gameObject.SetActive(false);
 
+                // 갈려는 부스
                 if (companyUuidList[i] == MainHallData.Instance.targetCompanyUuid)
                 {
 
