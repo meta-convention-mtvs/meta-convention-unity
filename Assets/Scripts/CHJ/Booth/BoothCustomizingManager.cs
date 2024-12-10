@@ -23,6 +23,8 @@ public class BoothCustomizingManager : MonoBehaviour
     private int currentIndex;
     private List<GameObject> instantiatedObject;
 
+    private BoothOwner boothOwner;
+
     // Obj파일을 불러오면 바로 인스턴스화됩니다. 새로운 obj 파일을 불러오면 이전에 불러왔던 파일을 없애주고 불러와야 합니다.
     private GameObject currentInstantiatedObject;
 
@@ -32,6 +34,8 @@ public class BoothCustomizingManager : MonoBehaviour
         // 1로 초기화시킨다.
         boothCustomizeData.modelingScale = 1;
         boothCustomizeData.color = new FireStoreColor(0, 0, 0);
+
+        
         LoadGamePrefab(boothPrefabs);
     }
 
@@ -484,5 +488,22 @@ public class FireStoreColor
     public Color GetColor()
     {
         return new Color(r, g, b);
+    }
+}
+
+[FirestoreData]
+public class BoothOwner
+{
+    [FirestoreProperty]
+    public string uid { get; set; }
+
+    public BoothOwner()
+    {
+
+    }
+
+    public BoothOwner(string uid)
+    {
+        this.uid = uid;
     }
 }

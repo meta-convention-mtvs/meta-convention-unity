@@ -59,7 +59,7 @@ public class MewtwoEX : MonoBehaviour
                 // 갈려는 부스
                 if (companyUuidList[i] == MainHallData.Instance.targetCompanyUuid)
                 {
-
+                    
                 }
             }  
         }
