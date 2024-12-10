@@ -13,13 +13,13 @@ public class RecommendBoothDirection : MonoBehaviour
 
     private void Start()
     {
-        recommendedBoothPosition = MainHallData.Instance.targetCompanyUuid;
+        
     }
 
     private void Update()
     {
-        boothDirection = recommendedBoothPosition.position - transform.position;
-        boothDistance = boothDirection.magnitude;
-        boothDirection.Normalize();
+        //boothDirection = recommendedBoothPosition.position - transform.position;
+        //boothDistance = boothDirection.magnitude;
+        //boothDirection.Normalize();
     }
 }

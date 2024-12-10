@@ -55,6 +55,11 @@ public class MewtwoEX : MonoBehaviour
                     go.GetComponent<BoothRuntimeCreate>().SetBoothModelingPrefab(mobilityObjects[i]);
 
                 boothPositionList[i].gameObject.SetActive(false);
+
+                if (companyUuidList[i] == MainHallData.Instance.targetCompanyUuid)
+                {
+
+                }
             }  
         }
         //ApplyBoothDatasFromDatabaseInList(boothList);
