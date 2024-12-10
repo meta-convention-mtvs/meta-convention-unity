@@ -39,7 +39,6 @@ public class MewtwoEX : MonoBehaviour
 
         companyUuidList = await GetUUIDListFromDatabase(category.Value);
 
-        GameObject[] boothList = new GameObject[companyUuidList.Count];
         for(int i = 0; i < companyUuidList.Count; i++)
         {
             if(!string.IsNullOrEmpty(companyUuidList[i]))
@@ -55,7 +54,6 @@ public class MewtwoEX : MonoBehaviour
                 else if(category == BoothCategory.Mobility)
                     go.GetComponent<BoothRuntimeCreate>().SetBoothModelingPrefab(mobilityObjects[i]);
 
-                boothList[i] = go;
                 boothPositionList[i].gameObject.SetActive(false);
             }  
         }
