@@ -26,6 +26,7 @@ public class CheckBoothPositionDataAvailable : MonoBehaviour
         if (boothPositionMgr.SaveBoothPosition(boothMgr.GetBoothCategory()))
         {
             boothMgr.SaveBoothData();
+            boothMgr.SaveOwnerData();
             myButton.interactable = false;
             myTransition.PerformTransition();
             errorText.text = "";
