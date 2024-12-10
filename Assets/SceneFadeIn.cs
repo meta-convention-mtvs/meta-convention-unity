@@ -20,7 +20,7 @@ public class SceneFadeIn : MonoBehaviour
         // 검정색 화면을 서서히 투명하게 만드는 애니메이션
         blackScreen.DOFade(0f, seconds)
             .OnStart(() => {
-                blackScreen.color = new Color(0, 0, 0, 1);
+                blackScreen.color = new Color(1, 1, 1, 1);
             }).OnComplete(() => Destroy(blackScreen.gameObject));
     }
 }
