@@ -1090,7 +1090,7 @@ PrefabInstance:
     - target: {fileID: 1710175002611410054, guid: d9908ba52ec4f4a4db8aca000262fd11,
         type: 3}
       propertyPath: m_Text
-      value: "\uAD00\uB78C\uAC1D \uC720\uC800\n\uC11C\uBE44\uC2A4 \uC811\uC18D"
+      value: 
       objectReference: {fileID: 0}
     - target: {fileID: 1710175002611410054, guid: d9908ba52ec4f4a4db8aca000262fd11,
         type: 3}
@@ -1265,6 +1265,10 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 1446531020}
+    - targetCorrespondingSourceObject: {fileID: 7690751920026730156, guid: d9908ba52ec4f4a4db8aca000262fd11,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1446531021}
   m_SourcePrefab: {fileID: 100100000, guid: d9908ba52ec4f4a4db8aca000262fd11, type: 3}
 --- !u!224 &1446531016 stripped
 RectTransform:
@@ -1339,6 +1343,34 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 1
+  references:
+    version: 2
+    RefIds: []
+--- !u!114 &1446531021
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1446531018}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 56eb0353ae6e5124bb35b17aff880f16, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_StringReference:
+    m_TableReference:
+      m_TableCollectionName: 
+    m_TableEntryReference:
+      m_KeyId: 0
+      m_Key: 
+    m_FallbackState: 0
+    m_WaitForCompletion: 0
+    m_LocalVariables: []
+  m_FormatArguments: []
+  m_UpdateString:
+    m_PersistentCalls:
+      m_Calls: []
   references:
     version: 2
     RefIds: []
