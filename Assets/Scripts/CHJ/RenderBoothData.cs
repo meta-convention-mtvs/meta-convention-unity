@@ -13,6 +13,7 @@ public class RenderBoothData : MonoBehaviour
     public GameObject boothVideoWall;
     public GameObject banner;
     public GameObject brochure;
+    public GameObject card;
     public Renderer[] boothRenderers;
     public bool soundOff;
     public float boothObjectSizeAmplifier = 1.0f;

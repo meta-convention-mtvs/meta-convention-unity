@@ -35,7 +35,8 @@ public class BoothCustomizingManager : MonoBehaviour
         boothCustomizeData.modelingScale = 1;
         boothCustomizeData.color = new FireStoreColor(0, 0, 0);
 
-        
+        boothOwner = new BoothOwner(UuidMgr.Instance.cashedCard.id);
+
         LoadGamePrefab(boothPrefabs);
     }
 
@@ -317,6 +318,11 @@ public class BoothCustomizingManager : MonoBehaviour
         DatabaseManager.Instance.SaveCompanyDataTo<BoothCustomizeData>(UuidMgr.Instance.currentUserInfo.companyUuid, boothCustomizeData);
         print(UuidMgr.Instance.currentUserInfo.companyUuid);
 
+    }
+
+    public void SaveOwnerData()
+    {
+        AsyncDatabase.SetDataToDatabase(DatabasePath.GetCompanyDataPath(UuidMgr.Instance.currentUserInfo.companyUuid, nameof(BoothOwner)), boothOwner);
     }
 
     public enum BoothCustomzieDataSaveError
